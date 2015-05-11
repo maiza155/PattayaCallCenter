@@ -20,14 +20,12 @@ import java.util.Set;
  */
 public class AdapterMenuCaseChat extends BaseAdapter {
 
-    Context context;
-    private LayoutInflater mInflater;
-    OnItemClickListener mItemClickListener;
-
-
     public static HashMap<Integer, MenuObject> mMenuData = new HashMap<>();
     public static HashMap<Integer, List<Integer>> mMenuList = new HashMap<>();
+    Context context;
+    OnItemClickListener mItemClickListener;
     List<MenuObject> listData = new ArrayList<>();
+    private LayoutInflater mInflater;
 
     public AdapterMenuCaseChat(Context context, List<Integer> menu) {
         this.context = context;
@@ -41,6 +39,17 @@ public class AdapterMenuCaseChat extends BaseAdapter {
             listData.add(mMenuData.get(e));
         }
 
+    }
+
+    public void resetAdapter(List<Integer> menu) {
+        Set<Integer> set = new HashSet<>();
+        for (int e : menu) {
+            set.addAll(mMenuList.get(e));
+        }
+        for (int e : set) {
+            listData.add(mMenuData.get(e));
+        }
+        notifyDataSetChanged();
     }
 
     void init() {
@@ -91,10 +100,6 @@ public class AdapterMenuCaseChat extends BaseAdapter {
         mMenuList.put(4, listFour);
     }
 
-    public interface OnItemClickListener {
-        public void onItemClick(int id);
-    }
-
     public void SetOnItemClickListener(final OnItemClickListener mItemClickListener) {
         this.mItemClickListener = mItemClickListener;
     }
@@ -140,14 +145,8 @@ public class AdapterMenuCaseChat extends BaseAdapter {
         return convertView;
     }
 
-
-    class Holder {
-        TextView text;
-
-        Holder(View v) {
-            text = (TextView) v.findViewById(R.id.title);
-
-        }
+    public interface OnItemClickListener {
+        public void onItemClick(int id);
     }
 
     public static class MenuObject {
@@ -171,6 +170,15 @@ public class AdapterMenuCaseChat extends BaseAdapter {
 
         public int getId() {
             return id;
+        }
+    }
+
+    class Holder {
+        TextView text;
+
+        Holder(View v) {
+            text = (TextView) v.findViewById(R.id.title);
+
         }
     }
 }

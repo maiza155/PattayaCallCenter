@@ -5,11 +5,22 @@ package com.pattaya.pattayacallcenter.webservice.object.casedata;
  */
 public class GetCaseListData {
 
+
     String textSearch;
     int filterType;
     int userId;
+    int casesId;
     String accessToken;
     String clientId;
+
+
+    public int getCasesId() {
+        return casesId;
+    }
+
+    public void setCasesId(int casesId) {
+        this.casesId = casesId;
+    }
 
     public String getTextSearch() {
         return textSearch;

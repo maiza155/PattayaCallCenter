@@ -29,6 +29,7 @@ import android.widget.Toast;
 import com.github.ksoichiro.android.observablescrollview.ObservableListView;
 import com.github.ksoichiro.android.observablescrollview.ObservableScrollViewCallbacks;
 import com.github.ksoichiro.android.observablescrollview.ScrollState;
+import com.google.gson.Gson;
 import com.pattaya.pattayacallcenter.AdapterChat;
 import com.pattaya.pattayacallcenter.AdapterStricker;
 import com.pattaya.pattayacallcenter.Application;
@@ -52,10 +53,15 @@ import com.pattaya.pattayacallcenter.member.Adapter.AdapterMenuCaseChat;
 import com.pattaya.pattayacallcenter.webservice.RestFulQueary;
 import com.pattaya.pattayacallcenter.webservice.WebserviceConnector;
 import com.pattaya.pattayacallcenter.webservice.object.UpdateResult;
+import com.pattaya.pattayacallcenter.webservice.object.casedata.CaseListMemberObject;
+import com.pattaya.pattayacallcenter.webservice.object.casedata.GetCaseListData;
 import com.pattaya.pattayacallcenter.webservice.object.casedata.GetComplainObject;
 import com.squareup.otto.Subscribe;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -67,22 +73,23 @@ import retrofit.client.Response;
 public class CaseChatMemberActivity extends ActionBarActivity implements View.OnClickListener, ObservableScrollViewCallbacks {
 
 
+    private final int EDIT_ACTIVITY = 390;
+    private final int TAG_INTENT_PLACE = 909;
+    private final RestAdapter restAdapterOpenFire = RestAdapterOpenFire.getInstance();
+    private final OpenfireQueary openfireQueary = restAdapterOpenFire.create(OpenfireQueary.class);
+    ProgressDialog ringProgressDialog;
     private FrameLayout mMenuContainer;
     private Users otherUser;
-
     private AdapterChat adapterChat;
     private ObservableListView listChat;
     // widget
     private ImageButton btn;
     private TextView titleTextView;
-
     private TextView caseTitle;
     //slider buttom
     private GridView gridView;
     private GridView mGridMenu;
     private AdapterMenuCaseChat adapterMenuCaseChat;
-
-
     private Button btnCommit;
     private EditText txtMsg;
     private Button btnImage;
@@ -96,14 +103,9 @@ public class CaseChatMemberActivity extends ActionBarActivity implements View.On
     private SlideMenuManage mSlideMenuManageImage;
     private CameraMange cameraMange;
     private View mSlideMenuImage;
-
-    private final int EDIT_ACTIVITY = 390;
-    private final int TAG_INTENT_PLACE = 909;
-
     private ArrayList<Integer> listStiker;
     private AdapterStricker adapterStricker;
     private ProgressBar progressBar;
-
     private List<Integer> menu;
     private int idCase;
     private String caseName;
@@ -112,16 +114,10 @@ public class CaseChatMemberActivity extends ActionBarActivity implements View.On
     private String jid;
     private int complainId;
     private TextView txtempty;
-
     private RestAdapter openfireConnectorJson = RestAdapterOpenFire.getInstanceJson();
     private OpenfireQueary openfireQuearyJson = openfireConnectorJson.create(OpenfireQueary.class);
-    private final RestAdapter restAdapterOpenFire = RestAdapterOpenFire.getInstance();
-    private final OpenfireQueary openfireQueary = restAdapterOpenFire.create(OpenfireQueary.class);
-
     private RestAdapter webserviceConnector = WebserviceConnector.getInstanceCase();
     private RestFulQueary adapterRest = webserviceConnector.create(RestFulQueary.class);
-
-
     private String token;
     private String clientId;
     private int userId;
@@ -131,6 +127,14 @@ public class CaseChatMemberActivity extends ActionBarActivity implements View.On
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_case_chat_member);
         BusProvider.getInstance().register(this);
+
+
+        menu = new ArrayList<>();
+        mMenuContainer = (FrameLayout) findViewById(R.id.menuview_container);
+        mGridMenu = (GridView) findViewById(R.id.menugrid);
+        adapterMenuCaseChat = new AdapterMenuCaseChat(this, menu);
+        mGridMenu.setAdapter(adapterMenuCaseChat);
+
 
         init();
         setActionBsr();
@@ -144,10 +148,7 @@ public class CaseChatMemberActivity extends ActionBarActivity implements View.On
 
 
         /** ///////////////////////////////////////////////////////////////////////// */
-        mMenuContainer = (FrameLayout) findViewById(R.id.menuview_container);
-        mGridMenu = (GridView) findViewById(R.id.menugrid);
-        adapterMenuCaseChat = new AdapterMenuCaseChat(this, menu);
-        mGridMenu.setAdapter(adapterMenuCaseChat);
+
         //STATE_USER_LOGIN = STATE_MENU_2;
         // initMenuCase(STATE_USER_LOGIN);
         mSlideMenuManage = new SlideMenuManage(mMenuContainer, this);
@@ -225,41 +226,55 @@ public class CaseChatMemberActivity extends ActionBarActivity implements View.On
 
 
     void init() {
-        Bundle data = getIntent().getExtras();
-        if (data != null) {
-            //otherUser = data.getParcelable("user");
-            caseName = data.getString("casename");
-            idCase = data.getInt("id");
-            complainId = data.getInt("complainid");
-            String type = data.getString("type");
-            String[] dataType = type.split(",");
-            menu = new ArrayList<>();
-            for (String e : dataType) {
-                switch (e) {
-                    case "IsOper":
-                        menu.add(1);
-                        break;
-                    case "IsOwner":
-                        menu.add(2);
-                        break;
-                    case "IsNoti":
-                        menu.add(3);
-                        break;
-                    case "IsClose":
-                        menu.add(4);
-                        break;
-                }
-                System.out.println(e);
-            }
-            Log.e("caseid", "" + idCase);
-        }
-
         SharedPreferences spUser = getSharedPreferences(MasterData.SHARED_NAME_USER_FILE, Context.MODE_PRIVATE);
         jid = spUser.getString(MasterData.SHARED_USER_JID, "null");
         userId = spUser.getInt(MasterData.SHARED_USER_USER_ID, 0);
         SharedPreferences spConfig = Application.getContext().getSharedPreferences(MasterData.SHARED_NAME_CONFIG_FILE, Context.MODE_PRIVATE);
         token = spConfig.getString(MasterData.SHARED_CONFIG_TOKEN, null);
         clientId = spConfig.getString(MasterData.SHARED_CONFIG_CLIENT_ID, null);
+
+        Bundle data = getIntent().getExtras();
+        if (data != null) {
+            //otherUser = data.getParcelable("user");
+            caseName = data.getString("casename");
+            idCase = data.getInt("id");
+            complainId = data.getInt("complainid");
+
+            System.out.println("caseId >>" + idCase);
+            System.out.println("name >>" + caseName);
+            System.out.println("complainId >>" + complainId);
+
+            String type = data.getString("type");
+            if (type != null) {
+                System.out.println("Type : " + type);
+                String[] dataType = type.split(",");
+                menu = new ArrayList<>();
+                for (String e : dataType) {
+                    switch (e) {
+                        case "IsOper":
+                            menu.add(1);
+                            break;
+                        case "IsOwner":
+                            menu.add(2);
+                            break;
+                        case "IsNoti":
+                            menu.add(3);
+                            break;
+                        case "IsClose":
+                            menu.add(4);
+                            break;
+                    }
+
+                }
+                adapterMenuCaseChat.resetAdapter(menu);
+            } else {
+                getTypeList();
+            }
+
+
+        }
+
+
     }
 
     void setActionBsr() {
@@ -598,6 +613,79 @@ public class CaseChatMemberActivity extends ActionBarActivity implements View.On
             InputMethodManager inputManager = (InputMethodManager) this.getSystemService(Context.INPUT_METHOD_SERVICE);
             inputManager.hideSoftInputFromWindow(view.getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
         }
+    }
+
+
+    void getTypeList() {
+        ringProgressDialog = ProgressDialog.show(CaseChatMemberActivity.this, null, getResources().getString(R.string.please_wait), true);
+        ringProgressDialog.setCancelable(true);
+        GetCaseListData getCaseListData = new GetCaseListData();
+        getCaseListData.setCasesId(idCase);
+        getCaseListData.setUserId(userId);
+        getCaseListData.setFilterType(2);
+        getCaseListData.setAccessToken(token);
+        getCaseListData.setClientId(clientId);
+        Gson gson = new Gson();
+        String json = gson.toJson(getCaseListData);
+        System.out.println(json);
+
+        adapterRest.getCaseList(getCaseListData, new Callback<Response>() {
+            @Override
+            public void success(Response result, Response response2) {
+                DatabaseChatHelper.init().clearCaseTable();
+                BufferedReader reader;
+                StringBuilder sb = new StringBuilder();
+                try {
+                    reader = new BufferedReader(new InputStreamReader(result.getBody().in()));
+                    String line;
+
+                    try {
+                        while ((line = reader.readLine()) != null) {
+                            sb.append(line);
+                        }
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                String JsonConvertData = "{data:" + sb.toString() + "}";
+                System.out.println(userId);
+                System.out.println(JsonConvertData);
+                CaseListMemberObject caseListObject = new Gson().fromJson(JsonConvertData, CaseListMemberObject.class);
+                String type = caseListObject.getData().get(0).getCasesType();
+                String[] dataType = type.split(",");
+                menu = new ArrayList<>();
+                for (String e : dataType) {
+                    switch (e) {
+                        case "IsOper":
+                            menu.add(1);
+                            break;
+                        case "IsOwner":
+                            menu.add(2);
+                            break;
+                        case "IsNoti":
+                            menu.add(3);
+                            break;
+                        case "IsClose":
+                            menu.add(4);
+                            break;
+                    }
+
+                }
+                adapterMenuCaseChat.resetAdapter(menu);
+                ringProgressDialog.dismiss();
+
+            }
+
+            @Override
+            public void failure(RetrofitError error) {
+                ringProgressDialog.dismiss();
+                Toast.makeText(getApplication(), "Unable connect server. Please try again", Toast.LENGTH_SHORT).show();
+                System.out.println("error = [" + error + "]");
+
+            }
+        });
     }
 
     @Override

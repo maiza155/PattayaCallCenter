@@ -93,6 +93,7 @@ public class CaseAddAndEditActivity extends ActionBarActivity implements View.On
     private static SharedPreferences spConfig;
     private static SharedPreferences sp;
     RestAdapter webserviceConnectorUser = WebserviceConnector.getInstance();
+    ProgressDialog ringProgressDialog;
     private TextView txtPlace;
     private TextView txtTo;
     private EditText txtName;
@@ -131,12 +132,10 @@ public class CaseAddAndEditActivity extends ActionBarActivity implements View.On
     private int userId;
     private String token;
     private String clientId;
-
     private int caseId;
     private int complainId;
     private String displayName;
     private String displayImage;
-    ProgressDialog ringProgressDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -462,7 +461,7 @@ public class CaseAddAndEditActivity extends ActionBarActivity implements View.On
                             @Override
                             public void success(UpdateResult updateResult, Response response) {
                                 System.out.println(userId);
-                                System.out.println("updateResult = [" + updateResult.getPrimaryKeyId() + "], response = [" + response + "]");
+                                System.out.println("updateResult = [" + updateResult.getCasesId() + "], response = [" + response + "]");
                                 if (updateResult.getResult()) {
                                     String roomName = "case-" + updateResult.getPrimaryKeyId();
                                     final ChatRoomObject chatRoomObject = new ChatRoomObject();
@@ -482,7 +481,8 @@ public class CaseAddAndEditActivity extends ActionBarActivity implements View.On
                                                 pub.setImage(displayImage);
                                                 pub.setAction("เปิดเคส");
                                                 pub.setDisplayData(c.getTime().toString());
-                                                pub.setPrimarykey(updateResult.getPrimaryKeyId());
+                                                pub.setCaseId(updateResult.getCasesId());
+                                                pub.setComplainId(updateResult.getPrimaryKeyId());
                                                 pub.setName(displayName);
                                                 pub.setTitle(openCaseAssignObject.getCasesName());
                                                 listNotify.add(pub);

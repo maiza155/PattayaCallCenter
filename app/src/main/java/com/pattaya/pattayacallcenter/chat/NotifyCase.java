@@ -15,7 +15,7 @@ import android.widget.RemoteViews;
 import com.pattaya.pattayacallcenter.Application;
 import com.pattaya.pattayacallcenter.Data.MasterData;
 import com.pattaya.pattayacallcenter.R;
-import com.pattaya.pattayacallcenter.member.CaseAddAndEditActivity;
+import com.pattaya.pattayacallcenter.member.CaseChatMemberActivity;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -33,11 +33,13 @@ public class NotifyCase {
     public static void setNotifyChat(PubsubObject object) {
         SharedPreferences spConfig = Application.getContext().getSharedPreferences(MasterData.SHARED_NAME_CONFIG_FILE, Context.MODE_PRIVATE);
         Boolean alertSound = spConfig.getBoolean(MasterData.SHARED_CONFIG_ALERT_SOUND, true);
+        Boolean alert = spConfig.getBoolean(MasterData.SHARED_CONFIG_ALERT, true);
+
 
 
         Calendar cal = Calendar.getInstance();
         SimpleDateFormat sdf = new SimpleDateFormat("EEE MMM dd HH:mm:ss z yyyy");
-        SimpleDateFormat mysdf = new SimpleDateFormat("DDD MMM yyyy HH:mm ");
+        SimpleDateFormat mysdf = new SimpleDateFormat("d MMM yyyy HH:mm ");
         try {
             cal.setTime(sdf.parse(object.getDisplayData()));// all done
         } catch (ParseException e) {
@@ -50,7 +52,7 @@ public class NotifyCase {
         contentView.setTextViewText(R.id.header, object.getAction());
         contentView.setTextViewText(R.id.title,"ชื่อเรื่อง : " + object.getTitle());
         contentView.setTextViewText(R.id.name, "ชื่อผู้เเจ้ง: " + object.getName());
-        contentView.setTextViewText(R.id.date, "วันที่    : " + cal.getTime());
+        contentView.setTextViewText(R.id.date, "วันที่    : " + mysdf.format(cal.getTime()));
 
         String content = "ชื่อเรื่อง :" + object.getTitle() + "\n" + "ชื่อผู้เเจ้ง :" + object.getName() + "\n";
 
@@ -74,9 +76,9 @@ public class NotifyCase {
             mBuilder.setSound(alarmSound);
         }
 
-        Intent notificationIntent = new Intent(Application.getContext(), CaseAddAndEditActivity.class);
+        Intent notificationIntent = new Intent(Application.getContext(), CaseChatMemberActivity.class);
         notificationIntent.putExtra("id", object.getCaseId());
-        notificationIntent.putExtra("casename", object.getName());
+        notificationIntent.putExtra("casename", object.getTitle());
         notificationIntent.putExtra("complainid", object.getComplainId());
         notificationIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
         notificationIntent.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
