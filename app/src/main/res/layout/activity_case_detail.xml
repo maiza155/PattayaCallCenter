@@ -1,0 +1,270 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.pattaya.pattayacallcenter.guest.CaseDetailActivity">
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="@dimen/horizontal_margin"
+        android:layout_marginRight="@dimen/horizontal_margin">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <TableLayout
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:stretchColumns="0,1">
+
+                <TableRow
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content">
+
+                    <TextView
+                        android:id="@+id/title"
+                        style="@style/text_header_list_style"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_margin="5dp"
+                        android:paddingLeft="5dp"
+                        android:text="เรื่อง - " />
+                </TableRow>
+
+                <TableRow>
+
+                    <FrameLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="@dimen/button_height"
+                        android:layout_marginBottom="10dp"
+                        android:background="@color/grayColor">
+
+                        <TextView
+                            style="@style/actionbar_text_header_style"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="left|center"
+                            android:drawableLeft="@drawable/asset_icon_normal_location_white"
+                            android:gravity="left|center"
+                            android:paddingLeft="5dp"
+                            android:text="@string/profile_place" />
+                    </FrameLayout>
+                </TableRow>
+
+                <TableRow>
+
+                    <TextView
+                        android:id="@+id/address"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="10dp"
+                        android:layout_marginLeft="20dp"
+                        android:layout_marginTop="5dp"
+                        android:text="บ้านเลขที่ 1-5 ถ.พัทยาเหนือ ต.นาเกลือ อ.บางละมุง จ.ชลบุรี" />
+                </TableRow>
+
+                <TableRow>
+
+                    <FrameLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="@dimen/button_height"
+                        android:layout_marginBottom="10dp"
+                        android:background="@color/grayColor">
+
+                        <TextView
+                            style="@style/actionbar_text_header_style"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="left|center"
+                            android:drawableLeft="@drawable/asset_icon_normal_person"
+                            android:gravity="left|center"
+                            android:paddingLeft="5dp"
+                            android:text="@string/case_name" />
+                    </FrameLayout>
+                </TableRow>
+
+                <TableRow>
+
+                    <TextView
+                        android:id="@+id/hidden"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="10dp"
+                        android:layout_marginLeft="20dp"
+                        android:layout_marginTop="5dp"
+                        android:text="@string/hidden" />
+
+                </TableRow>
+
+                <TableRow>
+
+                    <FrameLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="@dimen/button_height"
+                        android:layout_marginBottom="10dp"
+                        android:background="@color/grayColor">
+
+                        <TextView
+                            style="@style/actionbar_text_header_style"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="left"
+                            android:drawableLeft="@drawable/asset_icon_normal_notice"
+                            android:gravity="left|center"
+                            android:paddingLeft="5dp"
+                            android:text="@string/status" />
+                    </FrameLayout>
+                </TableRow>
+
+                <TableRow>
+
+                    <TextView
+                        android:id="@+id/status"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="10dp"
+                        android:layout_marginLeft="20dp"
+                        android:layout_marginTop="5dp"
+                        android:text="อยู่ระหว่างรอรับเรื่อง" />
+                </TableRow>
+
+                <TableRow>
+
+                    <FrameLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="@dimen/button_height"
+                        android:layout_marginBottom="10dp"
+                        android:background="@color/grayColor">
+
+                        <TextView
+                            style="@style/actionbar_text_header_style"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="left"
+                            android:drawableLeft="@drawable/asset_icon_normal_grid"
+                            android:gravity="left|center"
+                            android:paddingLeft="5dp"
+                            android:text="@string/image" />
+                    </FrameLayout>
+                </TableRow>
+
+                <TableRow>
+
+                    <FrameLayout>
+
+                        <com.pattaya.pattayacallcenter.customview.ExpandableHeightGridView
+                            android:id="@+id/grdImagesView"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="5dp"
+                            android:columnWidth="120dp"
+                            android:gravity="center"
+                            android:horizontalSpacing="4dp"
+                            android:isScrollContainer="false"
+                            android:numColumns="auto_fit"
+                            android:stretchMode="columnWidth"
+                            android:verticalSpacing="4dp" />
+
+                        <TextView
+                            android:id="@+id/txt_empty"
+                            android:layout_gravity="center"
+                            android:gravity="center"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:text="ไม่มีข้อมูล" />
+
+                    </FrameLayout>
+
+                </TableRow>
+            </TableLayout>
+        </LinearLayout>
+
+    </ScrollView>
+
+    <FrameLayout
+        android:id="@+id/menu_slide"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:clickable="true">
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:alpha="0.6"
+            android:background="@color/brownColor"
+            android:clickable="false" />
+
+        <TableLayout
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/primary"
+            android:clickable="true">
+
+            <TableRow android:layout_marginBottom="2dp">
+
+                <Button
+                    android:id="@+id/btn_resultDetail"
+                    style="@style/button_style"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginRight="2dp"
+                    android:layout_weight="1"
+                    android:background="@color/blueColor"
+                    android:drawableLeft="@drawable/asset_icon_normal_doc"
+                    android:gravity="left|center"
+                    android:paddingLeft="10dp"
+                    android:text=" ผลการปฏิบัติ" />
+
+
+                <Button
+                    android:id="@+id/btn_chat"
+                    style="@style/button_style"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:background="@color/blueColor"
+                    android:drawableLeft="@drawable/asset_icon_normal_say"
+                    android:gravity="left|center"
+                    android:paddingLeft="10dp"
+                    android:text=" สนทนา" />
+
+            </TableRow>
+
+            <TableRow android:layout_marginBottom="2dp">
+
+
+                <Button
+                    android:id="@+id/btn_edit"
+                    style="@style/button_style"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginRight="2dp"
+                    android:layout_weight="1"
+                    android:background="@color/blueColor"
+                    android:drawableLeft="@drawable/asset_icon_normal_edit"
+                    android:gravity="left|center"
+                    android:paddingLeft="10dp"
+                    android:text=" แก้ไข" />
+
+
+                <Button
+                    android:id="@+id/btn_delete"
+                    style="@style/button_style"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:background="@color/blueColor"
+                    android:drawableLeft="@drawable/asset_icon_normal_delete"
+                    android:gravity="left|center"
+                    android:paddingLeft="10dp"
+                    android:text=" ลบ" />
+            </TableRow>
+
+
+        </TableLayout>
+
+
+    </FrameLayout>
+</RelativeLayout>

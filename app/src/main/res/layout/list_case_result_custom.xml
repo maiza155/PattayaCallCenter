@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:paddingTop="5dp"
+    android:background="#ffffff"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:id="@+id/layout_profile"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="top"
+        android:orientation="horizontal">
+
+        <com.pattaya.pattayacallcenter.customview.RoundedImageView
+            android:id="@+id/pic_logoAdapter"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_margin="10dp"
+            android:src="@drawable/com_facebook_profile_picture_blank_portrait" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingLeft="5dp">
+
+            <TextView
+                style="@style/text_header_list_style"
+                android:id="@+id/txt_name"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="left"
+                android:paddingLeft="0dp"
+                android:paddingTop="5dp"
+                android:text="name" />
+
+            <TextView
+                style="@style/date_sub_list_text_style"
+                android:id="@+id/txt_dateTime"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="left"
+                android:paddingLeft="0dp"
+                android:paddingTop="5dp"
+                android:text="time" />
+
+            <TextView
+                android:id="@+id/txt_resultDetail"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="left"
+                android:paddingLeft="20dp"
+                android:paddingTop="5dp"
+                android:text="detail" />
+
+        </LinearLayout>
+
+
+    </LinearLayout>
+
+
+    <com.pattaya.pattayacallcenter.customview.ExpandableHeightGridView
+        android:id="@+id/grd_picResult"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginTop="5dp"
+        android:columnWidth="120dp"
+        android:gravity="center"
+        android:horizontalSpacing="5dp"
+        android:isScrollContainer="false"
+        android:numColumns="auto_fit"
+        android:stretchMode="columnWidth"
+        android:verticalSpacing="5dp" />
+</LinearLayout>

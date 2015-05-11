@@ -1,0 +1,42 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:focusableInTouchMode="true">
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <TextView
+            style="@style/actionbar_text_header_style"
+            android:id="@+id/actionbar_textview"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:gravity="center"
+            android:text="test"/>
+
+        <ImageButton
+            android:id="@+id/add_right_menu"
+            android:layout_width="wrap_content"
+            android:layout_height="30dp"
+            android:layout_gravity="right"
+            android:background="@null"
+            android:gravity="center"
+            android:src="@drawable/asset_icon_large_add"
+            android:scaleType="centerInside"
+         />
+
+
+
+
+    </FrameLayout>
+    <View
+        android:id="@+id/badge"
+        android:layout_width="25dp"
+        android:layout_height="25dp"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentRight="true"/>
+
+
+</RelativeLayout>

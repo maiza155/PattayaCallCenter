@@ -1,0 +1,9 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:com.pattaya.pattayacallcenter="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context="com.pattaya.pattayacallcenter.member.CaseForwardToUser">
+    <item
+        android:id="@+id/action_save"
+        android:title="@string/save"
+        com.pattaya.pattayacallcenter:showAsAction="always" />
+</menu>

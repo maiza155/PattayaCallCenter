@@ -1,0 +1,109 @@
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/menu_slide"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:clickable="true">
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:alpha="0.6"
+        android:background="@color/brownColor"
+        android:clickable="false" />
+
+    <TableLayout
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/primary"
+        android:clickable="true">
+
+        <TableRow android:layout_marginBottom="2dp">
+
+
+            <Button
+                android:id="@+id/btn_detail"
+                style="@style/button_style"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginRight="2dp"
+                android:layout_weight="1"
+                android:background="@color/blueColor"
+                android:drawableLeft="@drawable/asset_icon_normal_info_white"
+                android:gravity="left|center"
+                android:paddingLeft="10dp"
+                android:text="@string/menu_case_member_detail" />
+
+
+            <Button
+                android:id="@+id/btn_to"
+                style="@style/button_style"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="left"
+                android:layout_weight="1"
+                android:background="@color/blueColor"
+                android:drawableLeft="@drawable/asset_icon_normal_fwd"
+                android:elegantTextHeight="false"
+                android:gravity="left|center"
+                android:paddingLeft="10dp"
+                android:text="@string/menu_case_member_to" />
+
+        </TableRow>
+
+        <TableRow android:layout_marginBottom="2dp">
+
+
+            <Button
+                android:id="@+id/btn_date"
+                style="@style/button_style"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="left"
+                android:layout_marginRight="2dp"
+                android:layout_weight="1"
+                android:background="@color/blueColor"
+                android:drawableLeft="@drawable/asset_icon_normal_calendar"
+                android:gravity="left|center"
+                android:paddingLeft="10dp"
+                android:text="@string/menu_case_member_date" />
+
+
+            <Button
+                android:id="@+id/btn_result"
+                style="@style/button_style"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="left"
+                android:layout_weight="1"
+                android:background="@color/blueColor"
+                android:drawableLeft="@drawable/asset_icon_normal_doc"
+                android:gravity="left|center"
+                android:paddingLeft="10dp"
+                android:text="@string/menu_case_member_result" />
+
+        </TableRow>
+
+        <TableRow>
+
+            <FrameLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_margin="@dimen/border_table"
+                android:layout_weight="1"
+                android:background="@color/blueColor">
+
+                <Button
+                    android:id="@+id/btn_close"
+                    style="@style/button_style"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:background="@color/blueColor"
+                    android:drawableLeft="@drawable/asset_icon_normal_task"
+                    android:text="@string/menu_case_member_close" />
+            </FrameLayout>
+        </TableRow>
+    </TableLayout>
+
+
+</FrameLayout>

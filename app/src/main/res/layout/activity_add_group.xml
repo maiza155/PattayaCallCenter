@@ -1,0 +1,117 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.pattaya.pattayacallcenter.member.AddGroupActivity">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:background="@color/grayLightColor">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <Button
+                    android:id="@+id/btn_chat"
+                    style="@style/button_style"
+                    android:gravity="left|center"
+                    android:layout_marginBottom="1dp"
+                    android:layout_weight="1"
+                    android:paddingLeft="20dp"
+                    android:drawableLeft="@drawable/asset_icon_normal_chat"
+                    android:text="@string/chat" />
+
+                <View
+                    android:layout_width="1dp"
+                    android:layout_height="match_parent"
+                    android:background="@color/whiteColor" />
+
+                <Button
+                    android:id="@+id/btn_leave"
+                    style="@style/button_style"
+                    android:layout_marginBottom="1dp"
+                    android:paddingLeft="20dp"
+                    android:layout_weight="1"
+                    android:gravity="left|center"
+                    android:drawableLeft="@drawable/asset_icon_normal_cancel2"
+                    android:text="@string/leave_group" />
+            </LinearLayout>
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="@color/whiteColor" />
+            <Button
+                android:id="@+id/btn_invite"
+                style="@style/button_style"
+                android:layout_marginBottom="1dp"
+                android:gravity="center"
+                android:text="@string/add_friend_group" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@color/brownColor">
+
+            <TextView
+                style="@style/actionbar_text_header_style"
+                android:layout_width="wrap_content"
+                android:layout_height="@dimen/button_height"
+                android:drawableLeft="@drawable/asset_icon_normal_person"
+                android:gravity="center|left"
+                android:paddingLeft="10dp"
+                android:text="@string/member"
+                android:textSize="18dp" />
+
+
+        </LinearLayout>
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+
+
+            <ListView
+                android:id="@+id/listview_addgroup"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:choiceMode="singleChoice"
+                android:divider="@color/button_material_dark"
+                android:dividerHeight="1dp"/>
+
+            <TextView
+                android:id="@+id/empty"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:gravity="center"
+                android:layout_centerInParent="true"
+                android:text="Can't connect to server" />
+
+            <ProgressBar
+                style="?android:attr/progressBarStyleSmall"
+                android:layout_width="wrap_content"
+                android:layout_height="fill_parent"
+                android:gravity="center"
+                android:layout_centerInParent="true"
+                android:layout_below="@id/empty"
+                android:id="@+id/progressBar" />
+
+
+
+
+
+        </RelativeLayout>
+    </LinearLayout>
+
+
+</RelativeLayout>

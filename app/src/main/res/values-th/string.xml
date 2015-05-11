@@ -1,0 +1,289 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Menu in case menber -->
+    <string name="menu_case_member_detail">รายละเอียดงาน</string>
+    <string name="menu_case_member_to">ส่งงานต่อ</string>
+    <string name="menu_case_member_date">วันที่ปฏิบัติงาน</string>
+    <string name="menu_case_member_result">ผลการปฏิบัติงาน</string>
+    <string name="menu_case_member_close">ปิดเคส</string>
+    <string name="menu_case_member_edit">เเก้ไข</string>
+    <string name="menu_case_member_delete">ลบ</string>
+    <string name="menu_case_member_create">สร้างเคส</string>
+    <string name="menu_case_member_noti">เรื่องร้องเรียน</string>
+    <string name="menu_case">เคส</string>
+    <string name="case_chat">ห้องสนทนาของเคส</string>
+    <string name="case_detail">รายละเอียดของเคส</string>
+    <string name="case_name">ชื่อผู้เเจ้ง</string>
+    <string name="complaintType_0">อยู่ระหว่างการรับเรื่องร้องเรียน</string>
+    <string name="complaintType_1">ยกเลิกเรื่องร้องเรียน</string>
+    <string name="complaintType_2">อยู่ระหว่างการดำเนินงาน</string>
+    <string name="complaintType_3">ดำเนินการเรียบร้อย</string>
+
+
+    <string name="leave_group">ออกจากกลุ่ม</string>
+    <string name="add_friend_group">ชวนเพื่อนเข้าร่วมกลุ่ม</string>
+    <string name="add_case_complain">เเจ้งเรื่องร้องเรียน</string>
+    <string name="case_complain">เรื่องร้องเรียน</string>
+    <string name="org_name"> ชื่อคนในสังกัด</string>
+    <string name="image">รูปภาพ</string>
+
+
+    <!-- Strinjg in case menber Forword-->
+    <string name="member_case_forward_detail_respond">ผู้รับผิดชอบโปรดระบุ</string>
+    <string name="member_case_forward_detail">รายละเอียดโปรดระบุ</string>
+    <string name="member_case_forward_detail_button">รายละเอียด</string>
+    <string name="member_case_forward_image">ภาพประกอบเคส</string>
+    <string name="member_case_forward_respond">ผู้รับผิดชอบ</string>
+    <string name="member_case_list_forward_respond">รายชื่อผู้รับผิดชอบ</string>
+    <string name="member_case_forward_save">บันทึกการส่งงานต่อ</string>
+    <string name="member_case_forward_user">บุคคล</string>
+    <string name="member_case_forward_people">หน่วยงาน</string>
+    <string name="member_case_work_date_save">บันทึกวันที่ปฏิบัตงาน</string>
+    <string name="member_org">สมาชิกในสังกัด</string>
+    <string name="time_success">วันที่เสร็จ</string>
+    <string name="time_start">วันที่เริ่ม</string>
+    <string name="time_end">วันที่สิ้นสุด</string>
+
+    <string name="friend_search">ชื่อ อีเมล หรือ เบอร์โทรศัพท์</string>
+    <string name="friend_favor">ผู้ติดต่อบ่อย</string>
+    <string name="friend_normal">ผู้ติดต่อ</string>
+    <string name="add_friend">เพิ่มเพื่อน</string>
+    <string name="chat_room">ห้องสนทนา</string>
+    <string name="service">บริการ</string>
+    <string name="hidden">ไม่ประสงค์ออกนาม</string>
+    <string name="no_hidden">ประสงค์ออกนาม</string>
+
+    <string name="member">สมาชิก</string>
+
+    <string name="create_group">สร้างกลุ่ม</string>
+    <string name="type">หมวดหมู่</string>
+    <string name="search">ค้นหา</string>
+    <string name="group">กลุ่ม</string>
+    <string name="friend">เพื่อน</string>
+    <string name="setting">ตั้งค่า</string>
+    <string name="open">เปิด</string>
+    <string name="close">ปิด</string>
+    <string name="people">คน</string>
+    <string name="post">โพส</string>
+    <string name="favorite">ติดต่อบ่อย</string>
+    <string name="respond_people">บุคคล</string>
+    <string name="respond_org">หน่วยงาน</string>
+
+
+    <string name="accept">เข้าร่วม</string>
+    <string name="not_accept">ไม่เข้าร่วม</string>
+    <string name="save">บันทึก</string>
+    <string name="username">ชื่อผู้ใช้งาน</string>
+    <string name="password">รหัสผ่าน</string>
+    <string name="forget_pass">จำรหัสผ่านไม่ได้?</string>
+    <string name="login">ลงชื่อเข้าใช้งาน</string>
+    <string name="register">ลงทะเบียน</string>
+    <string name="uploading">อัพโหลดข้อมูล</string>
+    <string name="load_data">โหลดข้อมูล</string>
+    <string name="detail">รายละเอียด</string>
+    <string name="ok">ตกลง</string>
+    <string name="status">สถานะ</string>
+
+    <string name="org">สังกัด</string>
+    <string name="exit">ออกจากระบบ</string>
+
+    <string name="chat">การสนทนา</string>
+    <string name="chat_delete">ลบการสนทนา</string>
+    <string name="delete">ลบ</string>
+
+
+    <string name="alert_show">เเสดงการเเจ้งเตือน</string>
+    <string name="alert_sound">เสียงของการเเจ้งเตือน</string>
+
+    <string name="profile_change_img">เปลี่ยนรูป</string>
+    <string name="profile_information">ข้อมูลส่วนตัว</string>
+    <string name="profile_name">ชื่อ</string>
+    <string name="profile_lastname">นามสกุล</string>
+    <string name="profile_mobile">เบอร์โทรศัพท์</string>
+    <string name="profile_idcard">หมายเลขบัตรประชาชน</string>
+    <string name="profile_place">ที่อยู่</string>
+    <string name="profile_address">บ้านเลขที่</string>
+    <string name="profile_province">จังหวัด</string>
+    <string name="profile_aumpher">อำเภอ</string>
+    <string name="profile_tombon">ตำบล</string>
+    <string name="profile_post">รหัสไปรษณีย์</string>
+    <string name="soi">ซอย</string>
+    <string name="street">ถนน</string>
+    <string name="moo">หมู่</string>
+    <string name="txt_detail_message">ใส่รายละเอียดเพิ่มเติม</string>
+    <string name="shared_location">เเชร์สถานที่</string>
+
+    <string name="send_invite">ส่งคำเชิญ</string>
+    <string name="send_case">ส่ง</string>
+    <string name="please_select">โปรดเลือกอย่างน้อยหนึ่ง รายการ</string>
+
+
+    <string name="email_incorrect">อีเมลไม่ถูกต้อง</string>
+    <string name="pass_incorrect">รหัสผ่านไม่ถูกต้อง</string>
+    <string name="update_data">อัพเดทข้อมูล</string>
+    <string name="change_pass">เปลี่ยนรหัสผ่าน</string>
+    <string name="cant_connect_server">ไม่สามารถเชื่อมต่อระบบได้</string>
+    <string name="please_wait">โปรดรอ....</string>
+
+    <string name="update_data_success">อัพเดทข้อมูลสำเร็จ</string>
+    <string name="register_success">ลงทะเบียนสำเร็จ</string>
+
+    <string name="image_select">เลือกรูปภาพ</string>
+    <string name="image_select_from_gallery">เลือกรูปภาพจากแกลเลอรี</string>
+    <string name="image_capture">ภาพถ่าย</string>
+
+    <string name="alert">การเเเจ้งเตือน</string>
+    <string name="please_enter_fill">โปรดกรอกข้อมูลให้ครบ</string>
+    <string name="new_pass_not_match">รหัสผ่านไม่ถูกต้อง</string>
+    <string name="pass_or_user_incorrect">รหัสผ่านหรือชื่อไม่ถูกต้อง</string>
+    <string name="login_failure">ลงชื่อเข้าใช้ไม่สำเร็จ</string>
+
+
+    <string name="thank">ขอบคุณค่ะ</string>
+    <string name="idcard_incorrect">บัตรประชาชนไม่ถูกต้อง</string>
+    <string name="mobile_incorrect">เบอร์โทรศัพท์ไม่ถูกต้อง</string>
+    <string name="invite_org">คำเชิญเข้าสังกัด</string>
+    <string name="invite_add_friend">คำเชิญ</string>
+
+
+    <string name="email_is_exist">อีเมลนี้มีอยู่ในระบบเเล้ว</string>
+    <string name="forget_pass_message">ระบบส่งระหัสผ่านใหม่ให้ท่านเรียบร้อยเเล้ว กรุณาตรวจสอบอีเมล</string>
+    <string name="register_message">ระบบได้ลงทะเบียนการใช้งานเรียบร้อยแล้ว กรุณาตรวจสอบอีเมลยืนยันการเข้าใช้งานระบบ</string>
+    <string name="accept_msg">หรือ \n ปฏิเสธการเข้าสังกัดนี้ด้วยปุ่มด้านล่าง</string>
+    <string name="accept_msg2">กรอกรายละเอียดส่วนบุคคลเพื่อเข้าสังกัด</string>
+
+    <string-array name="array_service">
+        <item>บริการ</item>
+    </string-array>
+    <string-array name="array_type">
+        <item>ประเภท</item>
+    </string-array>
+
+
+    <string name="no_messages">ยังไม่มีรายการ\nเเจ้งเรื่องร้องเรียนของท่าน</string>
+    <string name="prompt">ซอย</string>
+
+
+    <string name="nameVilage">หมู่บ้าน</string>
+    <string name="nameAlley">ซอย</string>
+    <string name="nameRoad">ถนน</string>
+    <string name="nameProvince">จังหวัด</string>
+    <string name="nameDistrict">อำเภอ</string>
+    <string name="nameParish">ตำบล</string>
+    <string name="title_activity_maps">Map</string>
+
+
+    <string name="promptCategory">หมวดหมู่</string>
+    <string name="promptPriority">ระดับความสำคัญ</string>
+    <string name="promptAction">การดำเนินการ</string>
+    <string name="promptDue">กำหนดเสร็จ</string>
+
+    <string name="no_result">ไม่มีข้อมูล</string>
+    <string name="please_check_internet">โปรดตรวจสอบการเชื่อมต่อ เเละลองใหม่อีกครั้ง</string>
+
+
+    <string-array name="array_Category">
+        <item>ทั้งหมด</item>
+        <item>เคสที่รับผิดชอบ</item>
+        <item>เคสที่สร้าง</item>
+        <item>เคสที่ต้องติดตาม</item>
+        <item>ทั้งหมด</item>
+    </string-array>
+    <string-array name="array_Priority">
+        <item>ทั้งหมด</item>
+        <item>ไม่เร่งด่วน</item>
+        <item>เร่งด่วน</item>
+        <item>สำคัญและเร่งด่วน</item>
+    </string-array>
+    <string-array name="array_Action">
+        <item>ทั้งหมด</item>
+        <item>ระหว่างดำเนินการ</item>
+        <item>ดำเนินการเสร็จแล้ว</item>
+    </string-array>
+    <string-array name="array_Due">
+        <item>ทั้งหมด</item>
+        <item>วันนี้</item>
+        <item>ถัดไป7วัน</item>
+        <item>ถัดไป15วัน</item>
+        <item>เกินกำหนด</item>
+    </string-array>
+
+    <string name="invite_friend">ชวนเพื่อนเข้ากลุ่ม</string>
+    <string name="invited_friend">เพื่อนที่จะได้รับคำเชิญเข้ากลุ่มนี้</string>
+    <string name="request_friend">คำขอแป็นเพื่อน</string>
+    <string name="request_group">คำชวนเข้ากลุ่ม</string>
+
+    <string name="old_pass">รหัสผ่านเก่า</string>
+    <string name="new_pass">รหัสผ่านใหม่</string>
+    <string name="confirm_pass">ยืนยันรหัส</string>
+    <string name="email">อีเมล</string>
+    <string name="request_pass">ขอรหัสผ่าน</string>
+
+
+    <string name="progress">ความคืบหน้า</string>
+
+
+    <string name="confirm_delete">ยืนยันการลบข้อมูล?</string>
+    <string name="cancel">ยกเลิก</string>
+    <string name="no_invite">ไม่มีคำเชิญเข้าร่วมสังกัด</string>
+
+
+    <string name="facebook_app_id">334030673457912</string>
+    <integer name="google_play_services_version">6587000</integer>
+
+    <string name="app_name">PattayaCallCenter</string>
+    <string name="hello_world">Hello world!</string>
+    <string name="action_settings">Settings</string>
+    <string name="title_activity_login">LoginActivity</string>
+    <string name="title_activity_register">RegisterActivity</string>
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="title_activity_forget_password">ForgetPasswordActivity</string>
+    <string name="title_activity_case_list">CaseListActivity</string>
+    <string name="title_activity_case_add_edit">CaseAddEditActivity</string>
+    <string name="title_activity_case_map">CaseMapActivity</string>
+    <string name="title_activity_profile">ProfileActivity</string>
+    <string name="title_activity_alert_setting">AlertSettingActivity</string>
+    <string name="title_activity_organize">OrganizeActivity</string>
+    <string name="title_activity_change_password">ChangePasswordActivity</string>
+    <string name="title_activity_organize_member_list">OrganizeMemberListActivity</string>
+    <string name="title_activity_login_facebook">LoginFacebookActivity</string>
+    <string name="title_activity_case_detail">CaseDetailActivity</string>
+    <string name="title_activity_case_result">CaseResultActivity</string>
+    <string name="title_activity_case_chat">CaseChatActivity</string>
+    <string name="title_activity_member_main">MemberMainActivity</string>
+    <string name="title_activity_friend_request">FriendRequestActivity</string>
+    <string name="title_activity_add_friend">AddFriendActivity</string>
+    <string name="title_activity_add_group">AddGroupActivity</string>
+    <string name="title_activity_chat">ChatActivity</string>
+    <string name="title_activity_post">PostActivity</string>
+    <string name="title_activity_case_advance_search">CaseAdvanceSearchActivity</string>
+    <string name="title_activity_case_chat_member">CaseChatMemberActivity</string>
+    <string name="title_activity_case_detail_member">CaseDetailMemberActivity</string>
+    <string name="title_activity_case_forward">CaseForwardActivity</string>
+    <string name="title_activity_case_work_date">CaseWorkDateActivity</string>
+    <string name="title_activity_case_result_member">CaseResultMemberActivity</string>
+    <string name="title_activity_case_close">CaseCloseActivity</string>
+    <string name="title_activity_case_edit_member">CaseEditMemberActivity</string>
+    <string name="title_activity_create_group">CreateGroupActivity</string>
+    <string name="title_activity_case_forward_to_user">CaseForwardToUser</string>
+    <string name="title_activity_case_forward_to_organize">CaseForwardToOrganize</string>
+    <string name="title_activity_member_detail">MemberDetailActivity</string>
+    <string name="title_activity_delete_chat">DeleteChatActivity</string>
+    <string name="title_activity_organize_member">OrganizeMemberActivity</string>
+    <string name="title_activity_case_add_and_edit">CaseAddAndEditActivity</string>
+    <string name="title_activity_place">PlaceActivity</string>
+    <string name="title_activity_case_add_and_edit_to">CaseAddAndEditTo</string>
+    <string name="title_activity_case_forward_to">CaseForwardToActivity</string>
+    <string name="title_activity_close_case">CloseCaseA</string>
+    <string name="title_activity_show_post_data">ShowPostData</string>
+
+
+    <string-array name="array_close_case">
+        <item>ดำเนินการเเก้ไขเเล้ว</item>
+        <item>ไม่สามารถดำเนินการเเก้ไขได้</item>
+        <item>ไม่พบปัญหาตามที่ร้องเรียน</item>
+        <item>ยกเลิกปัญหา</item>
+        <item>อื่นๆ</item>
+    </string-array>
+
+</resources>

@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="primaryDark">@color/blueSkyColor</color>
+    <color name="primary">@color/blueSkyColor</color>
+    <color name="accent">@android:color/white</color>
+    <color name="colortext">@android:color/black</color>
+    <color name="black_overlay">#66000000</color>
+    <color name="black">@android:color/black</color>
+    <color name="bluedark">@android:color/holo_blue_dark</color>
+
+    <color name="whiteColor">#ffffff</color>
+    <color name="redDarkColor">#ff0000</color>
+    <color name="greenLightColor">#00CC00</color>
+    <color name="greenColor">#72d572</color>
+    <color name="greenDarkColor">#8CC83C</color>
+    <color name="yellowColor">#fdd835</color>
+    <color name="orangeColor">#faaf3c</color>
+    <color name="pinkColor">#f8bbd0</color>
+    <color name="blueSoftColor">#b4dcff</color>
+    <color name="blueSkyColor">#28aae1</color>
+    <color name="blueColor">#0071bc</color>
+    <color name="blueDarkColor">#0000ff</color>
+    <color name="violetColor">#7986cb</color>
+    <color name="grayDarkColor">#4d4d4d</color>
+    <color name="grayColor">#808080</color>
+    <color name="grayLightColor">#b4b4b4</color>
+    <color name="graySoftColor">#e6e6e6</color>
+    <color name="redSoftColor">#CD853F</color>
+    <color name="yellowSoftColor">#f0ad4e</color>
+    <color name="greenSoftColor">#CD853F</color>
+    <color name="brownColor">#968773</color>
+    <color name="brownLightColor">#dcc8b4</color>
+    <color name="brownSoftColor">#faf0e6</color>
+    <color name="transparent">#00000000</color>
+
+</resources>

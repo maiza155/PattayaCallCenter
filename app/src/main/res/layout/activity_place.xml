@@ -1,0 +1,58 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:focusableInTouchMode="true">
+
+    <ScrollView
+        android:id="@+id/scroll"
+        android:paddingLeft="@dimen/horizontal_margin"
+        android:paddingRight="@dimen/horizontal_margin"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:paddingBottom="5dp"
+        android:paddingTop="5dp">
+
+        <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+
+            <EditText
+                android:id="@+id/number"
+                android:singleLine="true"
+                style="@style/edittext_style"
+                android:hint="@string/profile_address" />
+
+            <EditText
+                android:id="@+id/soi"
+                android:singleLine="true"
+                style="@style/edittext_style"
+                android:hint="@string/soi" />
+            <EditText
+                android:id="@+id/street"
+                android:singleLine="true"
+                style="@style/edittext_style"
+                android:hint="@string/street" />
+            <EditText
+                android:id="@+id/moo"
+                android:singleLine="true"
+                style="@style/edittext_style"
+                android:hint="@string/moo" />
+
+            <EditText
+                android:id="@+id/detail"
+                style="@style/text_fild_style"
+                android:layout_toRightOf="@+id/textdetail"
+                android:hint="@string/txt_detail_message" />
+
+        </LinearLayout>
+    </ScrollView>
+
+    <Button
+        android:id="@+id/btn_map"
+        style="@style/button_style"
+        android:background="@color/orangeColor"
+        android:layout_alignParentBottom="true"
+        android:text="@string/shared_location"
+        android:drawableLeft="@drawable/asset_icon_normal_location_white" />
+</RelativeLayout>

@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:clickable="true">
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:alpha="0.6"
+        android:background="@null"
+        android:clickable="false" />
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="243dp"
+        android:background="@color/whiteColor"
+        android:layout_gravity="bottom"
+        android:orientation="vertical">
+
+        <FrameLayout
+            android:id="@+id/update"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/bottom_height">
+
+            <Button
+                android:id="@+id/btnupdate"
+                style="@style/button_style"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="right|center"
+                android:textColor="@color/black"
+                android:textSize="24dp"
+                android:padding="5dp"
+                android:layout_marginRight="10dp"
+                android:textStyle="bold"
+                android:text="Update" />
+        </FrameLayout>
+
+        <GridView
+            android:layout_below="@id/update"
+            android:id="@+id/grid_sticker"
+            android:layout_width="match_parent"
+            android:layout_height="243dp"
+            android:layout_marginLeft="10dp"
+            android:columnWidth="70dp"
+            android:gravity="center"
+            android:horizontalSpacing="2dp"
+            android:numColumns="auto_fit"
+            android:stretchMode="columnWidth"
+            android:verticalSpacing="2dp" />
+
+
+        <ProgressBar
+            style="?android:attr/progressBarStyleInverse"
+            android:layout_gravity="center"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:id="@+id/progressBar" />
+
+
+        <TextView
+            android:id="@+id/empty_sticker"
+            android:text="@string/no_result"
+            android:layout_gravity="center"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true" />
+
+
+    </RelativeLayout>
+
+
+</FrameLayout>

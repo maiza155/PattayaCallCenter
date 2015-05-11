@@ -1,0 +1,216 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:focusableInTouchMode="true"
+    tools:context="com.pattaya.pattayacallcenter.share.ProfileActivity">
+
+    <LinearLayout
+        android:id="@+id/layout_detail"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/layout_buttom"
+        android:layout_marginBottom="10dp"
+        android:orientation="vertical"
+        android:paddingLeft="@dimen/horizontal_margin"
+        android:paddingRight="@dimen/horizontal_margin"
+        android:paddingTop="@dimen/activity_vertical_margin">
+
+        <ScrollView
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content">
+
+            <LinearLayout
+                android:id="@+id/bon"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <LinearLayout
+                    android:id="@+id/layout_profile"
+                    android:layout_width="match_parent"
+                    android:layout_height="100dp"
+                    android:layout_marginBottom="10dp"
+                    android:gravity="top"
+                    android:orientation="horizontal"
+                    android:weightSum="1.0">
+
+                    <com.pattaya.pattayacallcenter.customview.RoundedImageView
+                        android:id="@+id/img_pic"
+                        android:layout_width="80dp"
+                        android:layout_height="80dp"
+                        android:src="@drawable/com_facebook_profile_picture_blank_portrait"
+                        />
+
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:layout_weight="0.9"
+                        android:orientation="vertical"
+                        android:paddingLeft="10dp">
+
+                        <TextView
+                            android:id="@+id/txt_email"
+                            android:layout_width="match_parent"
+                            android:layout_height="45dp"
+                            android:paddingLeft="10dp"
+                            android:paddingTop="10dp"
+                            android:text="xxxxxx@gmail.com" />
+
+                        <Button
+                            android:id="@+id/btn_changeProfile"
+                            style="@style/button_style"
+                            android:paddingLeft="10dp"
+                            android:drawableLeft="@drawable/asset_icon_normal_photo_white"
+                            android:background="@color/orangeColor"
+                            android:text="@string/profile_change_img" />
+
+                    </LinearLayout>
+                </LinearLayout>
+                <!--END_PROFILE-->
+                <FrameLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/button_height"
+                    android:layout_marginBottom="10dp"
+                    android:background="@color/grayColor">
+
+                    <TextView
+                        style="@style/actionbar_text_header_style"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="left|center"
+                        android:drawableLeft="@drawable/asset_icon_normal_person"
+                        android:gravity="left|center"
+                        android:paddingLeft="5dp"
+                        android:text="@string/profile_information" />
+
+
+                </FrameLayout>
+
+
+                <TextView
+                    style="@style/text_header_style"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="10dp"
+                    android:text="@string/profile_name" />
+
+
+                <EditText
+                    android:id="@+id/txt_userName"
+                    style="@style/edittext_style"
+                    android:singleLine="true" />
+
+                <TextView
+                    style="@style/text_header_style"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="10dp"
+                    android:text="@string/profile_lastname" />
+
+                <EditText
+                    android:id="@+id/txt_lastName"
+                    style="@style/edittext_style"
+                    android:singleLine="true" />
+
+                <TextView
+                    style="@style/text_header_style"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="10dp"
+                    android:text="@string/profile_mobile" />
+
+                <EditText
+                    android:id="@+id/txt_mobile"
+                    style="@style/edittext_style"
+                    android:hint="@string/profile_mobile"
+                    android:inputType="phone"
+                    android:singleLine="true" />
+
+                <TextView
+                    style="@style/text_header_style"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="10dp"
+                    android:text="@string/profile_idcard" />
+
+                <EditText
+                    android:id="@+id/txt_idCard"
+                    style="@style/edittext_style"
+                    android:ems="13"
+                    android:inputType="number"
+                    android:singleLine="true" />
+
+
+                <FrameLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/button_height"
+                    android:layout_marginBottom="10dp"
+                    android:layout_marginTop="10dp"
+                    android:background="@color/grayColor">
+
+                    <TextView
+                        style="@style/actionbar_text_header_style"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="left|center"
+                        android:drawableLeft="@drawable/asset_icon_normal_home"
+                        android:gravity="left|center"
+                        android:paddingLeft="5dp"
+                        android:text="@string/profile_place" />
+                </FrameLayout>
+
+
+                <EditText
+                    android:id="@+id/txt_address"
+                    style="@style/edittext_style"
+                    android:hint="@string/profile_address"
+                    android:singleLine="true" />
+
+
+
+                <EditText
+                    android:id="@+id/txt_provinceName"
+                    style="@style/edittext_style"
+                    android:hint="@string/profile_province"
+                    android:singleLine="true" />
+                <EditText
+                    android:id="@+id/txt_districtName"
+                    style="@style/edittext_style"
+                    android:hint="@string/profile_aumpher"
+                    android:singleLine="true" />
+                <EditText
+                    android:id="@+id/txt_parishName"
+                    style="@style/edittext_style"
+                    android:hint="@string/profile_tombon"
+                    android:singleLine="true" />
+
+                <EditText
+                    android:id="@+id/txt_postNumber"
+                    style="@style/edittext_style"
+                    android:hint="@string/profile_post"
+                    android:inputType="number"
+                    android:singleLine="true" />
+            </LinearLayout>
+        </ScrollView>
+    </LinearLayout>
+
+    <!--END_DETAIL-->
+    <LinearLayout
+        android:id="@id/layout_buttom"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true">
+
+        <Button
+            android:id="@+id/btn_saveRegister"
+            style="@style/button_style"
+            android:background="@color/greenDarkColor"
+            android:text="@string/save" />
+
+    </LinearLayout>
+
+
+</RelativeLayout>

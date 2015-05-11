@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item android:state_focused="true"
+        android:drawable="@color/abc_search_url_text_normal" />
+
+
+    <item android:state_focused="true"
+        android:state_pressed="true"
+        android:drawable="@color/accent_material_light" />
+
+    <item android:state_pressed="true"
+        android:drawable="@color/brownLightColor" />
+
+
+    <item android:state_selected="true"
+        android:drawable="@color/accent_material_light" />
+
+
+    <item android:drawable="@color/brownSoftColor" />
+</selector>
+<!--<selector xmlns:android="http://schemas.android.com/apk/res/android">
+<item android:state_pressed="true" android:drawable="@color/greenColor" />
+<item android:state_focused="true" android:drawable="@color/link_text_material_light" />
+</selector>-->

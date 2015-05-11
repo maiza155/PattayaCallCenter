@@ -1,0 +1,131 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.pattaya.pattayacallcenter.member.CaseFragment">
+
+    <LinearLayout
+        android:id="@+id/search_tab"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/background_floating_material_dark"
+        android:orientation="horizontal"
+        android:weightSum="1">
+
+        <EditText
+            android:id="@+id/search"
+            style="@style/edittext_style"
+            android:layout_width="match_parent"
+            android:layout_marginLeft="@dimen/horizontal_margin"
+            android:layout_marginRight="@dimen/horizontal_margin"
+            android:layout_marginTop="@dimen/margin_grab"
+            android:layout_weight="0.2"
+            android:drawableLeft="@drawable/ic_search"
+            android:hint="@string/search"
+            android:inputType="textNoSuggestions" />
+
+        <ImageButton
+            android:id="@+id/btn_advanceSearch"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginLeft="0dp"
+            android:layout_marginRight="10dp"
+            android:layout_weight="0.8"
+            android:background="@color/transparent"
+            android:src="@drawable/asset_icon_advance_search" />
+    </LinearLayout>
+
+
+    <android.support.v4.widget.SwipeRefreshLayout
+        android:id="@+id/container_list"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@id/search_tab">
+
+    <ListView
+            android:id="@+id/list"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+
+    </android.support.v4.widget.SwipeRefreshLayout>
+
+
+    <RelativeLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true">
+
+        <ProgressBar
+            android:id="@+id/progress"
+            style="?android:attr/progressBarStyleSmallInverse"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:visibility="gone" />
+
+        <TextView
+            android:id="@+id/empty"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/progress"
+            android:gravity="center"
+            android:text="No result \n and Tap to refresh" />
+    </RelativeLayout>
+
+    <FrameLayout
+        android:id="@+id/menu_slide"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:clickable="true">
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:alpha="0.6"
+            android:background="@color/brownColor"
+            android:clickable="false" />
+
+        <TableLayout
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/primary"
+            android:clickable="true">
+
+            <TableRow>
+
+                <Button
+                    android:id="@+id/btn_report"
+                    style="@style/button_style"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="left"
+                    android:layout_marginRight="2dp"
+                    android:layout_weight="1"
+                    android:background="@color/blueColor"
+                    android:drawableLeft="@drawable/asset_icon_normal_edit"
+                    android:gravity="left|center"
+                    android:paddingLeft="10dp"
+                    android:text="@string/menu_case_member_noti" />
+
+
+                <Button
+                    android:id="@+id/btn_create"
+                    style="@style/button_style"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="left"
+                    android:layout_weight="1"
+                    android:background="@color/blueColor"
+                    android:drawableLeft="@drawable/asset_icon_normal_write"
+                    android:gravity="left|center"
+                    android:paddingLeft="10dp"
+                    android:text="@string/menu_case_member_create" />
+
+            </TableRow>
+
+        </TableLayout>
+
+
+    </FrameLayout>
+
+</RelativeLayout>

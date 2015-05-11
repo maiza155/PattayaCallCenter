@@ -1,0 +1,76 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.pattaya.pattayacallcenter.member.ChatActivity">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_above="@+id/bar"
+        android:orientation="vertical">
+
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/case_name"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:animateLayoutChanges="true"
+                android:padding="10dp"
+                android:textStyle="bold"
+                android:background="@color/brownLightColor"
+                android:minHeight="70dp"
+                android:maxHeight="200dp" />
+
+            <com.github.ksoichiro.android.observablescrollview.ObservableListView
+                android:layout_marginTop="10dp"
+                android:paddingLeft="@dimen/horizontal_margin"
+                android:paddingRight="@dimen/horizontal_margin"
+                android:id="@+id/chat"
+                android:divider="@null"
+
+                android:stackFromBottom="true"
+                android:transcriptMode="alwaysScroll"
+                android:dividerHeight="0dp"
+                android:listSelector="@android:color/transparent"
+                android:clickable="false"
+                android:focusable="false"
+                android:layout_gravity="bottom"
+                android:gravity="bottom"
+                android:layout_width="match_parent"
+                android:layout_height="fill_parent" />
+        </LinearLayout>
+
+
+    </LinearLayout>
+
+    <FrameLayout
+        android:id="@+id/sub_menu"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_above="@+id/bar">
+
+        <include
+            android:id="@+id/menu_slide_sticker"
+            layout="@layout/custom_chat_sticker_layout"
+            android:layout_width="match_parent"
+            android:layout_height="fill_parent" />
+
+        <include
+            layout="@layout/custom_chat_select_image"
+            android:layout_width="match_parent"
+            android:layout_height="fill_parent" />
+    </FrameLayout>
+
+    <include
+        android:id="@id/bar"
+        layout="@layout/custom_chat_bar" />
+
+
+</RelativeLayout>

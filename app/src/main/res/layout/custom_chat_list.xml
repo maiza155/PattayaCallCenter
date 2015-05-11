@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:paddingBottom="10dp"
+    android:paddingTop="10dp">
+
+    <FrameLayout
+        android:id="@+id/timeheader"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/grayColor">
+
+        <TextView
+            android:id="@+id/txt_timeheader"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:text="เสาร์ 22 พ.ย."
+            android:textColor="@android:color/white"
+            android:textSize="16dp" />
+    </FrameLayout>
+
+    <com.pattaya.pattayacallcenter.customview.RoundedImageView
+        android:id="@+id/pic_profile"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_alignParentLeft="true"
+        android:layout_below="@id/timeheader"
+        android:layout_margin="5dp"
+        android:src="@drawable/com_facebook_profile_picture_blank_portrait" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/timeheader"
+        android:layout_toRightOf="@id/pic_profile"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/txt_time"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:gravity="left|center"
+            android:text="time" />
+
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <ImageView
+                android:id="@+id/message_image"
+                android:layout_width="80dp"
+                android:layout_height="80dp"
+                android:paddingBottom="15dp"
+                android:paddingLeft="10dp"
+                android:paddingRight="10dp"
+                android:paddingTop="15dp" />
+
+            <TextView
+                android:id="@+id/txt_msg"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:maxWidth="200dp"
+                android:paddingBottom="15dp"
+                android:paddingLeft="10dp"
+                android:paddingRight="10dp"
+                android:paddingTop="15dp"
+                android:adjustViewBounds="true"
+                android:text="text message" />
+
+            <RelativeLayout
+                android:id="@+id/image_container"
+                android:background="@color/grayDarkColor"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content">
+
+                <ImageView
+                    android:id="@+id/image"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@color/graySoftColor"
+                    android:maxWidth="160dp"
+                    android:adjustViewBounds="true"
+                    android:src="@drawable/blue_background" />
+
+                <ProgressBar
+                    android:id="@+id/progress"
+                    style="?android:attr/progressBarStyleHorizontal"
+                    android:layout_centerInParent="true"
+                    android:layout_width="100dp"
+                    android:layout_height="30dp" />
+            </RelativeLayout>
+
+        </FrameLayout>
+
+
+    </LinearLayout>
+</RelativeLayout>

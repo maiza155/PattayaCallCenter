@@ -1,0 +1,54 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:focusableInTouchMode="true"
+    tools:context="com.pattaya.pattayacallcenter.member.AddFriendActivity">
+
+    <LinearLayout
+        android:id="@+id/top"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/grayDarkColor">
+
+        <EditText
+            android:id="@+id/search"
+            style="@style/edittext_style"
+            android:layout_marginLeft="@dimen/activity_vertical_margin"
+            android:layout_marginRight="@dimen/activity_vertical_margin"
+            android:layout_marginTop="@dimen/margin_grab"
+            android:drawableLeft="@drawable/ic_search"
+            android:gravity="center"
+            android:hint="@string/friend_search" />
+    </LinearLayout>
+
+    <Button
+        android:id="@+id/btn_add_friend"
+        style="@style/button_style"
+        android:layout_width="match_parent"
+        android:layout_alignParentBottom="true"
+        android:background="@color/greenDarkColor"
+        android:gravity="center"
+        android:paddingLeft="5dp"
+        android:text="@string/add_friend" />
+
+    <android.support.v4.widget.SwipeRefreshLayout
+        android:id="@+id/container_list"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_above="@id/btn_add_friend"
+        android:layout_below="@id/top">
+
+        <ExpandableListView
+            android:id="@+id/list"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:layout_alignParentRight="true"
+            android:groupIndicator="@drawable/selector_expandlistview"
+            android:listSelector="@android:color/transparent" />
+
+
+    </android.support.v4.widget.SwipeRefreshLayout>
+
+
+</RelativeLayout>

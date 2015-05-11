@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <style name="edittext_style" parent="@android:style/Widget.EditText">
+        <item name="android:background">@android:drawable/editbox_background</item>
+        <item name="android:layout_height">@dimen/button_height</item>
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_marginBottom">@dimen/margin_grab</item>
+        <item name="android:textSize">@dimen/default_text_size</item>
+        <item name="android:textColorHint">@color/grayDarkColor</item>
+        <item name="android:paddingLeft">10dp</item>
+    </style>
+
+
+    <style name="button_style">
+        <item name="android:padding">@dimen/padding_nornal</item>
+        <item name="android:layout_height">@dimen/button_height</item>
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:textColor">@android:color/white</item>
+        <item name="android:background">@null</item>
+        <item name="android:textSize">@dimen/button_text_size</item>
+    </style>
+
+    <style name="text_fild_style" parent="@android:style/Widget.EditText">
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_marginBottom">@dimen/margin_grab</item>
+        <item name="android:background">@android:drawable/editbox_background</item>
+        <item name="android:lines">8</item>
+        <item name="android:maxLines">10</item>
+        <item name="android:minLines">6</item>
+        <item name="android:padding">10dp</item>
+        <item name="android:gravity">top|left</item>
+        <item name="android:scrollbars">vertical</item>
+        <item name="android:textColor">@android:color/black</item>
+        <item name="android:textColorHint">@color/grayDarkColor</item>
+        <item name="android:textSize">@dimen/default_text_size</item>
+    </style>
+
+
+    <style name="spinner_style">
+        <item name="android:layout_height">@dimen/button_height</item>
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_margin">3dp</item>
+        <item name="android:background">@drawable/spinner_bg</item>
+        <item name="android:popupBackground">#FFFFFF</item>
+        <item name="android:textSize">@dimen/default_text_size</item>
+    </style>
+
+    <style name="text_header_style">
+        <item name="android:textSize">@dimen/default_text_size</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textColor">@color/grayColor</item>
+    </style>
+
+    <style name="text_detail_style">
+        <item name="android:textSize">@dimen/default_text_size</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textColor">@color/blueDarkColor</item>
+    </style>
+
+    <style name="actionbar_text_header_style">
+        <item name="android:textSize">@dimen/default_text_size</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textColor">@color/whiteColor</item>
+    </style>
+
+    <style name="default_text_style">
+        <item name="android:textSize">@dimen/default_text_size</item>
+    </style>
+
+    <style name="text_header_list_style">
+        <item name="android:textSize">@dimen/default_text_size</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textColor">@color/black</item>
+    </style>
+
+    <style name="sub_chat_list_text_style">
+        <item name="android:textSize">@dimen/default_text_size</item>
+        <item name="android:textColor">@color/black</item>
+    </style>
+
+    <style name="sub_list_text_style">
+        <item name="android:textSize">@dimen/sub_list_text_size</item>
+        <item name="android:textColor">@color/black</item>
+    </style>
+
+    <style name="date_sub_list_text_style">
+        <item name="android:textSize">@dimen/sub_list_text_size</item>
+        <item name="android:textColor">@color/black</item>
+        <item name="android:textStyle">italic</item>
+    </style>
+
+    <style name="SwitchButtonStyle">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:paddingLeft">10dp</item>
+        <item name="android:paddingRight">10dp</item>
+        <item name="android:paddingTop">4dp</item>
+        <item name="android:paddingBottom">4dp</item>
+    </style>
+
+
+</resources>

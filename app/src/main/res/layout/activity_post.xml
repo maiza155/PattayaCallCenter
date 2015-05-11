@@ -1,0 +1,81 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.pattaya.pattayacallcenter.member.PostActivity">
+
+    <ScrollView
+        android:id="@+id/scroll"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_above="@id/button"
+        android:paddingTop="5dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:paddingLeft="@dimen/horizontal_margin"
+            android:paddingRight="@dimen/horizontal_margin">
+
+            <TextView
+                style="@style/text_header_style"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:drawableLeft="@drawable/asset_icon_normal_info_gray"
+                android:gravity="center"
+                android:text="@string/member_case_forward_detail" />
+
+            <EditText
+                android:id="@+id/detail"
+                style="@style/text_fild_style"
+                android:hint="@string/detail" />
+
+            <TextView
+                android:id="@+id/image_header"
+                style="@style/text_header_style"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="5dp"
+                android:drawableLeft="@drawable/asset_icon_normal_photo_gray"
+                android:gravity="center"
+                android:text="@string/image" />
+
+            <com.pattaya.pattayacallcenter.customview.ExpandableHeightGridView
+                android:id="@+id/grid_view"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="5dp"
+                android:columnWidth="100dp"
+                android:gravity="center"
+                android:horizontalSpacing="8dp"
+                android:isScrollContainer="false"
+                android:numColumns="auto_fit"
+                android:stretchMode="columnWidth"
+                android:verticalSpacing="8dp">
+
+            </com.pattaya.pattayacallcenter.customview.ExpandableHeightGridView>
+
+        </LinearLayout>
+    </ScrollView>
+
+    <FrameLayout
+        android:id="@+id/button"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/button_height"
+        android:layout_alignParentBottom="true"
+        android:background="@color/orangeColor">
+
+        <Button
+            style="@style/button_style"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:clickable="false"
+            android:drawableLeft="@drawable/asset_icon_normal_grid"
+            android:gravity="center"
+            android:text="@string/image" />
+
+    </FrameLayout>
+
+</RelativeLayout>

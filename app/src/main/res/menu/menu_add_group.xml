@@ -1,0 +1,26 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context="com.pattaya.pattayacallcenter.member.AddGroupActivity">
+    <item
+        android:id="@+id/action_new"
+        android:icon="@drawable/down_white"
+        android:title="eventgroup"
+        app:showAsAction="always">
+        <menu>
+            <item
+
+                android:id="@+id/action_editGroup"
+                android:orderInCategory="100"
+                android:title="แก้ไข"
+                app:showAsAction="always" />
+            <item
+                android:id="@+id/action_deleteGroup"
+                android:orderInCategory="100"
+                android:title="ลบกลุ่ม"
+                app:showAsAction="always" />
+
+        </menu>
+    </item>
+
+</menu>

@@ -1,0 +1,42 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:focusableInTouchMode="true"
+    android:layout_height="match_parent">
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <ImageButton
+            android:id="@+id/add_left_menu"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@null"
+            android:scaleType="centerInside"
+            android:layout_gravity="left"
+            android:gravity="center"
+            android:src="@drawable/ic_search" />
+
+        <TextView
+            android:id="@+id/actionbar_textview"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:layout_gravity="center"
+            android:text="test"
+            style="@style/actionbar_text_header_style" />
+
+
+        <ImageButton
+            android:id="@+id/add_right_menu"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@null"
+            android:scaleType="centerInside"
+            android:layout_gravity="right"
+            android:gravity="center" />
+
+    </FrameLayout>
+
+
+</RelativeLayout>

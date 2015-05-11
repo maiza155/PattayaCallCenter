@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:com.pattaya.pattayacallcenter="http://schemas.android.com/apk/res-auto">
+
+    <item
+        android:id="@+id/action_save"
+        android:icon="@drawable/asset_icon_menu_post"
+        android:title="post"
+        com.pattaya.pattayacallcenter:showAsAction="always" />
+
+</menu>

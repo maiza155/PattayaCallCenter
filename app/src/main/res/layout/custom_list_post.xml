@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:paddingBottom="5dp"
+    android:background="#ffffff"
+    android:orientation="vertical"
+    android:paddingTop="5dp">
+
+    <LinearLayout
+        android:id="@+id/layout_profile"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="top"
+        android:orientation="horizontal">
+
+        <com.pattaya.pattayacallcenter.customview.RoundedImageView
+            android:id="@+id/pic_logoAdapter"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_margin="10dp"
+            android:src="@drawable/com_facebook_profile_picture_blank_portrait" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/txt_name"
+                style="@style/text_header_list_style"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="left"
+                android:paddingTop="5dp"
+                android:text="header" />
+
+            <TextView
+                android:id="@+id/txt_dateTime"
+                style="@style/date_sub_list_text_style"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="left"
+                android:text="10 มกรา 2558 เวลา 12.00 น." />
+
+        </LinearLayout>
+
+
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/txt_resultDetail"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="left"
+        android:layout_marginLeft="20dp"
+        android:padding="5dp"
+        android:text="ศูนย์อำนวยการแก้ไขปัญหาเรื่องราวร้องทุกข์ได้ดำเนินการแก้ไขปัญหาดังกล่าวเรียบร้อยแล้ว"
+        android:textColor="@color/grayDarkColor" />
+
+    <TextView
+        android:id="@+id/txt_more"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="...see more..."
+        android:textSize="18dp"
+        android:textStyle="italic"
+        android:paddingRight="15dp"
+        android:textColor="@color/grayColor"
+        android:layout_gravity="center"
+        android:visibility="gone" />
+
+    <LinearLayout
+        android:layout_marginLeft="5dp"
+        android:layout_marginRight="5dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <ImageView
+            android:id="@+id/image1"
+            android:layout_weight="1"
+            android:layout_marginLeft="2dp"
+            android:layout_gravity="right|center"
+            android:src="@drawable/com_facebook_profile_picture_blank_portrait"
+            android:layout_width="200dp"
+            android:layout_height="wrap_content" />
+
+        <ImageView
+            android:id="@+id/image2"
+            android:layout_weight="1"
+            android:layout_marginLeft="2dp"
+            android:layout_gravity="left|center"
+            android:src="@drawable/com_facebook_profile_picture_blank_portrait"
+            android:layout_width="200dp"
+            android:layout_height="wrap_content" />
+    </LinearLayout>
+
+    <View
+        android:id="@+id/dview"
+        android:layout_width="match_parent"
+        android:background="@color/grayLightColor"
+        android:layout_marginLeft="20dp"
+        android:layout_marginRight="20dp"
+        android:layout_height="1dp" />
+
+    <TextView
+        android:id="@+id/txt_image_more"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="20dp"
+        android:text="View More .."
+        android:textStyle="italic"
+        android:textColor="@color/grayColor"
+        android:layout_gravity="center"
+        android:layout_margin="5dp"
+
+        />
+
+</LinearLayout>

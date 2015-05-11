@@ -1,0 +1,11 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context="com.pattaya.pattayacallcenter.member.OrganizeMemberActivity">
+    <item
+        android:id="@+id/action_invite"
+        android:orderInCategory="100"
+        android:title="เชิญเพื่อน"
+        android:icon="@drawable/asset_icon_large_add"
+        app:showAsAction="always" />
+</menu>

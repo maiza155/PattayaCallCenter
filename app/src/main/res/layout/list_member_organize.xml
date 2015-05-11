@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginBottom="5dp"
+    android:layout_marginTop="5dp"
+    android:background="@color/brownSoftColor"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:id="@+id/layout_profile"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="2dp"
+        android:layout_marginLeft="10dp"
+        android:layout_marginTop="2dp"
+        android:gravity="top"
+        android:orientation="horizontal"
+        android:weightSum="1.0">
+
+        <com.pattaya.pattayacallcenter.customview.RoundedImageView
+            android:id="@+id/pic_profileAdapter"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_marginLeft="5dp"
+            android:src="@drawable/com_facebook_profile_picture_blank_portrait"
+            android:layout_gravity="left|center" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.9"
+            android:orientation="vertical"
+            android:paddingLeft="5dp">
+
+            <TextView
+                style="@style/text_header_list_style"
+                android:id="@+id/txt_name"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="left"
+                android:paddingLeft="10dp"
+                android:paddingTop="5dp"
+                android:text="อภัสนัน นนนภาพันธ์" />
+
+            <TextView
+                style="@style/sub_list_text_style"
+                android:id="@+id/txt_department"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="left"
+                android:paddingLeft="10dp"
+                android:paddingTop="5dp"
+                android:text="สำนักปลัดเมืองพัทยา" />
+
+
+        </LinearLayout>
+
+
+    </LinearLayout>
+</LinearLayout>

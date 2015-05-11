@@ -1,0 +1,95 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/primary"
+    android:focusableInTouchMode="true"
+    android:scrollbars="vertical"
+    tools:context="com.pattaya.pattayacallcenter.share.LoginActivity">
+
+    <ImageView
+        android:id="@+id/img_pic"
+        android:layout_width="match_parent"
+        android:layout_height="fill_parent"
+        android:background="@drawable/plage"
+        android:layout_alignParentTop="true"
+        android:layout_above="@+id/linearLayout" />
+
+
+    <LinearLayout
+        android:id="@+id/box"
+        android:layout_centerInParent="true"
+        android:layout_marginLeft="@dimen/activity_vertical_margin"
+        android:layout_marginRight="@dimen/activity_vertical_margin"
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <EditText
+            android:id="@+id/txt_userName"
+            style="@style/edittext_style"
+            android:gravity="center"
+            android:singleLine="true"
+            android:hint="@string/username" />
+
+        <EditText
+            android:id="@+id/txt_password"
+            android:inputType="textPassword"
+            style="@style/edittext_style"
+            android:singleLine="true"
+            android:gravity="center"
+            android:hint="@string/password" />
+    </LinearLayout>
+
+
+    <LinearLayout
+        android:id="@id/linearLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="@dimen/activity_vertical_margin"
+        android:layout_marginRight="@dimen/activity_vertical_margin"
+        android:layout_above="@+id/btn_login"
+        android:layout_below="@id/box"
+        android:orientation="vertical">
+
+        <Button
+            android:id="@+id/btn_forgetPassword"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:background="@android:color/transparent"
+            android:text="@string/forget_pass"
+            android:textAppearance="?android:attr/textAppearanceSmall"
+            android:textColor="@android:color/white"
+            android:textSize="18dp" />
+
+
+        <com.facebook.login.widget.LoginButton
+            android:id="@+id/authButton"
+            style="@style/com_facebook_loginview_default_style"
+            android:layout_width="match_parent"
+            android:layout_height="45dp"
+            android:layout_marginBottom="@dimen/margin_grab" />
+
+        <Button
+            android:id="@+id/btn_register"
+            style="@style/button_style"
+            android:background="@color/yellowSoftColor"
+            android:textStyle="bold"
+            android:text="@string/register" />
+
+
+    </LinearLayout>
+
+    <Button
+        android:layout_marginLeft="@dimen/activity_vertical_margin"
+        android:layout_marginRight="@dimen/activity_vertical_margin"
+        android:layout_alignParentBottom="true"
+        android:id="@+id/btn_login"
+        style="@style/button_style"
+        android:background="@color/greenDarkColor"
+        android:layout_marginBottom="@dimen/margin_grab"
+        android:textStyle="bold"
+        android:text="@string/login" />
+
+</RelativeLayout>

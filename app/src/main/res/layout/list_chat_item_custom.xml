@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:background="@drawable/list_member_chat_select_event"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <LinearLayout
+        android:id="@+id/layout_profile"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="top"
+        android:orientation="horizontal"
+        android:weightSum="1.0">
+
+        <com.pattaya.pattayacallcenter.customview.RoundedImageView
+            android:id="@+id/pic_profileAdapter"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_margin="10dp"
+            android:src="@drawable/com_facebook_profile_picture_blank_square" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.9"
+            android:orientation="vertical"
+            android:padding="5dp">
+
+            <TextView
+                android:id="@+id/txt_name"
+                style="@style/text_header_list_style"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:singleLine="true"
+                android:layout_marginRight="10dp"
+                android:gravity="left"
+                android:text="อภัสนัน นนนภาพันธ์" />
+
+            <TextView
+                android:id="@+id/txt_message"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginRight="10dp"
+                android:maxLines="1"
+                android:gravity="left"
+                android:padding="5dp"
+                android:text="ส่งรูปให้หน่อย" />
+
+        </LinearLayout>
+
+
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/txt_timesend"
+        android:layout_below="@id/layout_profile"
+        style="@style/date_sub_list_text_style"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="right"
+        android:paddingBottom="3dp"
+        android:paddingLeft="10dp"
+        android:paddingTop="0dp"
+        android:text="13 ม.ค.2558 เวลา 10:30 น." />
+
+    <View
+        android:id="@+id/badge"
+        android:layout_margin="@dimen/margin_grab"
+        android:layout_width="25dp"
+        android:layout_height="25dp"
+        android:layout_alignParentRight="true" />
+</RelativeLayout>

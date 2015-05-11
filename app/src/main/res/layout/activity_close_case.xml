@@ -1,0 +1,91 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:focusableInTouchMode="true">
+
+    <ScrollView
+        android:id="@+id/scroll"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_above="@id/button"
+        android:paddingTop="5dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginLeft="@dimen/activity_vertical_margin"
+            android:layout_marginRight="@dimen/activity_vertical_margin"
+            android:layout_marginTop="10dp"
+            android:orientation="vertical">
+
+            <Spinner
+                android:id="@+id/sp"
+                style="@style/spinner_style"
+                android:entries="@array/array_close_case"></Spinner>
+
+            <TextView
+                style="@style/text_header_style"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="5dp"
+                android:drawableLeft="@drawable/asset_icon_normal_info_gray"
+                android:gravity="center"
+                android:text="@string/member_case_forward_detail" />
+
+            <EditText
+                android:id="@+id/edit_textdetail"
+                style="@style/text_fild_style" />
+
+            <EditText
+                android:id="@+id/time"
+                android:focusable="false"
+                style="@style/edittext_style"
+                android:hint="@string/time_success" />
+
+            <TextView
+                style="@style/text_header_style"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="5dp"
+                android:drawableLeft="@drawable/asset_icon_normal_photo_gray"
+                android:gravity="center"
+                android:text="@string/image" />
+
+            <com.pattaya.pattayacallcenter.customview.ExpandableHeightGridView
+                android:id="@+id/grid_view"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="5dp"
+                android:columnWidth="100dp"
+                android:gravity="center"
+                android:horizontalSpacing="8dp"
+                android:isScrollContainer="false"
+                android:numColumns="auto_fit"
+                android:stretchMode="columnWidth"
+                android:verticalSpacing="8dp">
+
+            </com.pattaya.pattayacallcenter.customview.ExpandableHeightGridView>
+
+        </LinearLayout>
+    </ScrollView>
+
+    <FrameLayout
+        android:id="@+id/button"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/button_height"
+        android:layout_alignParentBottom="true"
+        android:background="@color/orangeColor">
+
+        <Button
+            style="@style/button_style"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:drawableLeft="@drawable/asset_icon_normal_grid"
+            android:gravity="center"
+            android:clickable="false"
+            android:text="@string/image_select" />
+
+    </FrameLayout>
+
+</RelativeLayout>

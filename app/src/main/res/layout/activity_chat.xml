@@ -1,0 +1,60 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.pattaya.pattayacallcenter.member.ChatActivity">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_above="@+id/bar"
+        android:orientation="vertical">
+
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginTop="10dp"
+            android:orientation="vertical"
+            android:paddingLeft="@dimen/horizontal_margin"
+            android:paddingRight="@dimen/horizontal_margin">
+
+            <ListView
+                android:id="@+id/chat"
+                android:divider="@null"
+                android:dividerHeight="0dp"
+                android:listSelector="@android:color/transparent"
+                android:clickable="false"
+                android:focusable="false"
+                android:layout_gravity="bottom"
+                android:gravity="bottom"
+
+                android:stackFromBottom="true"
+                android:transcriptMode="alwaysScroll"
+                android:layout_width="match_parent"
+                android:layout_height="fill_parent"/>
+        </LinearLayout>
+
+
+    </LinearLayout>
+
+
+    <include
+        android:id="@+id/menu_slide_sticker"
+        layout="@layout/custom_chat_sticker_layout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginBottom="@dimen/bottom_height" />
+
+    <include
+        layout="@layout/custom_chat_select_image"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginBottom="@dimen/bottom_height" />
+
+    <include
+        android:id="@id/bar"
+        layout="@layout/custom_chat_bar" />
+
+</RelativeLayout>

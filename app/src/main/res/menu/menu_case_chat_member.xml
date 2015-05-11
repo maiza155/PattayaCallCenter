@@ -1,0 +1,10 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:com.pattaya.pattayacallcenter="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context="com.pattaya.pattayacallcenter.member.CaseChatMemberActivity">
+    <item
+        android:id="@+id/action_add"
+        android:icon="@drawable/asset_icon_large_action"
+        android:title="add"
+        com.pattaya.pattayacallcenter:showAsAction="always" />
+</menu>

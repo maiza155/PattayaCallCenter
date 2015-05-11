@@ -1,0 +1,72 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:focusableInTouchMode="true"
+    android:paddingBottom="@dimen/activity_vertical_margin"
+    android:paddingLeft="@dimen/horizontal_margin"
+    android:paddingRight="@dimen/horizontal_margin"
+    android:paddingTop="@dimen/activity_vertical_margin"
+    tools:context="com.pattaya.pattayacallcenter.share.AlertSettingActivity">
+
+    <RelativeLayout
+        android:id="@+id/top"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <TextView
+            android:id="@+id/textView"
+            style="@style/default_text_style"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_centerInParent="true"
+            android:layout_marginTop="20dp"
+            android:text="@string/alert_show"
+            android:textAppearance="?android:attr/textAppearanceLarge" />
+
+        <com.kyleduo.switchbutton.switchbutton.SwitchButton
+            android:id="@+id/switch1"
+            style="@style/SwitchButtonStyle"
+            android:layout_alignParentRight="true"
+            android:layout_centerInParent="true"
+            android:layout_marginTop="20dp"
+            app:onColor="@color/blueColor"
+            app:thumb_height="30dp"
+            app:thumb_width="30dp" />
+    </RelativeLayout>
+
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/top">
+
+        <TextView
+            android:id="@+id/textView2"
+            style="@style/default_text_style"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_centerVertical="true"
+            android:layout_marginTop="20dp"
+            android:text="@string/alert_sound"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:textColor="@color/background_material_dark" />
+
+        <com.kyleduo.switchbutton.switchbutton.SwitchButton
+            android:id="@+id/switch2"
+            style="@style/SwitchButtonStyle"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
+            android:layout_marginTop="20dp"
+            app:onColor="@color/blueColor"
+            app:thumb_height="30dp"
+            app:thumb_width="30dp" />
+
+
+    </RelativeLayout>
+
+
+</RelativeLayout>

@@ -1,0 +1,77 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingBottom="@dimen/activity_vertical_margin"
+    android:paddingLeft="@dimen/horizontal_margin"
+    android:paddingRight="@dimen/horizontal_margin"
+    android:paddingTop="@dimen/activity_vertical_margin"
+    tools:context="com.pattaya.pattayacallcenter.member.CaseAdvanceSearchActivity">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <TextView
+            style="@style/text_header_style"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingLeft="5dp"
+            android:text="@string/promptCategory" />
+
+        <Spinner
+            android:id="@+id/spn_Category"
+            style="@style/spinner_style"
+            android:entries="@array/array_Category"
+            android:prompt="@string/promptCategory" />
+
+        <TextView
+            style="@style/text_header_style"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingLeft="5dp"
+            android:text="@string/promptPriority" />
+
+        <Spinner
+            android:id="@+id/spn_Priority"
+            style="@style/spinner_style"
+            android:entries="@array/array_Priority"
+            android:prompt="@string/promptPriority" />
+
+        <TextView
+            style="@style/text_header_style"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingLeft="5dp"
+            android:text="@string/promptAction" />
+
+        <Spinner
+            android:id="@+id/spn_Action"
+            style="@style/spinner_style"
+            android:entries="@array/array_Action"
+            android:prompt="@string/promptAction" />
+
+        <TextView
+            style="@style/text_header_style"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingLeft="5dp"
+            android:text="@string/promptDue" />
+
+        <Spinner
+            android:id="@+id/spn_Due"
+            style="@style/spinner_style"
+            android:entries="@array/array_Due"
+            android:prompt="@string/promptDue" />
+
+        <Button
+            style="@style/button_style"
+            android:layout_marginTop="20dp"
+            android:background="@color/greenDarkColor"
+            android:drawableRight="@drawable/abc_ic_search_api_mtrl_alpha"
+            android:text="@string/search" />
+
+    </LinearLayout>
+
+</RelativeLayout>

@@ -1,0 +1,9 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:com.pattaya.pattayacallcenter="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context="com.pattaya.pattayacallcenter.guest.PlaceActivity">
+    <item
+        android:id="@+id/action_add"
+        android:title="@string/ok"
+        com.pattaya.pattayacallcenter:showAsAction="always" />
+</menu>

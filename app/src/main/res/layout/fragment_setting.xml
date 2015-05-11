@@ -1,0 +1,117 @@
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.pattaya.pattayacallcenter.member.SettingFragment">
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/menu_slide"
+        android:clickable="true">
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:alpha="0.6"
+            android:background="@color/transparent"
+            android:clickable="false" />
+
+        <TableLayout
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/primary"
+            android:clickable="true">
+
+            <TableRow android:layout_marginBottom="2dp">
+
+
+                <Button
+                    style="@style/button_style"
+                    android:id="@+id/btn_own"
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:gravity="left|center"
+                    android:paddingLeft="10dp"
+                    android:layout_marginRight="2dp"
+                    android:background="@color/blueColor"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="left"
+                    android:drawableLeft="@drawable/asset_icon_normal_person"
+                    android:text="@string/profile_information" />
+
+
+                <Button
+                    style="@style/button_style"
+                    android:id="@+id/btn_alert"
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:gravity="left|center"
+                    android:paddingLeft="10dp"
+                    android:background="@color/blueColor"
+                    android:layout_height="wrap_content"
+                    android:drawableLeft="@drawable/asset_icon_normal_notice"
+                    android:layout_gravity="left"
+                    android:text="@string/alert"
+                    android:elegantTextHeight="true" />
+
+            </TableRow>
+
+            <TableRow android:layout_marginBottom="2dp">
+
+
+                <Button
+                    style="@style/button_style"
+                    android:id="@+id/btn_organize"
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:layout_marginRight="2dp"
+                    android:gravity="left|center"
+                    android:paddingLeft="10dp"
+                    android:background="@color/blueColor"
+                    android:layout_height="wrap_content"
+                    android:drawableLeft="@drawable/asset_icon_normal_department"
+                    android:layout_gravity="left"
+                    android:text="@string/org" />
+
+
+                <Button
+                    style="@style/button_style"
+                    android:id="@+id/btn_pass"
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:gravity="left|center"
+                    android:paddingLeft="10dp"
+                    android:background="@color/blueColor"
+                    android:layout_height="wrap_content"
+                    android:drawableLeft="@drawable/asset_icon_normal_lock"
+                    android:layout_gravity="left"
+                    android:text="@string/change_pass" />
+
+            </TableRow>
+
+            <TableRow android:layout_marginBottom="1dp">
+
+                <FrameLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:background="@color/redDarkColor">
+
+                    <Button
+                        style="@style/button_style"
+                        android:id="@+id/btn_exit"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="@null"
+                        android:drawableLeft="@drawable/asset_icon_normal_logout"
+                        android:layout_gravity="center"
+                        android:text="@string/exit" />
+                </FrameLayout>
+            </TableRow>
+        </TableLayout>
+
+
+    </FrameLayout>
+
+</FrameLayout>
