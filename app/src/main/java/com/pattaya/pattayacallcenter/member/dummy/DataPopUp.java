@@ -4,6 +4,15 @@ package com.pattaya.pattayacallcenter.member.dummy;
  * Created by SWF on 2/9/2015.
  */
 public class DataPopUp {
+    String image;
+    String name;
+    int position = 0;
+
+    public DataPopUp(String image, String name) {
+        this.image = image;
+        this.name = name;
+    }
+
     public String getName() {
         return name;
     }
@@ -12,20 +21,19 @@ public class DataPopUp {
         this.name = name;
     }
 
-    public int getImage() {
+    public String getImage() {
         return image;
     }
 
-    public void setImage(int image) {
+    public void setImage(String image) {
         this.image = image;
     }
 
-    int image;
-   String name;
+    public int getPosition() {
+        return position;
+    }
 
-
-    public DataPopUp(int image, String name) {
-        this.image = image;
-        this.name = name;
+    public void setPosition(int position) {
+        this.position = position;
     }
 }

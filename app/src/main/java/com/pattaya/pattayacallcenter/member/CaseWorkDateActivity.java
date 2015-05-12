@@ -1,6 +1,7 @@
 package com.pattaya.pattayacallcenter.member;
 
 import android.app.DatePickerDialog;
+import android.app.ProgressDialog;
 import android.app.TimePickerDialog;
 import android.content.Context;
 import android.content.Intent;
@@ -10,8 +11,6 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
 import android.text.InputType;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.DatePicker;
@@ -28,6 +27,8 @@ import com.pattaya.pattayacallcenter.webservice.RestFulQueary;
 import com.pattaya.pattayacallcenter.webservice.WebserviceConnector;
 import com.pattaya.pattayacallcenter.webservice.object.UpdateResult;
 import com.pattaya.pattayacallcenter.webservice.object.UpdateTaskObject;
+import com.pattaya.pattayacallcenter.webservice.object.casedata.CaseDataMemberObject;
+import com.pattaya.pattayacallcenter.webservice.object.casedata.GetComplainObject;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -42,29 +43,25 @@ import retrofit.client.Response;
 
 public class CaseWorkDateActivity extends ActionBarActivity implements View.OnClickListener {
 
+    private static SharedPreferences spConfig;
+    private static SharedPreferences sp;
+    SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
     private EditText startDate;
     private EditText startTime;
     private EditText endDate;
     private EditText endTime;
-
     private DatePickerDialog fromDatePickerDialog, toDatePickerDialog;
     private TimePickerDialog mStartTimePicker, mEndTimePicker;
-
     // widget
     private ImageButton btn;
     private Button btnSend;
     private TextView titleTextView;
     private SimpleDateFormat dateFormatter;
+    private SimpleDateFormat dateFormatterTime;
     private int year, month, day, hour, minute;
     private Calendar calendar;
-
-
     private RestAdapter webserviceConnector = WebserviceConnector.getInstanceCase();
     private RestFulQueary adapterRest = null;
-
-
-    private static SharedPreferences spConfig;
-    private static SharedPreferences sp;
     private int userId;
     private String token;
     private String clientId;
@@ -86,6 +83,7 @@ public class CaseWorkDateActivity extends ActionBarActivity implements View.OnCl
         endDate = (EditText) findViewById(R.id.end_date);
         endTime = (EditText) findViewById(R.id.end_time);
         dateFormatter = new SimpleDateFormat("dd/MM/yyyy", Locale.ROOT);
+        dateFormatterTime = new SimpleDateFormat("HH:mm", Locale.ROOT);
 
 
         btnSend = (Button) findViewById(R.id.btn_send);
@@ -106,6 +104,7 @@ public class CaseWorkDateActivity extends ActionBarActivity implements View.OnCl
         btn.setOnClickListener(this);
         setDate();
         setClickListener();
+        getCaseData();
     }
 
     void setActionBar() {
@@ -184,6 +183,8 @@ public class CaseWorkDateActivity extends ActionBarActivity implements View.OnCl
     }
 
     void saveTaskDate() {
+        final ProgressDialog ringProgressDialog = ProgressDialog.show(this, null, getResources().getString(R.string.please_wait), true);
+        ringProgressDialog.setCancelable(true);
         UpdateTaskObject updateTaskObject = new UpdateTaskObject();
         updateTaskObject.setCasesId(caseId);
         updateTaskObject.setUserId(userId);
@@ -206,12 +207,14 @@ public class CaseWorkDateActivity extends ActionBarActivity implements View.OnCl
                             "Please try again.", Toast.LENGTH_SHORT)
                             .show();
                 }
+                ringProgressDialog.dismiss();
 
             }
 
             @Override
             public void failure(RetrofitError error) {
                 System.out.println("error = [" + error + "]");
+                ringProgressDialog.dismiss();
                 Toast.makeText(getApplication(),
                         "Please check your internet connection.", Toast.LENGTH_SHORT)
                         .show();
@@ -220,27 +223,57 @@ public class CaseWorkDateActivity extends ActionBarActivity implements View.OnCl
 
     }
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        //getMenuInflater().inflate(R.menu.menu_case_work_date, menu);
-        return true;
+
+    void getCaseData() {
+        final ProgressDialog ringProgressDialog = ProgressDialog.show(this, null, getResources().getString(R.string.please_wait), true);
+        ringProgressDialog.setCancelable(true);
+        GetComplainObject getComplainObject = new GetComplainObject();
+        getComplainObject.setAccessToken(token);
+        getComplainObject.setClientId(clientId);
+        getComplainObject.setPrimaryKeyId(caseId);
+
+        adapterRest.getCaseData(getComplainObject, new Callback<CaseDataMemberObject>() {
+
+            @Override
+            public void success(CaseDataMemberObject caseDataMemberObject, Response response) {
+                System.out.println(caseDataMemberObject.getDateForOperationIn());
+                System.out.println(caseDataMemberObject.getDateForOperationOut());
+                if (caseDataMemberObject.getDateForOperationIn() != null
+                        && caseDataMemberObject.getDateForOperationOut() != null) {
+                    try {
+                        Date datestart = sdf.parse(caseDataMemberObject.getDateForOperationIn());
+                        startDate.setText(dateFormatter.format(datestart));
+                        startTime.setText(dateFormatterTime.format(datestart));
+
+
+                        Date dateend = sdf.parse(caseDataMemberObject.getDateForOperationOut());
+                        endDate.setText(dateFormatter.format(dateend));
+                        endTime.setText(dateFormatterTime.format(dateend));
+
+
+                    } catch (ParseException e) {
+                        e.printStackTrace();
+                    }
+
+
+                }
+
+                ringProgressDialog.dismiss();
+
+
+            }
+
+            @Override
+            public void failure(RetrofitError error) {
+                System.out.println("error = [" + error + "]");
+                ringProgressDialog.dismiss();
+                Toast.makeText(getApplication(),
+                        "Please check your internet connection.", Toast.LENGTH_SHORT)
+                        .show();
+            }
+        });
     }
 
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
-        }
-
-        return super.onOptionsItemSelected(item);
-    }
 
     Boolean checkDate() {
 

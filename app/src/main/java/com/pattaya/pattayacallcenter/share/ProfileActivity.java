@@ -255,6 +255,7 @@ public class ProfileActivity extends ActionBarActivity implements View.OnClickLi
                 if (fileImage != null) {
                     //update image but cannot upload file
                     ringProgressDialog.dismiss();
+                    new TaskResizeUpload().execute();
 
                 } else {
                     //not update data Image
@@ -290,7 +291,7 @@ public class ProfileActivity extends ActionBarActivity implements View.OnClickLi
         adapterRest.postUser(accessUserObject, new Callback<UpdateResult>() {
             @Override
             public void success(UpdateResult updateResult, Response response) {
-                System.out.println("updateResult = [" + updateResult + "], response = [" + response + "]");
+                System.out.println("updateResult = [" + updateResult.getResult() + "], response = [" + response + "]");
                 Boolean bool = updateResult.getResult();
 
                 if (bool) {
@@ -502,7 +503,7 @@ public class ProfileActivity extends ActionBarActivity implements View.OnClickLi
         protected void onPreExecute() {
 
             super.onPreExecute();
-            ringProgressDialog = ProgressDialog.show(ProfileActivity.this, getResources().getString(R.string.uploading), getResources().getString(R.string.please_wait), true);
+            ringProgressDialog = ProgressDialog.show(ProfileActivity.this, null, getResources().getString(R.string.please_wait), true);
             ringProgressDialog.setCancelable(true);
         }
         @Override
@@ -531,7 +532,7 @@ public class ProfileActivity extends ActionBarActivity implements View.OnClickLi
 
             System.out.println(bitmap);
             ByteArrayOutputStream bos = new ByteArrayOutputStream();
-            bitmap.compress(Bitmap.CompressFormat.JPEG, 50, bos);
+            bitmap.compress(Bitmap.CompressFormat.JPEG, MasterData.PERCEN_OF_IMAGE_FILE, bos);
             byte[] bitmapdata = bos.toByteArray();
             FileOutputStream fos = null;
             try {
@@ -581,7 +582,7 @@ public class ProfileActivity extends ActionBarActivity implements View.OnClickLi
                     FileListObject fileListObject = new Gson().fromJson(JsonConvertData, FileListObject.class);
                     System.out.println(fileListObject.getData().get(0).getUrl());
                     urlImage = fileListObject.getData().get(0).getUrl();
-                    setImageUrl(urlImage);
+                    //setImageUrl(urlImage);
                     accessUserObject.setUserImage(urlImage);
                     updateDataAll();
 
@@ -590,7 +591,7 @@ public class ProfileActivity extends ActionBarActivity implements View.OnClickLi
                 @Override
                 public void failure(RetrofitError error) {
                     ringProgressDialog.dismiss();
-                    System.out.println("error = [" + error + "]");
+                    System.out.println("error upload = [" + error + "]");
                     Toast.makeText(getApplication(), "Unable connect server \n Please try again", Toast.LENGTH_SHORT).show();
                     // alertDialogFailtoServer();
 
@@ -598,6 +599,12 @@ public class ProfileActivity extends ActionBarActivity implements View.OnClickLi
             });
 
             return null;
+        }
+
+        @Override
+        protected void onPostExecute(Boolean aBoolean) {
+            super.onPostExecute(aBoolean);
+            Log.e("Task Upload", "finish");
         }
     }
 

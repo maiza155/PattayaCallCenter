@@ -63,6 +63,7 @@ public class PostActivity extends ActionBarActivity implements View.OnClickListe
     private final RestAdapter restAdapterPost = WebserviceConnector.getInstanceCartdUI();
     private final RestFulQueary restFulQuearyPost = restAdapterPost.create(RestFulQueary.class);
     private final RestFulQueary restFulQuearyUpload = restAdapterUpload.create(RestFulQueary.class);
+    ProgressDialog ringProgressDialog;
     private List<String> imageData;
     private List imageUploadURL;
     private CameraMange cameraMange;
@@ -78,7 +79,6 @@ public class PostActivity extends ActionBarActivity implements View.OnClickListe
     private SharedPreferences spUser;
     private int userId;
     private SavePostObject savePostObject;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -164,8 +164,13 @@ public class PostActivity extends ActionBarActivity implements View.OnClickListe
 
 
     void savePost() {
-        final ProgressDialog ringProgressDialog = ProgressDialog.show(PostActivity.this, getResources().getString(R.string.post), getResources().getString(R.string.please_wait), true);
-        ringProgressDialog.setCancelable(true);
+        runOnUiThread(new Runnable() {
+            public void run() {
+                ringProgressDialog = ProgressDialog.show(PostActivity.this, null, getResources().getString(R.string.please_wait), true);
+                ringProgressDialog.setCancelable(true);
+            }
+        });
+
         restFulQuearyPost.savePost(savePostObject, new Callback<UpdateResult>() {
             @Override
             public void success(UpdateResult updateResult, Response response) {
@@ -299,7 +304,7 @@ public class PostActivity extends ActionBarActivity implements View.OnClickListe
                for (String e : imageData) {
                    imageCount++;
                    System.out.println(e);
-                   int randomNum = 500 + (int) (Math.random() * 2000000000);
+                   int randomNum = 500 + (int) ((Math.random() * 1204006080) / Math.random());
                    File file = new File(getCacheDir(), "pattaya-post"+randomNum);
                    try {
                        file.createNewFile();
@@ -322,7 +327,7 @@ public class PostActivity extends ActionBarActivity implements View.OnClickListe
 
                    System.out.println(bitmap);
                    ByteArrayOutputStream bos = new ByteArrayOutputStream();
-                   bitmap.compress(Bitmap.CompressFormat.JPEG, 50, bos);
+                   bitmap.compress(Bitmap.CompressFormat.JPEG, MasterData.PERCEN_OF_IMAGE_FILE, bos);
                    byte[] bitmapdata = bos.toByteArray();
                    FileOutputStream fos = null;
                    try {

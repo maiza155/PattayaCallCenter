@@ -23,9 +23,6 @@ import org.jivesoftware.smack.ChatManager;
 import org.jivesoftware.smack.ConnectionConfiguration;
 import org.jivesoftware.smack.MessageListener;
 import org.jivesoftware.smack.PacketListener;
-import org.jivesoftware.smack.Roster;
-import org.jivesoftware.smack.RosterEntry;
-import org.jivesoftware.smack.RosterGroup;
 import org.jivesoftware.smack.SmackException;
 import org.jivesoftware.smack.XMPPConnection;
 import org.jivesoftware.smack.XMPPException;
@@ -62,7 +59,6 @@ import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.List;
 
 import retrofit.Callback;
@@ -73,16 +69,16 @@ import retrofit.client.Response;
 /**
  * Created by SWF on 2/17/2015.
  */
-public class XMPPManage implements MessageListener {
+public class XMPPManageOfficial implements MessageListener {
     public static final String HOST = "58.181.163.115";
-    //    public static final String HOST = "172.16.1.128";
+    //public static final String HOST = "172.16.1.128";
     public static final int PORT = 5222;
     public static final String PASSWORD = "1234";
     static final RestAdapter restAdapterOpenFire = RestAdapterOpenFire.getInstance();
     static final OpenfireQueary openfireQueary = restAdapterOpenFire.create(OpenfireQueary.class);
     public static String SERVICE = "pattaya-data";
     public static String USERNAME = " ";
-    public static XMPPManage xmppManage = null;
+    public static XMPPManageOfficial xmppManage = null;
     static Chat chat = null;
     static Chat mChat = null;
     static ConnectionConfiguration config;
@@ -99,26 +95,20 @@ public class XMPPManage implements MessageListener {
     final String GROUP_FRIEND = "Friends";
     final String GROUP_FAVORITE = "Favorite";
 
-    public static XMPPManage getInstance() {
+    public static XMPPManageOfficial getInstance() {
         if (xmppManage == null) {
             Log.e("XMPPManage", "CreatE nEW oBJECT");
             init();
-            xmppManage = new XMPPManage();
+            xmppManage = new XMPPManageOfficial();
 
         }
         return xmppManage;
     }
 
     private static void init() {
-        sp = Application.getContext().getSharedPreferences(MasterData.SHARED_NAME_USER_FILE, Context.MODE_PRIVATE);
-        jid = sp.getString(MasterData.SHARED_USER_JID, null);
-        USERNAME = jid.split("@")[0];
-        SERVICE = jid.split("@")[1];
         spConfig = Application.getContext().getSharedPreferences(MasterData.SHARED_NAME_CONFIG_FILE, Context.MODE_PRIVATE);
 
-        Log.e("XMPPManage", jid);
-
-
+        USERNAME = "pattayaofficial58";
     }
 
     public static Chat getChat() {
@@ -126,7 +116,7 @@ public class XMPPManage implements MessageListener {
     }
 
     public static void setChat(Chat chat) {
-        XMPPManage.chat = chat;
+        XMPPManageOfficial.chat = chat;
     }
 
     private static void setChatRoomInvitationListener() {
@@ -206,63 +196,7 @@ public class XMPPManage implements MessageListener {
     }
 
     static void messageReceiver() {
-        PacketFilter filter = new MessageTypeFilter(Message.Type.chat);
-        mConnection.addPacketListener(new PacketListener() {
-            public void processPacket(Packet packet) {
-                Log.e("XMPPManage", "Packet Reciver >>" + packet);
-                DelayInformation inf = null;
-                try {
-                    inf = packet.getExtension("x", "jabber:x:delay");
-                } catch (Exception e) {
-                    Log.e("XMPPManage Error", "" + e);
-                }
-                // get offline message timestamp
-                if (inf != null) {
-                    Date date = inf.getStamp();
-                    Log.e("XMPPManage", "Time Stamp" + date);
 
-                }
-                final Message message = (Message) packet;
-                String from = message.getFrom().split("/")[0];
-                Log.e("XMPPManage", "////////////// User  Chat //////////////////////////");
-                Log.e("XMPPManage", "From :: " + " >> " + from);
-                Log.e("XMPPManage", "Received message :: " + " >> " + message.getBody());
-                Log.d("XMPPManage", "XML Message  " + " >> " + message);
-
-                if (!from.equalsIgnoreCase(mConnection.getUser().split("/")[0])
-                        && DatabaseChatHelper.init().getOneUsers(from) != null) {
-                    Calendar c = Calendar.getInstance();
-                    System.out.println(sdf.format(c.getTime())); //2014/08/06 16:00:22
-                    final Messages messages = new Messages();
-                    messages.setMessage(message.getBody());
-                    messages.setRoom(from);
-                    messages.setSender(from);
-                    messages.setTime(sdf.format(c.getTime()));
-                    //BusProvider.getInstance().post(messages);
-                    getUserData(messages);
-
-
-                } else if (from.equalsIgnoreCase(xmppManage.getmConnection().getUser().split("/")[0])) {
-                    String room = message.getSubject();
-                    System.out.println("XMPPManage  " + "room = [" + room + "]");
-                    if (room != null) {
-                        Calendar c = Calendar.getInstance();
-                        System.out.println(sdf.format(c.getTime())); //2014/08/06 16:00:22
-                        Messages messages = new Messages();
-                        messages.setMessage(message.getBody());
-                        messages.setRoom(room);
-                        messages.setSender(from);
-                        messages.setTime(sdf.format(c.getTime()));
-                        // DataChat mData = new DataChat(otherUser, messages);
-                        databaseChatHelper.addLogs(messages);
-                        BusProvider.getInstance().post(messages);
-                    }
-
-                }
-
-
-            }
-        }, filter);
         PacketFilter filterMulti = new MessageTypeFilter(Message.Type.groupchat);
         mConnection.addPacketListener(new PacketListener() {
             public void processPacket(Packet packet) {
@@ -301,7 +235,6 @@ public class XMPPManage implements MessageListener {
         }, filterMulti);
 
         PacketFilter filter2 = new MessageTypeFilter(Message.Type.normal);
-
         mConnection.addPacketListener(new PacketListener() {
             public void processPacket(Packet packet) {
                 Log.e("Tag, ", "////////////// notify messages //////////////////////////");
@@ -423,7 +356,7 @@ public class XMPPManage implements MessageListener {
             public void processPacket(Packet packet) throws SmackException.NotConnectedException {
 
                 new TaskGetFriend(Application.getContext()).execute();
-                Log.d("TAG SET >>>",""+packet);
+                Log.d("TAG SET >>>", "" + packet);
 
             }
         }, new IQTypeFilter(IQ.Type.SET));
@@ -670,23 +603,26 @@ public class XMPPManage implements MessageListener {
         new Thread(new Runnable() {
             public void run() {
                 try {
-                    Presence presence = new Presence(org.jivesoftware.smack.packet.Presence.Type.unavailable);
-                    presence.setStatus(mConnection.getUser() + "logout");
-                    //  pm = null;
+                    if (mConnection != null) {
+                        Presence presence = new Presence(Presence.Type.unavailable);
+                        presence.setStatus(mConnection.getUser() + "logout");
+                        //  pm = null;
 
-                    try {
-                        mConnection.disconnect(presence);
-                    } catch (Exception exception) {
-                        exception.printStackTrace();
+                        try {
+                            mConnection.disconnect(presence);
+                        } catch (Exception exception) {
+                            exception.printStackTrace();
+                            mConnection.disconnect();
+                        }
+
+                        Log.w("LogOut", "LogOut");
+
+
                         mConnection.disconnect();
+                        mConnection = null;
+                        xmppManage = null;
                     }
 
-                    Log.w("LogOut", "LogOut");
-
-
-                    mConnection.disconnect();
-                    mConnection = null;
-                    xmppManage = null;
                 } catch (SmackException.NotConnectedException e) {
                     e.printStackTrace();
                 }
@@ -696,152 +632,6 @@ public class XMPPManage implements MessageListener {
 
     }
 
-    public Boolean removeRoster(String jid) {
-        if (mConnection != null && mConnection.isConnected()) {
-            Roster roster = mConnection.getRoster();
-            RosterEntry entry = roster.getEntry(jid);
-            if (entry != null) {
-                try {
-                    roster.removeEntry(entry);
-                    return true;
-                } catch (XMPPException e) {
-
-                    e.printStackTrace();
-                    return false;
-                } catch (SmackException.NotLoggedInException e) {
-                    e.printStackTrace();
-                    return false;
-                } catch (SmackException.NotConnectedException e) {
-                    e.printStackTrace();
-                    return false;
-                } catch (SmackException.NoResponseException e) {
-                    e.printStackTrace();
-                    return false;
-                }
-
-            }
-
-
-        }
-        return false;
-    }
-
-    public Boolean createRoster(String jid, String name) {
-        System.out.println(name);
-        final String[] group = {GROUP_FRIEND};
-        if (mConnection != null && mConnection.isConnected()) {
-            Roster roster = mConnection.getRoster();
-            if (roster.getGroup(GROUP_FRIEND) == null) {
-                roster.createGroup(GROUP_FRIEND);
-            } else {
-                roster.getGroup(GROUP_FRIEND);
-            }
-            Presence subscribe = new Presence(Presence.Type.subscribe);
-            subscribe.setTo(jid);
-            try {
-                mConnection.sendPacket(subscribe);
-                roster.createEntry(jid, name, group);
-                return true;
-            } catch (SmackException.NotConnectedException e) {
-                e.printStackTrace();
-                return false;
-            } catch (SmackException.NotLoggedInException e) {
-                e.printStackTrace();
-                return false;
-            } catch (XMPPException.XMPPErrorException e) {
-                e.printStackTrace();
-                return false;
-            } catch (SmackException.NoResponseException e) {
-                e.printStackTrace();
-                return false;
-            }
-
-        }
-
-        return false;
-    }
-
-    public Boolean updateFavourite(String jid) {
-        String group = GROUP_FAVORITE;
-        String[] groups = {GROUP_FRIEND, group};
-        System.out.println(mConnection + "'''''''''" + mConnection.isConnected());
-        if (mConnection != null && mConnection.isConnected()) {
-            System.out.println(mConnection + "'''''''''" + mConnection.isConnected());
-            Roster roster = mConnection.getRoster();
-            RosterEntry userEntry = roster.getEntry(jid);
-            RosterGroup rosterGroup = roster.getGroup(group);
-            if (rosterGroup == null) roster.createGroup(group);
-            System.out.println(jid + "'''''''''" + userEntry);
-            if (userEntry != null) {
-                System.out.println("get group >>>" + userEntry.getGroups().isEmpty() + "   size" + userEntry.getGroups().size());
-                try {
-                    roster.createEntry(userEntry.getUser(), userEntry.getName(), groups);
-                    return true;
-                } catch (SmackException.NotLoggedInException e) {
-                    e.printStackTrace();
-                } catch (SmackException.NoResponseException e) {
-                    e.printStackTrace();
-                } catch (XMPPException.XMPPErrorException e) {
-                    e.printStackTrace();
-                } catch (SmackException.NotConnectedException e) {
-                    e.printStackTrace();
-                }
-
-            }
-        }
-        return false;
-    }
-
-    public Boolean removeFavourite(String jid) {
-        final String[] groups = {GROUP_FRIEND};
-        if (mConnection != null && mConnection.isConnected()) {
-            Roster roster = mConnection.getRoster();
-            RosterEntry userEntry = roster.getEntry(jid);
-            if (roster.getGroup(GROUP_FRIEND) == null) {
-                roster.createGroup(GROUP_FRIEND);
-            } else {
-                roster.getGroup(GROUP_FRIEND);
-            }
-            if (userEntry != null) {
-                try {
-                    roster.createEntry(jid, userEntry.getName(), groups);
-                    return true;
-                } catch (SmackException.NoResponseException e) {
-                    e.printStackTrace();
-                } catch (XMPPException.XMPPErrorException e) {
-                    e.printStackTrace();
-                } catch (SmackException.NotConnectedException e) {
-                    e.printStackTrace();
-                } catch (SmackException.NotLoggedInException e) {
-                    e.printStackTrace();
-                }
-
-            }
-
-
-        }
-
-        return false;
-    }
-
-    public Boolean checkRoster(String jid) {
-        if (mConnection != null && mConnection.isConnected()) {
-            Roster roster = mConnection.getRoster();
-            if (!roster.contains(jid)) {
-                return true;
-            } else {
-                RosterEntry entry = roster.getEntry(jid);
-                if (entry != null) {
-                    if (entry.getGroups().isEmpty()) {
-                        return true;
-                    }
-                }
-
-            }
-        }
-        return false;
-
-    }
 
     public void initIQForChatreQuest(final String room) {
         chatHistoryData.setCurrentListPacket(room);

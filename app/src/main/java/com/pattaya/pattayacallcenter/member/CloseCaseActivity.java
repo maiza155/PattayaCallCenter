@@ -69,43 +69,37 @@ import retrofit.client.Response;
 
 public class CloseCaseActivity extends ActionBarActivity implements View.OnClickListener, View.OnCreateContextMenuListener {
 
+    static SharedPreferences spConfig;
+    static SharedPreferences sp;
+    static SimpleDateFormat dateFormatter = new SimpleDateFormat("dd/MM/yyyy");
     List imageData;
     CameraMange cameraMange;
     ImageUpdateGridAdapter mGridAdapter;
     ExpandableHeightGridView gridView;
     View btnImage;
     CloseCaseObject data;
-
     Spinner spinner;
     EditText txtDetail;
     EditText time;
     // widget
     View btn;
     TextView titleTextView;
-
-    static SharedPreferences spConfig;
-    static SharedPreferences sp;
-
     int userId;
     String token;
     String clientId;
-
-    private int year, month, day, hour, minute;
-    private Calendar calendar;
     DatePickerDialog fromDatePickerDialog;
     int caseId;
     int complainId;
-    static SimpleDateFormat dateFormatter = new SimpleDateFormat("dd/MM/yyyy");
     RestAdapter webserviceConnectorUpload = WebserviceConnector.getInstanceUpload();
     RestFulQueary adapterRestUpload = null;
     RestAdapter webserviceConnector = WebserviceConnector.getInstanceCase();
     RestFulQueary adapterRest = null;
-
-
+    ProgressDialog ringProgressDialog;
+    private int year, month, day, hour, minute;
+    private Calendar calendar;
     private String displayName;
     private String displayImage;
     private String caseName;
-    ProgressDialog ringProgressDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -416,7 +410,7 @@ public class CloseCaseActivity extends ActionBarActivity implements View.OnClick
                     if (e.getTag() == 1) {
                         imageCount++;
 
-                        int randomNum = 500 + (int) (Math.random() * 2000000000);
+                        int randomNum = 500 + (int) ((Math.random() * 1204006080) / Math.random());
                         File file = new File(getCacheDir(), "pattaya" + randomNum);
                         try {
                             file.createNewFile();
@@ -440,7 +434,7 @@ public class CloseCaseActivity extends ActionBarActivity implements View.OnClick
 
                         System.out.println(bitmap);
                         ByteArrayOutputStream bos = new ByteArrayOutputStream();
-                        bitmap.compress(Bitmap.CompressFormat.JPEG, 50, bos);
+                        bitmap.compress(Bitmap.CompressFormat.JPEG, MasterData.PERCEN_OF_IMAGE_FILE, bos);
                         byte[] bitmapdata = bos.toByteArray();
                         FileOutputStream fos = null;
                         try {

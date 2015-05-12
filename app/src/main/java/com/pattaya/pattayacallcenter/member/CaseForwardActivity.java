@@ -78,6 +78,7 @@ public class CaseForwardActivity extends ActionBarActivity implements View.OnCli
 
     private static SharedPreferences spConfig;
     private static SharedPreferences sp;
+    ProgressDialog ringProgressDialog;
     private ArrayList<ForwardObject> arrayList;
     private TextView txtTo;
     private List imageData;
@@ -100,19 +101,14 @@ public class CaseForwardActivity extends ActionBarActivity implements View.OnCli
     private String displayName;
     private String displayImage;
     private String caseName;
-
     private SendReassignTaskObject data;
-
     private RestAdapter webserviceConnectorUpload = WebserviceConnector.getInstanceUpload();
     private RestFulQueary adapterRestUpload = null;
     private RestAdapter webserviceConnector = WebserviceConnector.getInstanceCase();
     private RestFulQueary adapterRest = null;
     private RestAdapter openfireConnectorJson = RestAdapterOpenFire.getInstanceJson();
     private OpenfireQueary openfireQuearyJson = openfireConnectorJson.create(OpenfireQueary.class);
-
     private int STATE_FORWARD = 0;
-
-    ProgressDialog ringProgressDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -518,8 +514,8 @@ public class CaseForwardActivity extends ActionBarActivity implements View.OnCli
                     if (e.getTag() == 1) {
                         imageCount++;
 
-                        int randomNum = 500 + (int) (Math.random() * 2000000000);
-                        File file = new File(getCacheDir(), "pattaya"+randomNum);
+                        int randomNum = 500 + (int) ((Math.random() * 1204006080) / Math.random());
+                        File file = new File(getCacheDir(), "pattaya-to" + randomNum);
                         try {
                             file.createNewFile();
                         } catch (IOException error) {
@@ -542,7 +538,7 @@ public class CaseForwardActivity extends ActionBarActivity implements View.OnCli
 
                         System.out.println(bitmap);
                         ByteArrayOutputStream bos = new ByteArrayOutputStream();
-                        bitmap.compress(Bitmap.CompressFormat.JPEG, 50, bos);
+                        bitmap.compress(Bitmap.CompressFormat.JPEG, MasterData.PERCEN_OF_IMAGE_FILE, bos);
                         byte[] bitmapdata = bos.toByteArray();
                         FileOutputStream fos = null;
                         try {

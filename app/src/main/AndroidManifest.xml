@@ -52,8 +52,8 @@
             android:name=".share.LoginActivity"
             android:configChanges="orientation"
             android:hardwareAccelerated="false"
-            android:windowSoftInputMode="adjustResize"
-            android:screenOrientation="portrait">
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="adjustResize">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -106,9 +106,9 @@
             android:label="@string/title_activity_case_result" />
         <activity
             android:name=".guest.CaseChatActivity"
+            android:label="@string/title_activity_case_chat"
             android:screenOrientation="portrait"
-            android:windowSoftInputMode="stateHidden"
-            android:label="@string/title_activity_case_chat" />
+            android:windowSoftInputMode="stateHidden" />
         <activity
             android:name=".member.OrganizeMemberActivity"
             android:label="@string/title_activity_case_chat" />
@@ -122,25 +122,25 @@
             android:label="@string/title_activity_case_chat" />
         <activity
             android:name=".member.MemberMainActivity"
-            android:screenOrientation="portrait"
+            android:label="@string/title_activity_member_main"
             android:launchMode="singleTask"
-            android:label="@string/title_activity_member_main"></activity>
+            android:screenOrientation="portrait"></activity>
         <activity
             android:name=".member.FriendRequestActivity"
             android:label="@string/title_activity_friend_request" />
         <activity
             android:name=".member.AddFriendActivity"
-            android:windowSoftInputMode="adjustPan"
-            android:label="@string/title_activity_add_friend" />
+            android:label="@string/title_activity_add_friend"
+            android:windowSoftInputMode="adjustPan" />
         <activity
             android:name=".member.AddGroupActivity"
             android:label="@string/title_activity_add_group" />
         <activity
             android:name=".member.ChatActivity"
-            android:screenOrientation="portrait"
             android:label="@string/title_activity_chat"
-            android:windowSoftInputMode="stateHidden"
-            android:launchMode="singleTask" />
+            android:launchMode="singleTask"
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="stateHidden" />
         <activity
             android:name=".member.CaseAdvanceSearchActivity"
             android:label="@string/title_activity_case_advance_search" />
@@ -150,8 +150,8 @@
             android:windowSoftInputMode="stateHidden" />
         <activity
             android:name=".member.CaseChatMemberActivity"
-            android:screenOrientation="portrait"
             android:label="@string/title_activity_case_chat_member"
+            android:screenOrientation="portrait"
             android:windowSoftInputMode="stateHidden" />
         <activity
             android:name=".member.CaseDetailMemberActivity"
@@ -200,6 +200,7 @@
             android:label="@string/title_activity_show_post_data"></activity>
 
         <service android:name=".chat.XMPPService" />
+        <service android:name=".chat.XMPPServiceOfficial" />
         <service
             android:name=".chat.StrickLoaderService"
             android:enabled="true"

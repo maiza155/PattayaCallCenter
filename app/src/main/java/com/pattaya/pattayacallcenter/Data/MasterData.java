@@ -8,6 +8,7 @@ public class MasterData {
     public static final int PICK_IMAGE_MULTIPLE = 300;
     public static final int PLACE_DATA = 299;
     public static final int FORWARD_TO_DATA = 298;
+    public static final int PERCEN_OF_IMAGE_FILE = 70;
 
 
     public static final String SHARED_NAME_USER_FILE = "PREF_USER";
@@ -21,7 +22,7 @@ public class MasterData {
     public static final String SHARED_USER_FACEBOOK = "FACEBOOK";
     public static final String SHARED_USER_FRIST_NAME = "FIRST_NAME";
     public static final String SHARED_USER_LAST_NAME = "LAST_NAME";
-
+    public static final String SHARED_IS_OFFICIAL = "OFFICIAL";
 
     public static final String SHARED_NAME_CONFIG_FILE = "APP_CONFIG";
     public static final String SHARED_CONFIG_ALERT = "ALERT";

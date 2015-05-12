@@ -50,9 +50,9 @@ public class NotifyCase {
                 R.layout.notification_layout);
 
         contentView.setTextViewText(R.id.header, object.getAction());
-        contentView.setTextViewText(R.id.title,"ชื่อเรื่อง : " + object.getTitle());
-        contentView.setTextViewText(R.id.name, "ชื่อผู้เเจ้ง: " + object.getName());
-        contentView.setTextViewText(R.id.date, "วันที่    : " + mysdf.format(cal.getTime()));
+        contentView.setTextViewText(R.id.title,"ชื่อเรื่อง:"+ Application.getContext().getResources().getString(R.string.tab) + object.getTitle());
+        contentView.setTextViewText(R.id.name, "ชื่อผู้เเจ้ง:"+ Application.getContext().getResources().getString(R.string.tab) + object.getName());
+        contentView.setTextViewText(R.id.date, "วันที:"+ Application.getContext().getResources().getString(R.string.tab) + mysdf.format(cal.getTime()));
 
         String content = "ชื่อเรื่อง :" + object.getTitle() + "\n" + "ชื่อผู้เเจ้ง :" + object.getName() + "\n";
 

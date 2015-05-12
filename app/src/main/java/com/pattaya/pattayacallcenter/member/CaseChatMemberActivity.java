@@ -328,8 +328,6 @@ public class CaseChatMemberActivity extends ActionBarActivity implements View.On
                     case 6:
                         intent = new Intent(getApplicationContext(), CaseWorkDateActivity.class);
                         intent.putExtra("id", idCase);
-                        intent.putExtra("complainid", complainId);
-                        intent.putExtra("casename", caseName);
                         startActivity(intent);
                         break;
                     case 7:

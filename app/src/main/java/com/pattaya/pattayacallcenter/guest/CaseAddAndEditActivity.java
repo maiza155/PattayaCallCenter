@@ -112,13 +112,12 @@ public class CaseAddAndEditActivity extends ActionBarActivity implements View.On
     int contactInfoId;
     ProgressListener listener;
     SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy HH:mm");
+    ProgressDialog ringProgressDialog;
     private String displayName;
     private String displayImage;
     private RestFulQueary adapterRestUser = null;
     private RestAdapter openfireConnectorJson = RestAdapterOpenFire.getInstanceJson();
     private OpenfireQueary openfireQuearyJson = openfireConnectorJson.create(OpenfireQueary.class);
-
-    ProgressDialog ringProgressDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -616,8 +615,8 @@ public class CaseAddAndEditActivity extends ActionBarActivity implements View.On
                 for (ImageData e : mGridAdapter.getData()) {
                     if (e.getTag() == 1) {
                         imageCount++;
-                        int randomNum = 500 + (int) (Math.random() * 2000000000);
-                        File file = new File(getCacheDir(), "pattaya"+randomNum);
+                        int randomNum = 500 + (int) ((Math.random() * 1204006080) / Math.random());
+                        File file = new File(getCacheDir(), "pattaya-complain" + randomNum);
                         try {
                             file.createNewFile();
                         } catch (IOException error) {
@@ -640,7 +639,7 @@ public class CaseAddAndEditActivity extends ActionBarActivity implements View.On
 
                         System.out.println(bitmap);
                         ByteArrayOutputStream bos = new ByteArrayOutputStream();
-                        bitmap.compress(Bitmap.CompressFormat.JPEG, 50, bos);
+                        bitmap.compress(Bitmap.CompressFormat.JPEG, MasterData.PERCEN_OF_IMAGE_FILE, bos);
                         byte[] bitmapdata = bos.toByteArray();
                         FileOutputStream fos = null;
                         try {

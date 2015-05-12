@@ -18,6 +18,28 @@ public class CaseDataMemberObject {
     Boolean isFollowUp;
     int percentSuccess;
     Integer priorityString;
+    String dateForOperationIn;
+    String dateForOperationOut;
+
+    public String getDateForOperationIn() {
+        return dateForOperationIn;
+    }
+
+    public String getDateForOperationOut() {
+        return dateForOperationOut;
+    }
+
+    public Boolean isAction() {
+        return isAction;
+    }
+
+    public Boolean isFollowUp() {
+        return isFollowUp;
+    }
+
+    public Integer getPriorityString() {
+        return priorityString;
+    }
 
     public Integer getPriority() {
         return priorityString;

@@ -1,4 +1,4 @@
-package com.pattaya.pattayacallcenter;
+package com.pattaya.pattayacallcenter.webservice;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -25,16 +25,18 @@ import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.google.gson.Gson;
+import com.pattaya.pattayacallcenter.Application;
+import com.pattaya.pattayacallcenter.CountingTypedFile;
 import com.pattaya.pattayacallcenter.Data.MasterData;
 import com.pattaya.pattayacallcenter.Data.Messages;
 import com.pattaya.pattayacallcenter.Data.Users;
+import com.pattaya.pattayacallcenter.ProgressListener;
+import com.pattaya.pattayacallcenter.R;
 import com.pattaya.pattayacallcenter.chat.DatabaseChatHelper;
-import com.pattaya.pattayacallcenter.chat.XMPPManage;
-import com.pattaya.pattayacallcenter.chat.XMPPService;
+import com.pattaya.pattayacallcenter.chat.XMPPManageOfficial;
+import com.pattaya.pattayacallcenter.chat.XMPPServiceOfficial;
 import com.pattaya.pattayacallcenter.customview.FullscreenActivity;
 import com.pattaya.pattayacallcenter.customview.RoundedImageView;
-import com.pattaya.pattayacallcenter.webservice.RestFulQueary;
-import com.pattaya.pattayacallcenter.webservice.WebserviceConnector;
 import com.pattaya.pattayacallcenter.webservice.object.upload.FileListObject;
 
 import org.jivesoftware.smack.SmackException;
@@ -63,11 +65,11 @@ import retrofit.client.Response;
 /**
  * Created by SWF on 2/23/2015.
  */
-public class AdapterChat extends BaseAdapter {
+public class AdapterOfficial extends BaseAdapter {
 
     final RestAdapter restAdapterUpload = WebserviceConnector.getInstanceUpload();
     final RestFulQueary restFulQuearyUpload = restAdapterUpload.create(RestFulQueary.class);
-    XMPPManage xmppManage = XMPPManage.getInstance();
+    XMPPManageOfficial xmppManage = XMPPManageOfficial.getInstance();
     MultiUserChat multiUserChat;
     ListView view;
     SimpleDateFormat sdf = new SimpleDateFormat("E dd MMM yyyy-HH:mm:ss ");
@@ -82,7 +84,7 @@ public class AdapterChat extends BaseAdapter {
     private ProgressListener listener;
 
 
-    public AdapterChat(Context context, ArrayList data, Users user, String mUser, ListView view) {
+    public AdapterOfficial(Context context, ArrayList data, Users user, String mUser, ListView view) {
         this.context = context;
         this.dataUser = user;
         this.data = data;
@@ -320,7 +322,8 @@ public class AdapterChat extends BaseAdapter {
     }
 
     void initChatService() {
-        xmppManage = XMPPManage.getInstance();
+        xmppManage = XMPPManageOfficial.getInstance();
+
         if (xmppManage.getmConnection() != null && xmppManage.getmConnection().isConnected()) {
             if (dataUser.getType() == Users.TYPE_FRIEND) {
                 xmppManage.initChat(dataUser.getJid());
@@ -330,7 +333,7 @@ public class AdapterChat extends BaseAdapter {
             }
             xmppManage.initIQForChatreQuest(dataUser.getJid());
         } else {
-            context.startService(new Intent(context, XMPPService.class));
+            context.startService(new Intent(context, XMPPServiceOfficial.class));
         }
 
     }
@@ -577,11 +580,11 @@ public class AdapterChat extends BaseAdapter {
         }
     }
 
-    class TaskResizeUpload extends AsyncTask<Void,Void,Boolean>{
+    class TaskResizeUpload extends AsyncTask<Void, Void, Boolean> {
         String s;
         int position;
 
-        public TaskResizeUpload( String s,int position) {
+        public TaskResizeUpload(String s, int position) {
             this.position = position;
             this.s = s;
         }
@@ -629,8 +632,8 @@ public class AdapterChat extends BaseAdapter {
             } catch (IOException error) {
                 error.printStackTrace();
             }
-            Log.e("File upload",""+file.length());
-            Log.e("File upload",""+file.getAbsolutePath());
+            Log.e("File upload", "" + file.length());
+            Log.e("File upload", "" + file.getAbsolutePath());
 
             final long totalSize = file.length();
 

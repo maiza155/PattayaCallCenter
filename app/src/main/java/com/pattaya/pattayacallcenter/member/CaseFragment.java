@@ -28,16 +28,21 @@ import android.widget.PopupWindow;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
 import com.google.gson.Gson;
 import com.pattaya.pattayacallcenter.BusProvider;
+import com.pattaya.pattayacallcenter.Data.MasterData;
 import com.pattaya.pattayacallcenter.R;
 import com.pattaya.pattayacallcenter.chat.DatabaseChatHelper;
+import com.pattaya.pattayacallcenter.chat.XMPPManageOfficial;
+import com.pattaya.pattayacallcenter.chat.XMPPServiceOfficial;
 import com.pattaya.pattayacallcenter.customview.SlideMenuManage;
 import com.pattaya.pattayacallcenter.member.Adapter.AdapterListCaseActionBar;
 import com.pattaya.pattayacallcenter.member.Adapter.AdpterListCase;
 import com.pattaya.pattayacallcenter.member.dummy.DataPopUp;
 import com.pattaya.pattayacallcenter.webservice.RestFulQueary;
 import com.pattaya.pattayacallcenter.webservice.WebserviceConnector;
+import com.pattaya.pattayacallcenter.webservice.object.OfficialObject;
 import com.pattaya.pattayacallcenter.webservice.object.casedata.CaseListMemberData;
 import com.pattaya.pattayacallcenter.webservice.object.casedata.CaseListMemberObject;
 import com.pattaya.pattayacallcenter.webservice.object.casedata.GetCaseListData;
@@ -71,14 +76,23 @@ public class CaseFragment extends Fragment implements View.OnClickListener
     Button btnCreate;
     AdpterListCase adpterListCase;
     ListView list;
-    SharedPreferences sp;
+    SharedPreferences sp, spConfig;
     SharedPreferences.Editor editor;
     RestAdapter webserviceConnector = WebserviceConnector.getInstanceCase();
     RestFulQueary adapterRest = null;
+
+
+    RestAdapter webserviceConnectorUser = WebserviceConnector.getInstance();
+    RestFulQueary adapterRestUser = webserviceConnectorUser.create(RestFulQueary.class);
+
+    String userName;
+    String userImage;
     int userId;
+    Boolean isOfficial;
     String token;
     String clientId;
     List<CaseListMemberData> dataList = new ArrayList<>();
+    ArrayList<DataPopUp> listUsers = new ArrayList();
     View btnClick;
     ProgressBar progressBar;
     TextView txtEmpty;
@@ -103,14 +117,20 @@ public class CaseFragment extends Fragment implements View.OnClickListener
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
+        listUsers = new ArrayList();
 
+        sp = getActivity().getSharedPreferences(MasterData.SHARED_NAME_USER_FILE, Context.MODE_PRIVATE);
+        userId = sp.getInt(MasterData.SHARED_USER_USER_ID, -10);
+        userImage = sp.getString(MasterData.SHARED_USER_IMAGE, "No image");
+        userName = sp.getString(MasterData.SHARED_USER_DISPLAY_NAME, "Unknown");
+        isOfficial = sp.getBoolean(MasterData.SHARED_IS_OFFICIAL, false);
 
-        sp = getActivity().getSharedPreferences("PREF_USER", Context.MODE_PRIVATE);
-        userId = sp.getInt("USER_ID", -10);
-        sp = getActivity().getSharedPreferences("APP_CONFIG", Context.MODE_PRIVATE);
-        token = sp.getString("TOKEN", "null");
-        clientId = sp.getString("CLIENT_ID", "null");
+        spConfig = getActivity().getSharedPreferences(MasterData.SHARED_NAME_CONFIG_FILE, Context.MODE_PRIVATE);
+        token = spConfig.getString("TOKEN", "null");
+        clientId = spConfig.getString("CLIENT_ID", "null");
         adapterRest = webserviceConnector.create(RestFulQueary.class);
+        listUsers.add(new DataPopUp(userImage, userName));
+        getUserOfficialData();
 
 
     }
@@ -119,7 +139,6 @@ public class CaseFragment extends Fragment implements View.OnClickListener
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-
 
 
         this.inflater = inflater;
@@ -164,6 +183,7 @@ public class CaseFragment extends Fragment implements View.OnClickListener
             getCaseList("");
         }
 
+
         return root;
     }
 
@@ -194,6 +214,29 @@ public class CaseFragment extends Fragment implements View.OnClickListener
         actionBar.getSupportActionBar().setCustomView(v);
         actionBar.getSupportActionBar().setDisplayHomeAsUpEnabled(false);
         actionBar.getSupportActionBar().setDisplayShowHomeEnabled(false);
+
+        ImageView rootView = (ImageView) btn;
+        Log.e("isOfficial", "" + isOfficial);
+        if (isOfficial) {
+            if (listUsers.size() == 2) {
+                Glide.with(this)
+                        .load(listUsers.get(1).getImage())
+                        .override(300, 300)
+                        .fitCenter()
+                        .into(rootView);
+            } else {
+                getUserOfficialData();
+            }
+
+        } else {
+
+            Glide.with(this)
+                    .load(listUsers.get(0).getImage())
+                    .override(300, 300)
+                    .fitCenter()
+                    .into(rootView);
+        }
+
     }
 
 
@@ -259,21 +302,38 @@ public class CaseFragment extends Fragment implements View.OnClickListener
 
     private void displayPopupWindow(final View anchorView) {
         final PopupWindow popup = new PopupWindow(getActivity());
-        ArrayList list = new ArrayList();
-
-
         View layout = this.inflater.inflate(R.layout.custom_list_popup, null);
         ListView lv = (ListView) layout.findViewById(R.id.listview);
-        final AdapterListCaseActionBar adapterListCaseActionBar = new AdapterListCaseActionBar(list, getActivity());
+        final AdapterListCaseActionBar adapterListCaseActionBar = new AdapterListCaseActionBar(listUsers, getActivity());
         lv.setAdapter(adapterListCaseActionBar);
 
         adapterListCaseActionBar.SetOnItemClickListener(new AdapterListCaseActionBar.OnItemClickListener() {
             @Override
             public void onItemClick(View v, int position) {
-
+                System.out.println("position :" + position);
                 DataPopUp dataPopUp = (DataPopUp) adapterListCaseActionBar.getItem(position);
                 ImageView rootView = (ImageView) anchorView;
-                rootView.setImageResource(dataPopUp.getImage());
+                SharedPreferences.Editor editor = sp.edit();
+                if (position == 0) {
+                    editor.putBoolean(MasterData.SHARED_IS_OFFICIAL, false);
+                    editor.commit();
+                    isOfficial = false;
+                    System.out.println(dataPopUp.getImage());
+                    XMPPManageOfficial.getInstance().disConnect();
+
+                } else {
+                    editor.putBoolean(MasterData.SHARED_IS_OFFICIAL, true);
+                    editor.commit();
+                    isOfficial = true;
+                    getActivity().startService(new Intent(getActivity(), XMPPServiceOfficial.class));
+                    System.out.println(dataPopUp.getImage());
+                }
+                Glide.with(v.getContext())
+                        .load(dataPopUp.getImage())
+                        .override(300, 300)
+                        .fitCenter()
+                        .into(rootView);
+
                 popup.dismiss();
             }
         });
@@ -282,7 +342,7 @@ public class CaseFragment extends Fragment implements View.OnClickListener
         popup.setContentView(layout);
         // Set content width and height
         popup.setHeight(WindowManager.LayoutParams.WRAP_CONTENT);
-        popup.setWidth(300);
+        popup.setWidth(WindowManager.LayoutParams.WRAP_CONTENT);
         // Closes the popup window when touch outside of it - when looses focus
         popup.setOutsideTouchable(true);
         popup.setFocusable(true);
@@ -345,6 +405,33 @@ public class CaseFragment extends Fragment implements View.OnClickListener
                 System.out.println("error = [" + error + "]");
                 mSwipeRefreshLayout.setRefreshing(false);
 
+            }
+        });
+    }
+
+    void getUserOfficialData() {
+        adapterRestUser.getUserOfficialData(userId, new Callback<OfficialObject>() {
+            @Override
+            public void success(OfficialObject officialObject, Response response) {
+                if (listUsers.size() == 1) {
+                    listUsers.add(new DataPopUp(officialObject.getUserImage(), officialObject.getDisplayname()));
+                    System.out.println("officialObject = [" + officialObject + "], response = [" + response + "]");
+                    ImageView rootView = (ImageView) btn;
+                    if (rootView != null && isOfficial) {
+                        Glide.with(getActivity())
+                                .load(listUsers.get(1).getImage())
+                                .override(300, 300)
+                                .fitCenter()
+                                .into(rootView);
+
+                    }
+                }
+
+            }
+
+            @Override
+            public void failure(RetrofitError error) {
+                System.out.println("error = [" + error + "]");
             }
         });
     }

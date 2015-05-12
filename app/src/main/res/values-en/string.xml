@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <string name="tab">\u0009</string>
     <!-- Menu in case menber -->
     <string name="menu_case_member_detail">Details</string>
     <string name="menu_case_member_to">Reassign</string>

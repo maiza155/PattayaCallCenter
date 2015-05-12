@@ -7,6 +7,7 @@ import com.pattaya.pattayacallcenter.webservice.object.GetInviteUserObject;
 import com.pattaya.pattayacallcenter.webservice.object.GetTokenObject;
 import com.pattaya.pattayacallcenter.webservice.object.GetUserObject;
 import com.pattaya.pattayacallcenter.webservice.object.LoginObject;
+import com.pattaya.pattayacallcenter.webservice.object.OfficialObject;
 import com.pattaya.pattayacallcenter.webservice.object.RegistObject;
 import com.pattaya.pattayacallcenter.webservice.object.SaveFacebookObject;
 import com.pattaya.pattayacallcenter.webservice.object.SavePostObject;
@@ -95,6 +96,10 @@ public interface RestFulQueary {
     @Headers("Content-Type:application/json;charset=UTF-8")
     @POST("/organize/getOrganizeData")
     void getOrganizeData(@Body GetOrgObject object, Callback<OrgData> json);
+
+    @Headers("Content-Type:application/json;charset=UTF-8")
+    @GET("/user/getUserOfficialData/{id}")
+    void getUserOfficialData(@Path("id") int id, Callback<OfficialObject> json);
 
 
     /**

@@ -3,7 +3,6 @@ package com.pattaya.pattayacallcenter.chat;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Handler;
@@ -11,8 +10,6 @@ import android.os.IBinder;
 import android.os.Message;
 import android.util.Log;
 
-import com.pattaya.pattayacallcenter.Application;
-import com.pattaya.pattayacallcenter.Data.MasterData;
 import com.pattaya.pattayacallcenter.Data.Users;
 
 import org.jivesoftware.smack.SmackException;
@@ -23,10 +20,10 @@ import java.util.List;
 /**
  * Created by SWF on 2/24/2015.
  */
-public class XMPPService extends Service {
+public class XMPPServiceOfficial extends Service {
 
-    static XMPPManage xmppManage = XMPPManage.getInstance();
-    private static XMPPService instance = null;
+    static XMPPManageOfficial xmppManage = XMPPManageOfficial.getInstance();
+    private static XMPPServiceOfficial instance = null;
     ThreadXMPP td = new ThreadXMPP();
     private Handler handler = new Handler() {
         @Override
@@ -92,10 +89,6 @@ public class XMPPService extends Service {
                     if (xmppManage.getmConnection() != null) {
                         if (!xmppManage.getmConnection().isConnected()) {
                             try {
-                                SharedPreferences sp = Application.getContext().getSharedPreferences(MasterData.SHARED_NAME_USER_FILE, Context.MODE_PRIVATE);
-                                String jid = sp.getString(MasterData.SHARED_USER_JID, null);
-
-                                Log.e("XMPPSerVICE", jid + "  login wait 6 sec .. .. ... .. ." + xmppManage.getmConnection().isConnected());
                                 xmppManage.login();
                                 Presence p = new Presence(Presence.Type.available, "I am busy", 1, Presence.Mode.available);
                                 xmppManage.getmConnection().sendPacket(p);

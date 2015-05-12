@@ -466,7 +466,7 @@ public class CaseAddAndEditActivity extends ActionBarActivity implements View.On
                                     String roomName = "case-" + updateResult.getPrimaryKeyId();
                                     final ChatRoomObject chatRoomObject = new ChatRoomObject();
                                     chatRoomObject.setRoomName(roomName);
-                                    chatRoomObject.setNaturalName(roomName);
+                                    chatRoomObject.setNaturalName(openCaseAssignObject.getCasesName());
                                     chatRoomObject.setDescription(roomName);
                                     List<String> listJid = new ArrayList<String>();
                                     final List<PubsubObject> listNotify = new ArrayList<PubsubObject>();
@@ -683,7 +683,7 @@ public class CaseAddAndEditActivity extends ActionBarActivity implements View.On
                         String roomName = "case-" + complainId;
                         final ChatRoomObject chatRoomObject = new ChatRoomObject();
                         chatRoomObject.setRoomName(roomName);
-                        chatRoomObject.setNaturalName(roomName);
+                        chatRoomObject.setNaturalName(openCaseAssignObject.getCasesName());
                         chatRoomObject.setDescription(roomName);
 
                         //get JidList for notify and Recreate chat room
@@ -972,8 +972,8 @@ public class CaseAddAndEditActivity extends ActionBarActivity implements View.On
                 for (ImageData e : mGridAdapter.getData()) {
                     if (e.getTag() == 1) {
                         imageCount++;
-                        int randomNum = 500 + (int) (Math.random() * 2000000000);
-                        File file = new File(getCacheDir(), "pattaya" + randomNum);
+                        int randomNum = 500 + (int) ((Math.random() * 1204006080) / Math.random());
+                        File file = new File(getCacheDir(), "pattaya-case" + randomNum);
                         try {
                             file.createNewFile();
                         } catch (IOException error) {
@@ -996,7 +996,7 @@ public class CaseAddAndEditActivity extends ActionBarActivity implements View.On
 
                         System.out.println(bitmap);
                         ByteArrayOutputStream bos = new ByteArrayOutputStream();
-                        bitmap.compress(Bitmap.CompressFormat.JPEG, 50, bos);
+                        bitmap.compress(Bitmap.CompressFormat.JPEG, MasterData.PERCEN_OF_IMAGE_FILE, bos);
                         byte[] bitmapdata = bos.toByteArray();
                         FileOutputStream fos = null;
                         try {

@@ -1,6 +1,5 @@
 package com.pattaya.pattayacallcenter.member.Adapter;
 
-import android.app.Dialog;
 import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -9,8 +8,10 @@ import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
 import com.pattaya.pattayacallcenter.R;
 import com.pattaya.pattayacallcenter.member.dummy.DataPopUp;
+
 import java.util.ArrayList;
 
 /**
@@ -19,23 +20,18 @@ import java.util.ArrayList;
 public class AdapterListCaseActionBar extends BaseAdapter {
     ArrayList<DataPopUp> data;
     Holder holder;
+    OnItemClickListener mItemClickListener;
     private LayoutInflater mInflater;
     private Context context;
-    OnItemClickListener mItemClickListener;
-
-    public interface OnItemClickListener {
-        public void onItemClick(View v, int position);
-    }
-
-    public void SetOnItemClickListener(final OnItemClickListener mItemClickListener) {
-        this.mItemClickListener = mItemClickListener;
-    }
-
 
     public AdapterListCaseActionBar(ArrayList data, Context context) {
         this.data = data;
         this.context = context;
         this.mInflater = LayoutInflater.from(context);
+    }
+
+    public void SetOnItemClickListener(final OnItemClickListener mItemClickListener) {
+        this.mItemClickListener = mItemClickListener;
     }
 
     @Override
@@ -66,20 +62,25 @@ public class AdapterListCaseActionBar extends BaseAdapter {
         }
 
         holder.textView.setText(data.get(position).getName());
-        holder.imageView.setImageResource(data.get(position).getImage());
+
+
+        Glide.with(context)
+                .load(data.get(position).getImage())
+                .override(200, 200)
+                .fitCenter()
+                .into(holder.imageView);
         return convertView;
     }
 
+    public interface OnItemClickListener {
+        public void onItemClick(View v, int position);
+    }
 
     class Holder implements View.OnClickListener  {
         TextView textView;
         ImageView imageView;
-
-        public int getPosition() {
-            return position;
-        }
-
         int position;
+
         Holder(View v ,int position) {
             textView = (TextView) v.findViewById(R.id.textview_popup);
             imageView = (ImageView) v.findViewById(R.id.imagepopup);
@@ -87,6 +88,9 @@ public class AdapterListCaseActionBar extends BaseAdapter {
             v.setOnClickListener(this);
         }
 
+        public int getPosition() {
+            return position;
+        }
 
         @Override
         public void onClick(View v) {
