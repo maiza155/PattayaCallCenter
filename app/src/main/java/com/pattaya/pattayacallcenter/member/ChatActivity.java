@@ -42,13 +42,13 @@ import java.util.ArrayList;
 public class ChatActivity extends ActionBarActivity implements View.OnClickListener {
 
 
+    private final int PICK_IMAGE_MULTIPLE = 300;
     // widget
     ImageButton btn;
     TextView titleTextView;
     //sticker
     Button btnUpdateStricker;
     TextView txtempty;
-
     //slider buttom
     GridView gridView;
     AdapterStricker adapterStricker;
@@ -60,12 +60,10 @@ public class ChatActivity extends ActionBarActivity implements View.OnClickListe
     ImageButton btnSticker;
     EditText txtMsg;
     ListView listChat;
-
     SlideMenuManage mSlideMenuManageSticker;
     SlideMenuManage mSlideMenuManageImage;
     CameraMange cameraMange;
     View mSlideMenuImage;
-    private final int PICK_IMAGE_MULTIPLE = 300;
     ArrayList dataChat;
     ArrayList dataUser;
     ArrayList listStiker;
@@ -267,7 +265,7 @@ public class ChatActivity extends ActionBarActivity implements View.OnClickListe
             //  Toast.makeText(getApplication(), messages.getRoom() + " New Messages ", Toast.LENGTH_SHORT).show();
             DatabaseChatHelper.init().clearCountLastMessage(messages.getRoom());
             if (!messages.getSender().matches(mUser)) {
-                NotifyChat.cancelNotification(NotifyChat.NOTIFY_CHAT_ID);
+                //NotifyChat.cancelNotification(NotifyChat.NOTIFY_CHAT_ID);
                 adapterChat.queryChatLogsNoReset(messages, false);
                 //setListViewInBtm();
             }

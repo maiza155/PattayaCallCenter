@@ -318,6 +318,7 @@ public class CaseFragment extends Fragment implements View.OnClickListener
                     editor.putBoolean(MasterData.SHARED_IS_OFFICIAL, false);
                     editor.commit();
                     isOfficial = false;
+
                     System.out.println(dataPopUp.getImage());
                     XMPPManageOfficial.getInstance().disConnect();
 
@@ -325,15 +326,21 @@ public class CaseFragment extends Fragment implements View.OnClickListener
                     editor.putBoolean(MasterData.SHARED_IS_OFFICIAL, true);
                     editor.commit();
                     isOfficial = true;
-                    getActivity().startService(new Intent(getActivity(), XMPPServiceOfficial.class));
-                    System.out.println(dataPopUp.getImage());
+                    if (XMPPManageOfficial.getInstance() == null
+                            || XMPPManageOfficial.getInstance().getmConnection() == null
+                            || !XMPPManageOfficial.getInstance().getmConnection().isConnected()) {
+                        getActivity().startService(new Intent(getActivity(), XMPPServiceOfficial.class));
+                        System.out.println(dataPopUp.getImage());
+                    }
+
                 }
                 Glide.with(v.getContext())
                         .load(dataPopUp.getImage())
                         .override(300, 300)
                         .fitCenter()
                         .into(rootView);
-
+                mSwipeRefreshLayout.setRefreshing(true);
+                getCaseList("");
                 popup.dismiss();
             }
         });
@@ -357,8 +364,13 @@ public class CaseFragment extends Fragment implements View.OnClickListener
     void getCaseList(String s) {
         txtEmpty.setVisibility(View.GONE);
         GetCaseListData getCaseListData = new GetCaseListData();
-        getCaseListData.setFilterType(2);
-        getCaseListData.setUserId(userId);
+        if (isOfficial) {
+            getCaseListData.setFilterType(3);
+        } else {
+            getCaseListData.setFilterType(2);
+            getCaseListData.setUserId(userId);
+        }
+
         getCaseListData.setAccessToken(token);
         getCaseListData.setTextSearch(s);
         adapterRest.getCaseList(getCaseListData, new Callback<Response>() {

@@ -60,7 +60,7 @@ public class AdapteGridViewShow extends BaseAdapter {
     }
 
     public View getView(final int position, View convertView, ViewGroup parent) {
-        ;
+
         View row = convertView;
         ViewHolder holder;
         if (row == null) {
@@ -74,7 +74,7 @@ public class AdapteGridViewShow extends BaseAdapter {
 
 
         holder.btnCancle.setVisibility(View.GONE);
-        System.out.println(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>" + data.get(position).getInfoImage());
+        // System.out.println(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>" + data.get(position).getInfoImage());
         Glide.
                 with(context).
                 load(data.get(position).getInfoImage()).

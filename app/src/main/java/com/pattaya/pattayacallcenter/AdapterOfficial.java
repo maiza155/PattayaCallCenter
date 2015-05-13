@@ -1,4 +1,4 @@
-package com.pattaya.pattayacallcenter.webservice;
+package com.pattaya.pattayacallcenter;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -25,18 +25,16 @@ import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.google.gson.Gson;
-import com.pattaya.pattayacallcenter.Application;
-import com.pattaya.pattayacallcenter.CountingTypedFile;
 import com.pattaya.pattayacallcenter.Data.MasterData;
 import com.pattaya.pattayacallcenter.Data.Messages;
 import com.pattaya.pattayacallcenter.Data.Users;
-import com.pattaya.pattayacallcenter.ProgressListener;
-import com.pattaya.pattayacallcenter.R;
 import com.pattaya.pattayacallcenter.chat.DatabaseChatHelper;
 import com.pattaya.pattayacallcenter.chat.XMPPManageOfficial;
 import com.pattaya.pattayacallcenter.chat.XMPPServiceOfficial;
 import com.pattaya.pattayacallcenter.customview.FullscreenActivity;
 import com.pattaya.pattayacallcenter.customview.RoundedImageView;
+import com.pattaya.pattayacallcenter.webservice.RestFulQueary;
+import com.pattaya.pattayacallcenter.webservice.WebserviceConnector;
 import com.pattaya.pattayacallcenter.webservice.object.upload.FileListObject;
 
 import org.jivesoftware.smack.SmackException;
@@ -323,8 +321,11 @@ public class AdapterOfficial extends BaseAdapter {
 
     void initChatService() {
         xmppManage = XMPPManageOfficial.getInstance();
+        System.out.println("XMPP ADAPTER OFFICIAL   " + "   " + xmppManage.getmConnection());
+
 
         if (xmppManage.getmConnection() != null && xmppManage.getmConnection().isConnected()) {
+            System.out.println("XMPP ADAPTER OFFICIAL   " + "   " + xmppManage.getmConnection().isConnected());
             if (dataUser.getType() == Users.TYPE_FRIEND) {
                 xmppManage.initChat(dataUser.getJid());
             } else if (dataUser.getType() == Users.TYPE_GROUP) {
@@ -333,6 +334,7 @@ public class AdapterOfficial extends BaseAdapter {
             }
             xmppManage.initIQForChatreQuest(dataUser.getJid());
         } else {
+            System.out.println("XMPP ADAPTER OFFICIAL   " + "   RUN SERVICE");
             context.startService(new Intent(context, XMPPServiceOfficial.class));
         }
 
@@ -476,6 +478,8 @@ public class AdapterOfficial extends BaseAdapter {
     }
 
     class queryTask extends AsyncTask<Void, Void, Boolean> {
+
+
         ArrayList<Messages> messages;
         Messages message;
         boolean isReset = false;
@@ -487,6 +491,12 @@ public class AdapterOfficial extends BaseAdapter {
         queryTask(Messages message, boolean isReset) {
             this.message = message;
             this.isReset = isReset;
+        }
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            System.out.println("init database");
         }
 
         @Override
@@ -504,6 +514,8 @@ public class AdapterOfficial extends BaseAdapter {
             } else {
                 add(message);
             }
+
+            System.out.println("finish database");
             //setListViewInBtm();
         }
     }

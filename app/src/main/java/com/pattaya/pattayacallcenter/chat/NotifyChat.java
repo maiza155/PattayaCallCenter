@@ -26,7 +26,7 @@ public class NotifyChat {
             .getSystemService(Application.getContext().NOTIFICATION_SERVICE);
 
 
-    public static void setNotifyChat(String str, String jid) {
+    public static void setNotifyChat(String str, String jid, String msg) {
         SharedPreferences spConfig = Application.getContext().getSharedPreferences(MasterData.SHARED_NAME_CONFIG_FILE, Context.MODE_PRIVATE);
         Boolean alertSound = spConfig.getBoolean(MasterData.SHARED_CONFIG_ALERT_SOUND, true);
 
@@ -34,8 +34,8 @@ public class NotifyChat {
         NotificationCompat.Builder mBuilder =
                 new NotificationCompat.Builder(Application.getContext())
                         .setSmallIcon(R.drawable.ic_launcher)
-                        .setContentTitle("New Message")
-                        .setContentText(str)
+                        .setContentTitle(str)
+                        .setContentText(msg)
                         .setAutoCancel(true);
         mBuilder.setLights(Color.BLUE, 500, 500);
         long[] pattern = {500, 500};

@@ -96,6 +96,7 @@ public class XMPPManage implements MessageListener {
     static String jid;
     static PubSubManager manager;
     static XMPPTCPConnection admin;
+    static Boolean isOfficial;
     final String GROUP_FRIEND = "Friends";
     final String GROUP_FAVORITE = "Favorite";
 
@@ -112,6 +113,8 @@ public class XMPPManage implements MessageListener {
     private static void init() {
         sp = Application.getContext().getSharedPreferences(MasterData.SHARED_NAME_USER_FILE, Context.MODE_PRIVATE);
         jid = sp.getString(MasterData.SHARED_USER_JID, null);
+        isOfficial = sp.getBoolean(MasterData.SHARED_IS_OFFICIAL, false);
+
         USERNAME = jid.split("@")[0];
         SERVICE = jid.split("@")[1];
         spConfig = Application.getContext().getSharedPreferences(MasterData.SHARED_NAME_CONFIG_FILE, Context.MODE_PRIVATE);
@@ -148,10 +151,10 @@ public class XMPPManage implements MessageListener {
             MultiUserChat muc = new MultiUserChat(mConnection, room);
             try {
 
-                Log.e("XMPPManage", "Join ? 1: " + room + "   " + muc.isJoined());
+                //Log.e("XMPPManage", "Join ? 1: " + room + "   " + muc.isJoined());
                 String name = mConnection.getUser().split("@")[0];
                 muc.join(name);
-                Log.e("XMPPManage", "mConnector  1: " + room + "   " + muc.isJoined());
+                //Log.e("XMPPManage", "mConnector  1: " + room + "   " + muc.isJoined());
                 Log.e("XMPPManage", "Join ? 1 : " + room + "   " + muc.isJoined());
 
             } catch (SmackException.NoResponseException e) {
@@ -292,7 +295,16 @@ public class XMPPManage implements MessageListener {
                     messages.setTime(sdf.format(c.getTime()));
                     String checkcase = room.split("@")[0];
                     checkcase = checkcase.split("-")[0];
-                    getUserData(messages);
+                    Log.e("IsOfficial is flase >>>", "    " + checkcase);
+
+                    if (checkcase.matches("case") && isOfficial) {
+                        Log.e("IsOfficial is true >>>", "    JA");
+
+                    } else {
+                        Log.e("IsOfficial is flase >>>", "    JA");
+                        getUserData(messages);
+                    }
+
 
                 }
 
@@ -395,12 +407,12 @@ public class XMPPManage implements MessageListener {
                     Log.d("TAG SET >>> REsult", "" + packet);
 
                     List<Users> arrUsers = DatabaseChatHelper.init().getUsers();
-                    for (Users e : arrUsers) {
+                   /* for (Users e : arrUsers) {
                         if (e.getType() == Users.TYPE_GROUP) {
                             setJoinRoom(e.getJid());
                         }
 
-                    }
+                    }*/
 
                 }
 
@@ -423,7 +435,7 @@ public class XMPPManage implements MessageListener {
             public void processPacket(Packet packet) throws SmackException.NotConnectedException {
 
                 new TaskGetFriend(Application.getContext()).execute();
-                Log.d("TAG SET >>>",""+packet);
+                Log.d("TAG SET >>>", "" + packet);
 
             }
         }, new IQTypeFilter(IQ.Type.SET));
@@ -448,57 +460,69 @@ public class XMPPManage implements MessageListener {
     }
 
     static void getUserData(final Messages messages) {
-
-        Users users = databaseChatHelper.getOneUsers(messages.getSender());
-        if (users != null) {
-            messages.setSenderImage(users.getPic());
-            messages.setSenderName(users.getName());
-            databaseChatHelper.addLogs(messages);
-            BusProvider.getInstance().post(messages);
-            alert = spConfig.getBoolean(MasterData.SHARED_CONFIG_ALERT, true);
-            if (alert) {
-                if (messages.getRoom().matches(messages.getSender())) {
-                    NotifyChat.setNotifyChat("From : " + users.getName(), users.getJid());
-                }
-
-                String checkCase = messages.getRoom().split("@")[0];
-                checkCase = checkCase.split("-")[0];
-                System.out.println(checkCase);
-
-                if (checkCase.matches("pattaya")) {
-                    NotifyChat.setNotifyChat("From : " + users.getName(), messages.getRoom());
-                }
-
-            }
-
-        } else {
-            new TaskGetFriend(Application.getContext()).execute();
-            openfireQueary.getUser(messages.getSender().split("@")[0], new Callback<User>() {
-                @Override
-                public void success(User user, Response response) {
-                    System.out.println("user = [" + user + "], response = [" + response + "]");
-                    System.out.println("   " + user.getName());
-                    messages.setSenderImage(user.getProperty().get("userImage"));
-                    messages.setSenderName(user.getName());
+        new Thread() {
+            @Override
+            public void run() {
+                final Users users = databaseChatHelper.getOneUsers(messages.getSender());
+                if (users != null) {
+                    messages.setSenderImage(users.getPic());
+                    messages.setSenderName(users.getName());
                     databaseChatHelper.addLogs(messages);
                     BusProvider.getInstance().post(messages);
                     alert = spConfig.getBoolean(MasterData.SHARED_CONFIG_ALERT, true);
                     if (alert) {
                         if (messages.getRoom().matches(messages.getSender())) {
-                            NotifyChat.setNotifyChat("From : " + user.getName(), user.getUsername() + "@pattaya-data");
+                            NotifyChat.setNotifyChat(users.getName(), users.getJid(), messages.getMessage());
                         }
 
+                        String checkCase = messages.getRoom().split("@")[0];
+                        checkCase = checkCase.split("-")[0];
+                        System.out.println("indatabase " + checkCase);
+
+                        if (checkCase.matches("pattaya")) {
+                            NotifyChat.setNotifyChat(users.getName(), messages.getRoom(), messages.getMessage());
+                        }
 
                     }
-                }
 
-                @Override
-                public void failure(RetrofitError error) {
-                    System.out.println("error = [" + error + "]");
+                } else {
+                    new TaskGetFriend(Application.getContext()).execute();
+                    openfireQueary.getUser(messages.getSender().split("@")[0], new Callback<User>() {
+                        @Override
+                        public void success(User user, Response response) {
+                            System.out.println("user = [" + user + "], response = [" + response + "]");
+                            System.out.println("   " + user.getName());
+                            messages.setSenderImage(user.getProperty().get("userImage"));
+                            messages.setSenderName(user.getName());
+                            databaseChatHelper.addLogs(messages);
+                            BusProvider.getInstance().post(messages);
+                            alert = spConfig.getBoolean(MasterData.SHARED_CONFIG_ALERT, true);
+                            if (alert) {
+                                if (messages.getRoom().matches(messages.getSender())) {
+                                    NotifyChat.setNotifyChat(user.getName(), user.getUsername() + "@pattaya-data", messages.getMessage());
+                                }
 
+                                String checkCase = messages.getRoom().split("@")[0];
+                                checkCase = checkCase.split("-")[0];
+                                System.out.println("in server " + checkCase);
+
+                                if (checkCase.matches("pattaya")) {
+                                    NotifyChat.setNotifyChat(user.getName(), messages.getRoom(), messages.getMessage());
+                                }
+
+
+                            }
+                        }
+
+                        @Override
+                        public void failure(RetrofitError error) {
+                            System.out.println("error = [" + error + "]");
+
+                        }
+                    });
                 }
-            });
-        }
+            }
+        }.start();
 
 
     }
@@ -641,7 +665,6 @@ public class XMPPManage implements MessageListener {
     }
 
     public void setJoinGroupChat(MultiUserChat muc) {
-
         if (mConnection != null
                 && muc != null
                 && mConnection.isConnected()

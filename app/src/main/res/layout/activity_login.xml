@@ -1,95 +1,98 @@
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/activityRoot"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/primary"
-    android:focusableInTouchMode="true"
-    android:scrollbars="vertical"
-    tools:context="com.pattaya.pattayacallcenter.share.LoginActivity">
+    android:fillViewport="true">
 
-    <ImageView
-        android:id="@+id/img_pic"
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="match_parent"
-        android:layout_height="fill_parent"
-        android:background="@drawable/plage"
-        android:layout_alignParentTop="true"
-        android:layout_above="@+id/linearLayout" />
-
-
-    <LinearLayout
-        android:id="@+id/box"
-        android:layout_centerInParent="true"
-        android:layout_marginLeft="@dimen/activity_vertical_margin"
-        android:layout_marginRight="@dimen/activity_vertical_margin"
+        android:layout_height="match_parent"
+        android:focusableInTouchMode="true"
         android:orientation="vertical"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        tools:context="com.pattaya.pattayacallcenter.share.LoginActivity">
 
-        <EditText
-            android:id="@+id/txt_userName"
-            style="@style/edittext_style"
-            android:gravity="center"
-            android:singleLine="true"
-            android:hint="@string/username" />
-
-        <EditText
-            android:id="@+id/txt_password"
-            android:inputType="textPassword"
-            style="@style/edittext_style"
-            android:singleLine="true"
-            android:gravity="center"
-            android:hint="@string/password" />
-    </LinearLayout>
-
-
-    <LinearLayout
-        android:id="@id/linearLayout"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginLeft="@dimen/activity_vertical_margin"
-        android:layout_marginRight="@dimen/activity_vertical_margin"
-        android:layout_above="@+id/btn_login"
-        android:layout_below="@id/box"
-        android:orientation="vertical">
-
-        <Button
-            android:id="@+id/btn_forgetPassword"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+        <ImageView
+            android:id="@+id/img_pic"
+            android:layout_width="150dp"
+            android:layout_height="150dp"
+            android:layout_above="@+id/box"
             android:layout_gravity="center_horizontal"
-            android:background="@android:color/transparent"
-            android:text="@string/forget_pass"
-            android:textAppearance="?android:attr/textAppearanceSmall"
-            android:textColor="@android:color/white"
-            android:textSize="18dp" />
+            android:layout_margin="20dp"
+            android:background="@drawable/appicon" />
 
 
-        <com.facebook.login.widget.LoginButton
-            android:id="@+id/authButton"
-            style="@style/com_facebook_loginview_default_style"
+        <LinearLayout
+            android:id="@id/box"
             android:layout_width="match_parent"
-            android:layout_height="45dp"
-            android:layout_marginBottom="@dimen/margin_grab" />
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:layout_marginLeft="@dimen/activity_vertical_margin"
+            android:layout_marginRight="@dimen/activity_vertical_margin"
+            android:orientation="vertical">
 
-        <Button
-            android:id="@+id/btn_register"
-            style="@style/button_style"
-            android:background="@color/yellowSoftColor"
-            android:textStyle="bold"
-            android:text="@string/register" />
+            <EditText
 
+                android:id="@+id/txt_userName"
+                style="@style/edittext_style"
+                android:gravity="center"
+                android:hint="@string/username"
+                android:singleLine="true" />
+
+            <EditText
+                android:id="@+id/txt_password"
+                style="@style/edittext_style"
+                android:gravity="center"
+                android:hint="@string/password"
+                android:inputType="textPassword"
+                android:singleLine="true" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_below="@id/box"
+            android:layout_marginLeft="@dimen/activity_vertical_margin"
+            android:layout_marginRight="@dimen/activity_vertical_margin"
+            android:layout_marginTop="20dp"
+            android:orientation="vertical">
+
+            <Button
+                android:id="@+id/btn_login"
+                style="@style/button_style"
+                android:layout_marginBottom="@dimen/margin_grab"
+                android:background="@color/greenDarkColor"
+                android:text="@string/login"
+                android:textStyle="bold" />
+
+            <com.facebook.login.widget.LoginButton
+                android:id="@+id/authButton"
+                style="@style/com_facebook_loginview_default_style"
+                android:layout_width="match_parent"
+                android:layout_height="45dp"
+                android:layout_marginBottom="@dimen/margin_grab" />
+
+            <Button
+                android:id="@+id/btn_register"
+                style="@style/button_style"
+                android:background="@color/yellowSoftColor"
+                android:text="@string/register"
+                android:textStyle="bold" />
+
+            <Button
+                android:id="@+id/btn_forgetPassword"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:background="@android:color/transparent"
+                android:text="@string/forget_pass"
+                android:textAppearance="?android:attr/textAppearanceSmall"
+                android:textColor="@android:color/white"
+                android:textSize="18dp" />
+
+        </LinearLayout>
 
     </LinearLayout>
-
-    <Button
-        android:layout_marginLeft="@dimen/activity_vertical_margin"
-        android:layout_marginRight="@dimen/activity_vertical_margin"
-        android:layout_alignParentBottom="true"
-        android:id="@+id/btn_login"
-        style="@style/button_style"
-        android:background="@color/greenDarkColor"
-        android:layout_marginBottom="@dimen/margin_grab"
-        android:textStyle="bold"
-        android:text="@string/login" />
-
-</RelativeLayout>
+</ScrollView>

@@ -2,6 +2,7 @@ package com.pattaya.pattayacallcenter.member;
 
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
@@ -19,7 +20,10 @@ import com.astuetz.PagerSlidingTabStrip;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.gcm.GoogleCloudMessaging;
+import com.pattaya.pattayacallcenter.Data.MasterData;
 import com.pattaya.pattayacallcenter.R;
+import com.pattaya.pattayacallcenter.chat.XMPPManageOfficial;
+import com.pattaya.pattayacallcenter.chat.XMPPServiceOfficial;
 import com.pattaya.pattayacallcenter.member.Adapter.AdapterPager;
 
 import java.io.IOException;
@@ -46,17 +50,31 @@ public class MemberMainActivity extends ActionBarActivity implements View.OnClic
     SharedPreferences prefs;
     Context context;
     String regid;
+    SharedPreferences sp;
+    Boolean isOfficial;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_member_main);
 
+        sp = getSharedPreferences(MasterData.SHARED_NAME_USER_FILE, Context.MODE_PRIVATE);
+        isOfficial = sp.getBoolean(MasterData.SHARED_IS_OFFICIAL, false);
         tabs = (PagerSlidingTabStrip) findViewById(R.id.titles);
         adapterPager = new AdapterPager(getSupportFragmentManager(), this);
         viewPager = (ViewPager) findViewById(R.id.pager);
         viewPager.setAdapter(adapterPager);
         tabs.setViewPager(viewPager);
+        if (isOfficial) {
+            if (XMPPManageOfficial.getInstance() == null
+                    || XMPPManageOfficial.getInstance().getmConnection() == null
+                    || !XMPPManageOfficial.getInstance().getmConnection().isConnected()) {
+                startService(new Intent(this, XMPPServiceOfficial.class));
+
+            }
+        }
+
+
 
 
         if (checkPlayServices()) {

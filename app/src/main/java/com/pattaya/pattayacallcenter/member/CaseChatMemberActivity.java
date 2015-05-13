@@ -31,6 +31,7 @@ import com.github.ksoichiro.android.observablescrollview.ObservableScrollViewCal
 import com.github.ksoichiro.android.observablescrollview.ScrollState;
 import com.google.gson.Gson;
 import com.pattaya.pattayacallcenter.AdapterChat;
+import com.pattaya.pattayacallcenter.AdapterOfficial;
 import com.pattaya.pattayacallcenter.AdapterStricker;
 import com.pattaya.pattayacallcenter.Application;
 import com.pattaya.pattayacallcenter.BusProvider;
@@ -39,7 +40,6 @@ import com.pattaya.pattayacallcenter.Data.Messages;
 import com.pattaya.pattayacallcenter.Data.Users;
 import com.pattaya.pattayacallcenter.R;
 import com.pattaya.pattayacallcenter.chat.DatabaseChatHelper;
-import com.pattaya.pattayacallcenter.chat.NotifyChat;
 import com.pattaya.pattayacallcenter.chat.StrickLoaderService;
 import com.pattaya.pattayacallcenter.chat.jsonobject.ChatRoomObject;
 import com.pattaya.pattayacallcenter.chat.restadatper.OpenfireQueary;
@@ -78,6 +78,8 @@ public class CaseChatMemberActivity extends ActionBarActivity implements View.On
     private final RestAdapter restAdapterOpenFire = RestAdapterOpenFire.getInstance();
     private final OpenfireQueary openfireQueary = restAdapterOpenFire.create(OpenfireQueary.class);
     ProgressDialog ringProgressDialog;
+    Boolean isOfficial;
+    AdapterOfficial adapterOfficial;
     private FrameLayout mMenuContainer;
     private Users otherUser;
     private AdapterChat adapterChat;
@@ -141,7 +143,7 @@ public class CaseChatMemberActivity extends ActionBarActivity implements View.On
         ////////////////////////////////////////////////////////////////////////////////////////////
         caseTitle = (TextView) findViewById(R.id.case_name);
         listChat = (ObservableListView) findViewById(R.id.chat);
-        listChat.setScrollViewCallbacks(this);
+        //listChat.setScrollViewCallbacks(this);
         caseName = (caseName == null) ? "no name" : caseName;
         caseTitle.setText("เรื่อง - " + caseName);
         ////////////////////////////////////////////////////////////////////////////////////////////
@@ -213,8 +215,14 @@ public class CaseChatMemberActivity extends ActionBarActivity implements View.On
         adapterStricker.SetOnItemClickListener(new AdapterStricker.OnItemClickListener() {
             @Override
             public void onItemClick(String image) {
-                if (adapterChat != null) {
-                    adapterChat.enterMsg(image);
+                if (isOfficial) {
+                    if (adapterOfficial != null) {
+                        adapterOfficial.enterMsg(image);
+                    }
+                } else {
+                    if (adapterChat != null) {
+                        adapterChat.enterMsg(image);
+                    }
                 }
 
                 //setListViewInBtm();
@@ -227,8 +235,19 @@ public class CaseChatMemberActivity extends ActionBarActivity implements View.On
 
     void init() {
         SharedPreferences spUser = getSharedPreferences(MasterData.SHARED_NAME_USER_FILE, Context.MODE_PRIVATE);
-        jid = spUser.getString(MasterData.SHARED_USER_JID, "null");
+        isOfficial = spUser.getBoolean(MasterData.SHARED_IS_OFFICIAL, false);
+        if (isOfficial) {
+            jid = "pattayaofficial58@pattaya-data";
+
+        } else {
+            jid = spUser.getString(MasterData.SHARED_USER_JID, "null");
+
+        }
+
+
         userId = spUser.getInt(MasterData.SHARED_USER_USER_ID, 0);
+
+
         SharedPreferences spConfig = Application.getContext().getSharedPreferences(MasterData.SHARED_NAME_CONFIG_FILE, Context.MODE_PRIVATE);
         token = spConfig.getString(MasterData.SHARED_CONFIG_TOKEN, null);
         clientId = spConfig.getString(MasterData.SHARED_CONFIG_CLIENT_ID, null);
@@ -412,7 +431,11 @@ public class CaseChatMemberActivity extends ActionBarActivity implements View.On
     public void onBusReciver(String event) {
 
         if (roomIsCreated && event.equalsIgnoreCase(otherUser.getJid())) {
-            adapterChat.queryChatLogs(true);
+            if (isOfficial) {
+                adapterOfficial.queryChatLogs(true);
+            } else {
+                adapterChat.queryChatLogs(true);
+            }
             // Toast.makeText(getApplication(), event, Toast.LENGTH_SHORT).show();
         } else if (event.matches("sticker_fin")) {
             System.out.println("Finish sticker ");
@@ -440,13 +463,25 @@ public class CaseChatMemberActivity extends ActionBarActivity implements View.On
                 //  Toast.makeText(getApplication(), messages.getRoom() + " New Messages ", Toast.LENGTH_SHORT).show();
                 DatabaseChatHelper.init().clearCountLastMessage(messages.getRoom());
                 if (!messages.getSender().matches(jid)) {
-                    NotifyChat.cancelNotification(NotifyChat.NOTIFY_CHAT_ID);
-                    adapterChat.queryChatLogsNoReset(messages, false);
+                    System.out.println("Hello");
+                    // NotifyChat.cancelNotification(NotifyChat.NOTIFY_CHAT_ID);
+                    if (isOfficial) {
+                        adapterOfficial.queryChatLogsNoReset(messages, false);
+                    } else {
+                        adapterChat.queryChatLogsNoReset(messages, false);
+                    }
+
                 }
 
             }
         }
 
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        BusProvider.getInstance().unregister(this);
     }
 
     void setRoom() {
@@ -511,9 +546,16 @@ public class CaseChatMemberActivity extends ActionBarActivity implements View.On
 
 
     void initAdapter() {
-        adapterChat = new AdapterChat(this, dataChat, otherUser, jid, listChat);
-        listChat.setAdapter(adapterChat);
-        adapterChat.queryChatLogs(true);
+        System.out.println("init() isofficial " + isOfficial);
+        if (isOfficial) {
+            adapterOfficial = new AdapterOfficial(this, dataChat, otherUser, jid, listChat);
+            listChat.setAdapter(adapterOfficial);
+            adapterOfficial.queryChatLogs(true);
+        } else {
+            adapterChat = new AdapterChat(this, dataChat, otherUser, jid, listChat);
+            listChat.setAdapter(adapterChat);
+            adapterChat.queryChatLogs(true);
+        }
     }
 
 
@@ -580,7 +622,11 @@ public class CaseChatMemberActivity extends ActionBarActivity implements View.On
         } else if (v == btnCommit) {
             if (roomIsCreated) {
                 if (!txtMsg.getText().toString().matches("")) {
-                    adapterChat.enterMsg(txtMsg.getText().toString());
+                    if (isOfficial) {
+                        adapterOfficial.enterMsg(txtMsg.getText().toString());
+                    } else {
+                        adapterChat.enterMsg(txtMsg.getText().toString());
+                    }
                     // setListViewInBtm();
                 }
                 txtMsg.setText(null);
@@ -702,7 +748,11 @@ public class CaseChatMemberActivity extends ActionBarActivity implements View.On
                         Log.d("TAG", "CAmera Capture path2" + imgFile.getPath());
                         String[] imagesPath = new String[1];
                         imagesPath[0] = imgFile.getPath();
-                        adapterChat.addImageList(imagesPath);
+                        if (isOfficial) {
+                            adapterOfficial.addImageList(imagesPath);
+                        } else {
+                            adapterChat.addImageList(imagesPath);
+                        }
                         // setListViewInBtm();
                         // mGridAdapter.addItem(imgFile.getPath(), "!");
 
@@ -731,7 +781,11 @@ public class CaseChatMemberActivity extends ActionBarActivity implements View.On
             if (resultCode == Activity.RESULT_OK) {
 
                 String[] imagesPath = data.getStringExtra("data").split("\\|");
-                adapterChat.addImageList(imagesPath);
+                if (isOfficial) {
+                    adapterOfficial.addImageList(imagesPath);
+                } else {
+                    adapterChat.addImageList(imagesPath);
+                }
                 //setListViewInBtm();
 
 
@@ -751,7 +805,11 @@ public class CaseChatMemberActivity extends ActionBarActivity implements View.On
             if (resultCode == Activity.RESULT_OK) {
                 String detail = data.getStringExtra("detail");
                 if (!detail.matches("")) {
-                    adapterChat.enterMsg("My location is \n" + detail);
+                    if (isOfficial) {
+                        adapterOfficial.enterMsg("My location is \n" + detail);
+                    } else {
+                        adapterChat.enterMsg("My location is \n" + detail);
+                    }
                     // setListViewInBtm();
                 }
 

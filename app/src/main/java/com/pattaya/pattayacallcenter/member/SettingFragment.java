@@ -30,6 +30,19 @@ public class SettingFragment extends Fragment implements View.OnClickListener {
 
 
     static SettingFragment fragment = null;
+    TextView titleTextView;
+    SharedPreferences sp;
+    SharedPreferences.Editor editor;
+    SharedPreferences.Editor editorUser;
+    Button btnOwn;
+    Button btnAlert;
+    Button btnOrganize;
+    Button btnPass;
+    Button btnClose;
+
+    public SettingFragment() {
+        // Required empty public constructor
+    }
 
     public static SettingFragment newInstance() {
         if (fragment == null) {
@@ -40,30 +53,17 @@ public class SettingFragment extends Fragment implements View.OnClickListener {
         return fragment;
     }
 
-    public SettingFragment() {
-        // Required empty public constructor
-    }
-
-    TextView titleTextView;
-    SharedPreferences sp;
-    SharedPreferences.Editor editor;
-
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
+        SharedPreferences spUser = getActivity().getSharedPreferences(MasterData.SHARED_NAME_USER_FILE, Context.MODE_PRIVATE);
         sp = getActivity().getSharedPreferences(MasterData.SHARED_NAME_CONFIG_FILE, Context.MODE_PRIVATE);
         editor = sp.edit();
+        editorUser = spUser.edit();
 
 
     }
-
-    Button btnOwn;
-    Button btnAlert;
-    Button btnOrganize;
-    Button btnPass;
-    Button btnClose;
-
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -116,6 +116,9 @@ public class SettingFragment extends Fragment implements View.OnClickListener {
             XMPPManage.getInstance().disConnect();
             editor.putString(MasterData.SHARED_CONFIG_TOKEN, null);
             editor.commit();
+
+            editorUser.putBoolean(MasterData.SHARED_IS_OFFICIAL, false);
+            editorUser.commit();
             v.getContext().stopService(new Intent(v.getContext(), XMPPService.class));
             LoginManager.getInstance().logOut();
 

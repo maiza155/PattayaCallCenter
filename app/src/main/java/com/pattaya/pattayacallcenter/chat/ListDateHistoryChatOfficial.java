@@ -1,5 +1,6 @@
 package com.pattaya.pattayacallcenter.chat;
 
+import android.os.AsyncTask;
 import android.util.Log;
 
 import com.pattaya.pattayacallcenter.Data.Messages;
@@ -20,18 +21,19 @@ import java.util.List;
 /**
  * Created by SWF on 3/3/2015.
  */
-public class ListDateHistoryChat implements IQProvider {
+public class ListDateHistoryChatOfficial implements IQProvider {
     // public static final String NAMESPACE = "urn:xmpp:archive";
 
     public static final String ELEMENT_NAME = "list";
     public static String WITH = "telember@pattaya-data";
     ChatHistoryData chatHistoryData = ChatHistoryData.getInstance();
-    XMPPManage xmppManage = XMPPManage.getInstance();
+    XMPPManageOfficial xmppManage = XMPPManageOfficial.getInstance();
     private List<Date> dates;
     private List<Date> tempDate;
     private ArrayList<String> startTimes;
     private ArrayList<Package> packet;
-    public ListDateHistoryChat() {
+
+    public ListDateHistoryChatOfficial() {
         super();
     }
 
@@ -65,6 +67,14 @@ public class ListDateHistoryChat implements IQProvider {
         String xmlString = result.getWriter().toString();
         System.out.println(xmlString);
 */
+
+        new AsyncTask<Void, Void, Void>() {
+
+            @Override
+            protected Void doInBackground(Void... params) {
+                return null;
+            }
+        };
         while (false == stop) {
             switch (parser.getEventType()) {
                 case XmlPullParser.START_TAG: {

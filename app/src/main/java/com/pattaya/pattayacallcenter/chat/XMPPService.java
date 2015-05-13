@@ -109,7 +109,6 @@ public class XMPPService extends Service {
                         } else {
                             Log.e("XMPPSerVICE", "Break .. .. ... .. ." + xmppManage.getmConnection().isConnected());
                             xmppManage.createPubSub();
-
                             List<Users> arrUsers = DatabaseChatHelper.init().getUsers();
                             for (Users e : arrUsers) {
                                 if (e.getType() == Users.TYPE_GROUP) {

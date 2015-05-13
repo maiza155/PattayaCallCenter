@@ -24,6 +24,7 @@ import com.github.ksoichiro.android.observablescrollview.ObservableListView;
 import com.github.ksoichiro.android.observablescrollview.ObservableScrollViewCallbacks;
 import com.github.ksoichiro.android.observablescrollview.ScrollState;
 import com.pattaya.pattayacallcenter.AdapterChat;
+import com.pattaya.pattayacallcenter.AdapterOfficial;
 import com.pattaya.pattayacallcenter.AdapterStricker;
 import com.pattaya.pattayacallcenter.BusProvider;
 import com.pattaya.pattayacallcenter.Data.MasterData;
@@ -39,7 +40,6 @@ import com.pattaya.pattayacallcenter.chat.xmlobject.Chatroom.ChatRoom;
 import com.pattaya.pattayacallcenter.customview.CameraMange;
 import com.pattaya.pattayacallcenter.customview.CustomGalleryActivity;
 import com.pattaya.pattayacallcenter.customview.SlideMenuManage;
-import com.pattaya.pattayacallcenter.webservice.AdapterOfficial;
 import com.squareup.otto.Subscribe;
 
 import java.io.File;
@@ -104,7 +104,7 @@ public class CaseChatActivity extends ActionBarActivity implements View.OnClickL
 
         caseTitle = (TextView) findViewById(R.id.case_name);
         listChat = (ObservableListView) findViewById(R.id.chat);
-        listChat.setScrollViewCallbacks(this);
+        //listChat.setScrollViewCallbacks(this);
         caseName = (caseName == null) ? "no name" : caseName;
         caseTitle.setText("เรื่อง - " + caseName);
 
@@ -217,6 +217,12 @@ public class CaseChatActivity extends ActionBarActivity implements View.OnClickL
 
     }
 
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        BusProvider.getInstance().unregister(this);
+    }
+
     void initAdapter() {
         if (isOfficial) {
             adapterOfficial = new AdapterOfficial(this, dataChat, otherUser, jid, listChat);
@@ -235,6 +241,8 @@ public class CaseChatActivity extends ActionBarActivity implements View.OnClickL
     public void onBusReciver(String event) {
 
         if (roomIsCreated && event.equalsIgnoreCase(otherUser.getJid())) {
+
+            System.out.println("recive my log");
             if (isOfficial) {
                 adapterOfficial.queryChatLogs(true);
             } else {
@@ -489,6 +497,7 @@ public class CaseChatActivity extends ActionBarActivity implements View.OnClickL
 
     @Override
     public void onUpOrCancelMotionEvent(ScrollState scrollState) {
+        /*
         if (scrollState == ScrollState.UP) {
             if (caseTitle.isShown()) {
                 caseTitle.setVisibility(View.GONE);
@@ -497,7 +506,7 @@ public class CaseChatActivity extends ActionBarActivity implements View.OnClickL
             if (!caseTitle.isShown()) {
                 caseTitle.setVisibility(View.VISIBLE);
             }
-        }
+        }*/
 
     }
 }

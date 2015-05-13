@@ -13,6 +13,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewTreeObserver;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -71,15 +72,14 @@ import retrofit.client.Response;
 
 
 public class LoginActivity extends Activity {
+    final Context context = this;
     Button btnRegis;
     Button btnLogin;
     Button btnForget;
     TextView userName;
     TextView userPass;
     LoginButton btnFacebook;
-
     ProfileTracker mProfileTracker;
-    final Context context = this;
     RestAdapter webserviceConnector = WebserviceConnector.getInstance();
     // AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
     SharedPreferences spConfig;
@@ -109,6 +109,18 @@ public class LoginActivity extends Activity {
         mCallbackManager = CallbackManager.Factory.create();
         setClickListener();
         init();
+
+        final View activityRootView = findViewById(R.id.activityRoot);
+        activityRootView.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+            @Override
+            public void onGlobalLayout() {
+                int heightDiff = activityRootView.getRootView().getHeight() - activityRootView.getHeight();
+                if (heightDiff > 100) { // if more than 100 pixels, its probably a keyboard...
+                    System.out.println("move");
+                    activityRootView.scrollTo(0, btnFacebook.getBottom());
+                }
+            }
+        });
     }
 
     void init() {
@@ -210,7 +222,7 @@ public class LoginActivity extends Activity {
                                         if (acessTokenObject.getAcessToken() != null) {
                                             //เป็น user ใหม่
                                             if (userID == -10) {
-                                                Log.e("Get New Token New All Data", acessTokenObject.getAcessToken() + " Token :" + token + "  ID " + userDataObject.getDisplayName());
+                                                Log.e("Get-NEWTOKEN", acessTokenObject.getAcessToken() + " Token :" + token + "  ID " + userDataObject.getDisplayName());
 
                                                 editor = sp.edit();
                                                 editor.putInt(MasterData.SHARED_USER_USER_ID, userDataObject.getUserId());
@@ -315,7 +327,7 @@ public class LoginActivity extends Activity {
                                     public void failure(RetrofitError error) {
                                         ringProgressDialog.dismiss();
                                         alertDialogFailtoServer(getResources().getString(R.string.cant_connect_server));
-                                        Log.e("Login ... ToKen AcTivity Error", " " + error);
+                                        Log.e("Error-Token", " " + error);
 
                                     }
                                 });

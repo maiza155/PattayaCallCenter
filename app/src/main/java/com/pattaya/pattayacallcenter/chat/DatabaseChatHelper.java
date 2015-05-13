@@ -8,6 +8,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.os.AsyncTask;
 import android.provider.BaseColumns;
+import android.util.Log;
 
 import com.pattaya.pattayacallcenter.Application;
 import com.pattaya.pattayacallcenter.BusProvider;
@@ -39,14 +40,16 @@ public class DatabaseChatHelper extends SQLiteOpenHelper {
 
     public static final String DB_NAME = "pattaya";
     static final int DB_VERSION = 1;
+    static DatabaseChatHelper databaseChatHelper = null;
+    final RestAdapter restAdapterOpenFire = RestAdapterOpenFire.getInstance();
+    final OpenfireQueary openfireQueary = restAdapterOpenFire.create(OpenfireQueary.class);
     Date date;
     SimpleDateFormat sdf = new SimpleDateFormat("E dd MMM yyyy-HH:mm:ss ");
     DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault());
 
-    static DatabaseChatHelper databaseChatHelper = null;
-
-    final RestAdapter restAdapterOpenFire = RestAdapterOpenFire.getInstance();
-    final OpenfireQueary openfireQueary = restAdapterOpenFire.create(OpenfireQueary.class);
+    public DatabaseChatHelper(Context context) {
+        super(context, DB_NAME, null, DB_VERSION);
+    }
 
     public static DatabaseChatHelper init() {
         if (databaseChatHelper == null) {
@@ -56,10 +59,11 @@ public class DatabaseChatHelper extends SQLiteOpenHelper {
         return databaseChatHelper;
     }
 
-    public DatabaseChatHelper(Context context) {
-        super(context, DB_NAME, null, DB_VERSION);
+    public static Calendar DateToCalendar(Date date) {
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(date);
+        return cal;
     }
-
 
     @Override
     public void onCreate(SQLiteDatabase db) {
@@ -167,12 +171,6 @@ public class DatabaseChatHelper extends SQLiteOpenHelper {
 
         return data;
 
-    }
-
-    public static Calendar DateToCalendar(Date date) {
-        Calendar cal = Calendar.getInstance();
-        cal.setTime(date);
-        return cal;
     }
 
     String convertDateTimeToEng(String e) {
@@ -584,7 +582,7 @@ public class DatabaseChatHelper extends SQLiteOpenHelper {
                 //ทำการ clear database เพื่อทำการเพิ่มค่า ใหม่ลงไป
                 if (messageses.size() != 0) {
                     int delete = db.delete(Logs.TABLE_NAME, Logs.Column.ROOM + "= '" + room + "'", null);
-                    //Log.d("Database Chat", "DELETE TABLE" + delete);
+                    Log.e("Database Chat", "DELETE TABLE" + delete);
                 }
 
 
