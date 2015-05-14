@@ -15,8 +15,11 @@ import android.util.Log;
 import android.widget.RemoteViews;
 
 import com.pattaya.pattayacallcenter.Application;
+import com.pattaya.pattayacallcenter.BusProvider;
 import com.pattaya.pattayacallcenter.Data.MasterData;
 import com.pattaya.pattayacallcenter.R;
+import com.pattaya.pattayacallcenter.guest.CaseChatActivity;
+import com.pattaya.pattayacallcenter.guest.CaseDetailActivity;
 import com.pattaya.pattayacallcenter.member.CaseChatMemberActivity;
 import com.pattaya.pattayacallcenter.webservice.RestFulQueary;
 import com.pattaya.pattayacallcenter.webservice.WebserviceConnector;
@@ -82,16 +85,26 @@ public class NotifyCase {
             Uri alarmSound = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
             mBuilder.setSound(alarmSound);
         }
-
-        Intent notificationIntent = new Intent(Application.getContext(), CaseChatMemberActivity.class);
-        notificationIntent.putExtra("id", object.getCaseId());
-        notificationIntent.putExtra("casename", object.getTitle());
-        notificationIntent.putExtra("complainid", object.getComplainId());
-        notificationIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
-        notificationIntent.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
-        PendingIntent intent = PendingIntent.getActivity(Application.getContext(), 0,
-                notificationIntent, PendingIntent.FLAG_UPDATE_CURRENT);
-        mBuilder.setContentIntent(intent);
+        if (object.getCaseId() > 0) {
+            Intent notificationIntent = new Intent(Application.getContext(), CaseChatMemberActivity.class);
+            notificationIntent.putExtra("id", object.getCaseId());
+            notificationIntent.putExtra("casename", object.getTitle());
+            notificationIntent.putExtra("complainid", object.getComplainId());
+            notificationIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+            notificationIntent.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
+            PendingIntent intent = PendingIntent.getActivity(Application.getContext(), 0,
+                    notificationIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+            mBuilder.setContentIntent(intent);
+        } else {
+            Intent notificationIntent = new Intent(Application.getContext(), CaseDetailActivity.class);
+            notificationIntent.putExtra("id_case", object.getCaseId());
+            notificationIntent.putExtra("id", object.getComplainId());
+            notificationIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+            notificationIntent.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
+            PendingIntent intent = PendingIntent.getActivity(Application.getContext(), 0,
+                    notificationIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+            mBuilder.setContentIntent(intent);
+        }
 
 
         NotificationCompat.BigPictureStyle notiStyle = new
@@ -121,7 +134,15 @@ public class NotifyCase {
         token = spConfig.getString(MasterData.SHARED_CONFIG_TOKEN, "Null");
         clientId = spConfig.getString(MasterData.SHARED_CONFIG_CLIENT_ID, "Null");
         Log.e("TAG Notification ", "" + complainId);
-        new TaskQueryCaseId(Integer.parseInt(complainId), name, msg).execute();
+        new TaskQueryCaseId(Integer.parseInt(complainId), msg, name).execute();
+        SharedPreferences settings = Application.getContext().getSharedPreferences(MasterData.SHARED_CASE_COUNT, Context.MODE_PRIVATE);
+        String caseStr = "id_" + complainId;
+        int count = settings.getInt(caseStr, 0);
+        Log.e("count ", "" + count);
+        count = count + 1;
+        settings.edit().putInt(caseStr, count).commit();
+        Log.e("count ", "" + count);
+        BusProvider.getInstance().post("case_count");
 
 
     }
@@ -179,16 +200,32 @@ public class NotifyCase {
                         Uri alarmSound = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
                         mBuilder.setSound(alarmSound);
                     }
+                    if (caseMainObject.getRefCasesId() > 0) {
 
-                    Intent notificationIntent = new Intent(Application.getContext(), CaseChatMemberActivity.class);
-                    notificationIntent.putExtra("id", caseMainObject.getRefCasesId());
-                    notificationIntent.putExtra("casename", caseMainObject.getComplaintName());
-                    notificationIntent.putExtra("complainid", complainId);
-                    notificationIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
-                    notificationIntent.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
-                    PendingIntent intent = PendingIntent.getActivity(Application.getContext(), 0,
-                            notificationIntent, PendingIntent.FLAG_UPDATE_CURRENT);
-                    mBuilder.setContentIntent(intent);
+                        Intent notificationIntent = new Intent(Application.getContext(), CaseChatMemberActivity.class);
+                        notificationIntent.putExtra("id", caseMainObject.getRefCasesId());
+                        notificationIntent.putExtra("casename", caseMainObject.getComplaintName());
+                        notificationIntent.putExtra("complainid", complainId);
+                        notificationIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+                        notificationIntent.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
+
+
+                        PendingIntent intent = PendingIntent.getActivity(Application.getContext(), 0,
+                                notificationIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+                        mBuilder.setContentIntent(intent);
+                    } else {
+                        Intent notificationIntent = new Intent(Application.getContext(), CaseChatActivity.class);
+                        notificationIntent.putExtra("id", caseMainObject.getRefCasesId());
+                        notificationIntent.putExtra("casename", caseMainObject.getComplaintName());
+                        notificationIntent.putExtra("complainid", complainId);
+                        notificationIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+                        notificationIntent.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
+
+
+                        PendingIntent intent = PendingIntent.getActivity(Application.getContext(), 0,
+                                notificationIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+                        mBuilder.setContentIntent(intent);
+                    }
 
 
                     NotificationCompat.BigPictureStyle notiStyle = new

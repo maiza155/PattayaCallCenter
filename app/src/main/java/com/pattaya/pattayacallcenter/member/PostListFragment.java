@@ -2,6 +2,7 @@ package com.pattaya.pattayacallcenter.member;
 
 import android.content.Context;
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -85,7 +86,6 @@ public class PostListFragment extends Fragment implements AbsListView.OnScrollLi
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-
 
 
         View root = inflater.inflate(R.layout.fragment_post, container, false);
@@ -187,77 +187,101 @@ public class PostListFragment extends Fragment implements AbsListView.OnScrollLi
 
         tv_empty.setVisibility(View.GONE);
         progressBar.setVisibility(View.VISIBLE);
-        restFulQuearyPost.getPost(getPostObject, new Callback<Response>() {
-            @Override
-            public void success(Response result, Response response2) {
-                //Try to get response body
 
-
-                BufferedReader reader = null;
-                StringBuilder sb = new StringBuilder();
-                try {
-
-                    reader = new BufferedReader(new InputStreamReader(result.getBody().in()));
-
-                    String line;
-
-                    try {
-                        while ((line = reader.readLine()) != null) {
-                            sb.append(line);
-                        }
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-
-
-                String JsonConvertData = "{data:" + sb.toString() + "}";
-                PostList Object = new Gson().fromJson(JsonConvertData, PostList.class);
-
-
-                ArrayList tempList = new ArrayList();
-                progressBar.setVisibility(View.GONE);
-                if (Object.getData().size() > 0) {
-                    pagesLoader++;
-                    for (PostObject e : Object.getData()) {
-                        if (!postId.contains(e.getPostId())) {
-                            postId.add(e.getPostId());
-                            tempList.add(e);
-                        }
-                    }
-                    adapterListViewCaseResult.addItem(tempList);
-                    listDataresult = adapterListViewCaseResult.getListData();
-
-
-                }
-
-
-                if (adapterListViewCaseResult.getCount() == 0) {
-                    tv_empty.setVisibility(View.VISIBLE);
-
-                }
-                isFirst = false;
-                mSwipeRefreshLayout.setRefreshing(false);
-
-
-            }
+        new AsyncTask<Void, Void, Boolean>() {
 
             @Override
-            public void failure(RetrofitError error) {
-                System.out.println("Post error = [" + error + "]");
+            protected Boolean doInBackground(Void... params) {
+                restFulQuearyPost.getPost(getPostObject, new Callback<Response>() {
+                    @Override
+                    public void success(Response result, Response response2) {
+                        //Try to get response body
 
-                if (adapterListViewCaseResult.getCount() == 0) {
-                    tv_empty.setVisibility(View.VISIBLE);
 
-                }
+                        BufferedReader reader = null;
+                        StringBuilder sb = new StringBuilder();
+                        try {
 
-                progressBar.setVisibility(View.GONE);
-                isFirst = false;
-                mSwipeRefreshLayout.setRefreshing(false);
+                            reader = new BufferedReader(new InputStreamReader(result.getBody().in()));
+
+                            String line;
+
+                            try {
+                                while ((line = reader.readLine()) != null) {
+                                    sb.append(line);
+                                }
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+
+
+                        String JsonConvertData = "{data:" + sb.toString() + "}";
+                        PostList Object = new Gson().fromJson(JsonConvertData, PostList.class);
+
+
+                        ArrayList tempList = new ArrayList();
+
+                        if (Object.getData().size() > 0) {
+                            pagesLoader++;
+                            for (PostObject e : Object.getData()) {
+                                if (!postId.contains(e.getPostId())) {
+                                    postId.add(e.getPostId());
+                                    tempList.add(e);
+                                }
+                            }
+
+                            adapterListViewCaseResult.addItem(tempList);
+                            listDataresult = adapterListViewCaseResult.getListData();
+
+
+                        }
+
+                        getActivity().runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                progressBar.setVisibility(View.GONE);
+                                if (adapterListViewCaseResult.getCount() == 0) {
+                                    tv_empty.setVisibility(View.VISIBLE);
+
+                                }
+                                isFirst = false;
+                                mSwipeRefreshLayout.setRefreshing(false);
+                            }
+                        });
+
+
+                    }
+
+                    @Override
+                    public void failure(RetrofitError error) {
+                        System.out.println("Post error = [" + error + "]");
+                        getActivity().runOnUiThread(new Runnable() {
+
+                            @Override
+                            public void run() {
+                                if (adapterListViewCaseResult.getCount() == 0) {
+                                    tv_empty.setVisibility(View.VISIBLE);
+
+                                }
+
+                                progressBar.setVisibility(View.GONE);
+                                isFirst = false;
+                                mSwipeRefreshLayout.setRefreshing(false);
+                            }
+                        });
+
+
+                    }
+                });
+
+
+                return null;
             }
-        });
+        }.execute();
+
 
     }
 

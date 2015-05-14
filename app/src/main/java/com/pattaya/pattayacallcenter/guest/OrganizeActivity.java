@@ -24,6 +24,8 @@ import com.daimajia.androidanimations.library.YoYo;
 import com.facebook.login.LoginManager;
 import com.pattaya.pattayacallcenter.Data.MasterData;
 import com.pattaya.pattayacallcenter.R;
+import com.pattaya.pattayacallcenter.chat.XMPPManage;
+import com.pattaya.pattayacallcenter.chat.XMPPService;
 import com.pattaya.pattayacallcenter.chat.jsonobject.MapProperty;
 import com.pattaya.pattayacallcenter.chat.jsonobject.Property;
 import com.pattaya.pattayacallcenter.chat.jsonobject.UserProperty;
@@ -45,16 +47,16 @@ import retrofit.RetrofitError;
 import retrofit.client.Response;
 
 public class OrganizeActivity extends ActionBarActivity implements View.OnClickListener {
+    final RestAdapter restAdapterOpenFireJson = RestAdapterOpenFire.getInstanceJson();
+    final OpenfireQueary openfireQueary = restAdapterOpenFireJson.create(OpenfireQueary.class);
     Button btnCount;
     Button btnAccept;
     Button btnNoAccept;
     ImageButton btn;
     TextView titleTextView;
-
     EditText txt_name;
     EditText txt_lastname;
     EditText txt_iccard;
-
     FrameLayout frame;
     SharedPreferences sp;
     SharedPreferences spConfig;
@@ -62,10 +64,6 @@ public class OrganizeActivity extends ActionBarActivity implements View.OnClickL
     int userId;
     RestAdapter webserviceConnector = WebserviceConnector.getInstance();
     final RestFulQueary queary = webserviceConnector.create(RestFulQueary.class);
-
-    final RestAdapter restAdapterOpenFireJson = RestAdapterOpenFire.getInstanceJson();
-    final OpenfireQueary openfireQueary = restAdapterOpenFireJson.create(OpenfireQueary.class);
-
     int orgId;
     String jid;
     String pic;
@@ -164,12 +162,17 @@ public class OrganizeActivity extends ActionBarActivity implements View.OnClickL
                         new Handler().postDelayed(new Runnable() {
                             public void run() {
                                 if (bool) {
+                                    XMPPManage.getInstance().disConnect();
                                     editor = sp.edit();
                                     editor.putInt("USER_ID", -10);
                                     editor.commit();
                                     editor = spConfig.edit();
                                     editor.putString("TOKEN", null);
                                     editor.commit();
+
+
+                                    OrganizeActivity.this.stopService(new Intent(OrganizeActivity.this, XMPPService.class));
+
                                     LoginManager.getInstance().logOut();
 
 

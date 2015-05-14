@@ -269,7 +269,8 @@ public class ChatActivity extends ActionBarActivity implements View.OnClickListe
             //  Toast.makeText(getApplication(), messages.getRoom() + " New Messages ", Toast.LENGTH_SHORT).show();
             DatabaseChatHelper.init().clearCountLastMessage(messages.getRoom());
             if (!messages.getSender().matches(mUser)) {
-                //NotifyChat.cancelNotification(NotifyChat.NOTIFY_CHAT_ID);
+                NotifyChat.cancelNotification(NotifyChat.NOTIFY_CHAT_ID);
+                //NotifyCase.cancelNotification(NotifyCase.NOTIFY_CHAT_ID);
                 adapterChat.queryChatLogsNoReset(messages, false);
                 //setListViewInBtm();
             }

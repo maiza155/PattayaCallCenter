@@ -26,6 +26,8 @@ import com.google.gson.Gson;
 import com.pattaya.pattayacallcenter.BusProvider;
 import com.pattaya.pattayacallcenter.R;
 import com.pattaya.pattayacallcenter.chat.DatabaseChatHelper;
+import com.pattaya.pattayacallcenter.chat.XMPPManage;
+import com.pattaya.pattayacallcenter.chat.XMPPService;
 import com.pattaya.pattayacallcenter.customview.EmptyRecyclerView;
 import com.pattaya.pattayacallcenter.customview.SlideMenuManage;
 import com.pattaya.pattayacallcenter.guest.CaseList.ListAdapter;
@@ -71,10 +73,9 @@ public class CaseListActivity extends ActionBarActivity implements View.OnClickL
     int userId;
     String token;
     String clientId;
-    private SwipeRefreshLayout mSwipeRefreshLayout;
     ProgressDialog ringProgressDialog;
-
     int TAG_ORGANIZE = 808;
+    private SwipeRefreshLayout mSwipeRefreshLayout;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -164,6 +165,10 @@ public class CaseListActivity extends ActionBarActivity implements View.OnClickL
     public void updateListData(String s) {
         if (s.matches("update_case_list")) {
             getListData();
+        } else if (s.matches("case_count")) {
+            if (mAdapter != null) {
+                mAdapter.notifyDataSetChanged();
+            }
         }
 
     }
@@ -271,10 +276,14 @@ public class CaseListActivity extends ActionBarActivity implements View.OnClickL
             startActivity(intent);
             mSliderMange.stateShowMenu(mSliderMange.SETTING_MENU_HIDE);
         } else if (btnExit == v) {
-
+            XMPPManage.getInstance().disConnect();
             editor = sp.edit();
             editor.putString("TOKEN", null);
             editor.commit();
+            CaseListActivity.this.stopService(new Intent(CaseListActivity.this, XMPPService.class));
+
+            LoginManager.getInstance().logOut();
+
             Intent intent = new Intent(this, LoginActivity.class);
             startActivity(intent);
             LoginManager.getInstance().logOut();

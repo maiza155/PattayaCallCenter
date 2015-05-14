@@ -32,4 +32,7 @@ public class MasterData {
     public static final String SHARED_CONFIG_IS_FIRST = "IS_FIRST";
 
 
+    public static final String SHARED_CASE_COUNT = "CASE_COUNT";
+
+
 }

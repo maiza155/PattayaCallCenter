@@ -212,173 +212,207 @@ public class CaseAddAndEditActivity extends ActionBarActivity implements View.On
     }
 
     void uploadImage() {
-      new  TaskResizeUpload().execute();
+        new TaskResizeUpload().execute();
     }
 
     void saveData() {
-        setData();
-        Gson gson = new Gson();
-        String json = gson.toJson(caseMainObject);
-        System.out.println(json);
-        runOnUiThread(new Runnable() {
-            public void run() {
-                ringProgressDialog = ProgressDialog.show(CaseAddAndEditActivity.this, getResources().getString(R.string.save), getResources().getString(R.string.please_wait), true);
-                ringProgressDialog.setCancelable(true);
-            }
-        });
+        new AsyncTask<Void, Void, Boolean>() {
+            @Override
+            protected void onPreExecute() {
+                super.onPreExecute();
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        ringProgressDialog = ProgressDialog.show(CaseAddAndEditActivity.this, getResources().getString(R.string.save), getResources().getString(R.string.please_wait), true);
+                        ringProgressDialog.setCancelable(true);
+                    }
+                });
 
-        GetUserObject getUserObject = new GetUserObject(userId, token, clientId);
-        adapterRestUser.getUser(getUserObject, new Callback<AccessUserObject>() {
+            }
 
             @Override
-            public void success(AccessUserObject accessUserObject, Response response) {
-                CaseDataObject caseDataObject = caseMainObject.getContactInfo();
-                caseDataObject.setAddress(accessUserObject.getAddress());
-                caseDataObject.setDistrict(accessUserObject.getDistrict());
-                caseDataObject.setAmphur(accessUserObject.getAmphur());
-                caseDataObject.setProvince(accessUserObject.getProvince());
-                caseDataObject.setPostCode(accessUserObject.getPostCode());
-                caseDataObject.setEmail(accessUserObject.getEmail());
-                if (caseDataObject.getTelephone() == null || caseDataObject.getTelephone().isEmpty()) {
-                    caseDataObject.setTelephone(accessUserObject.getMobile());
-                }
-                if (caseDataObject.getNameContact() == null || caseDataObject.getNameContact().isEmpty()) {
-                    caseDataObject.setNameContact(accessUserObject.getDisplayName());
-                }
+            protected Boolean doInBackground(Void... params) {
+                setData();
+                Gson gson = new Gson();
+                String json = gson.toJson(caseMainObject);
+                System.out.println(json);
 
-                caseMainObject.setContactInfo(caseDataObject);
-                adapterRest.saveCase(caseMainObject, new Callback<UpdateResult>() {
-                            @Override
-                            public void success(final UpdateResult updateResult, Response response) {
-                                System.out.println("updateResult = [" + updateResult.getResult() + "], response = [" + response + "]");
+                GetUserObject getUserObject = new GetUserObject(userId, token, clientId);
+                adapterRestUser.getUser(getUserObject, new Callback<AccessUserObject>() {
+                    @Override
+                    public void success(AccessUserObject accessUserObject, Response response) {
+                        CaseDataObject caseDataObject = caseMainObject.getContactInfo();
+                        caseDataObject.setAddress(accessUserObject.getAddress());
+                        caseDataObject.setDistrict(accessUserObject.getDistrict());
+                        caseDataObject.setAmphur(accessUserObject.getAmphur());
+                        caseDataObject.setProvince(accessUserObject.getProvince());
+                        caseDataObject.setPostCode(accessUserObject.getPostCode());
+                        caseDataObject.setEmail(accessUserObject.getEmail());
+                        if (caseDataObject.getTelephone() == null || caseDataObject.getTelephone().isEmpty()) {
+                            caseDataObject.setTelephone(accessUserObject.getMobile());
+                        }
+                        if (caseDataObject.getNameContact() == null || caseDataObject.getNameContact().isEmpty()) {
+                            caseDataObject.setNameContact(accessUserObject.getDisplayName());
+                        }
 
-                                if (updateResult.getResult()) {
+                        caseMainObject.setContactInfo(caseDataObject);
+                        adapterRest.saveCase(caseMainObject, new Callback<UpdateResult>() {
+                                    @Override
+                                    public void success(final UpdateResult updateResult, Response response) {
+                                        System.out.println("updateResult = [" + updateResult.getResult() + "], response = [" + response + "]");
+                                        Log.e("TAG", "Save Data Success");
+                                        if (updateResult.getResult()) {
+                                            String roomName = "case-" + updateResult.getPrimaryKeyId();
+                                            final ChatRoomObject chatRoomObject = new ChatRoomObject();
+                                            chatRoomObject.setRoomName(roomName);
+                                            chatRoomObject.setNaturalName(roomName);
+                                            chatRoomObject.setDescription(roomName);
 
-                                    String roomName = "case-" + updateResult.getPrimaryKeyId();
-                                    final ChatRoomObject chatRoomObject = new ChatRoomObject();
-                                    chatRoomObject.setRoomName(roomName);
-                                    chatRoomObject.setNaturalName(roomName);
-                                    chatRoomObject.setDescription(roomName);
-
-                                    /////get JidList for notify and Recreate chat room
-                                    adapterRest.getUserListJid(updateResult.getPrimaryKeyId(), new Callback<Response>() {
-                                        @Override
-                                        public void success(Response result, Response response2) {
-
-                                            BufferedReader reader;
-                                            StringBuilder sb = new StringBuilder();
-                                            try {
-                                                reader = new BufferedReader(new InputStreamReader(result.getBody().in()));
-                                                String line;
-
-                                                try {
-                                                    while ((line = reader.readLine()) != null) {
-                                                        sb.append(line);
-                                                    }
-                                                } catch (IOException e) {
-                                                    e.printStackTrace();
-                                                }
-                                            } catch (IOException e) {
-                                                e.printStackTrace();
-                                            }
-                                            String JsonConvertData = "{data:" + sb.toString() + "}";
-
-                                            System.out.println(JsonConvertData);
-                                            CaseListJidObject listObject = new Gson().fromJson(JsonConvertData, CaseListJidObject.class);
-                                            Members members = new Members();
-                                            List<String> listJid = new ArrayList();
-                                            final List<PubsubObject> listNotify = new ArrayList<PubsubObject>();
-                                            Calendar c = Calendar.getInstance();
-                                            for (JidData e : listObject.getData()) {
-                                                if (!e.getJid().isEmpty() && e.getJid() != null) {
-                                                    listJid.add(e.getJid());
-                                                    PubsubObject pub = new PubsubObject();
-                                                    pub.setUsername(e.getJid().split("@")[0]);
-                                                    pub.setImage(displayImage);
-
-                                                    pub.setDisplayData(c.getTime().toString());
-                                                    // pub.setPrimarykey(complainId);
-                                                    if (complainId == 0) {
-                                                        pub.setAction("เปิดเคส");
-                                                    } else {
-                                                        pub.setAction("อัพเดทเคส");
-                                                    }
-                                                    pub.setComplainId(updateResult.getPrimaryKeyId());
-                                                    pub.setCaseId(caseId);
-                                                    pub.setName(displayName);
-                                                    pub.setTitle(caseMainObject.getComplaintName());
-
-                                                    listNotify.add(pub);
-                                                }
-
-                                            }
-                                            members.setMember(listJid);
-                                            chatRoomObject.setMembers(members);
-
-                                            //Recreate chat room`
-                                            openfireQuearyJson.createChatRoom(chatRoomObject, new Callback<Response>() {
+                                            /////get JidList for notify and Recreate chat room
+                                            adapterRest.getUserListJid(updateResult.getPrimaryKeyId(), new Callback<Response>() {
                                                 @Override
-                                                public void success(Response response, Response response2) {
-                                                    //System.out.println("response = [" + response + "], response2 = [" + response2 + "]");
-                                                    for (PubsubObject e : listNotify) {
+                                                public void success(Response result, Response response2) {
+                                                    Log.e("TAG", "getList Success");
+                                                    BufferedReader reader;
+                                                    StringBuilder sb = new StringBuilder();
+                                                    try {
+                                                        reader = new BufferedReader(new InputStreamReader(result.getBody().in()));
+                                                        String line;
 
-                                                        XMPPManage.getInstance().new TaskSendNotify(e).execute();
+                                                        try {
+                                                            while ((line = reader.readLine()) != null) {
+                                                                sb.append(line);
+                                                            }
+                                                        } catch (IOException e) {
+                                                            e.printStackTrace();
+                                                        }
+                                                    } catch (IOException e) {
+                                                        e.printStackTrace();
                                                     }
-                                                    DatabaseChatHelper.init().clearCaseTable();
-                                                    ringProgressDialog.dismiss();
-                                                    BusProvider.getInstance().post("update_case_list");
-                                                    Toast.makeText(getApplication(), "success", Toast.LENGTH_SHORT).show();
-                                                    Intent i = new Intent();
-                                                    setResult(Activity.RESULT_OK, i);
-                                                    finish();
+                                                    String JsonConvertData = "{data:" + sb.toString() + "}";
+
+                                                    System.out.println(JsonConvertData);
+                                                    CaseListJidObject listObject = new Gson().fromJson(JsonConvertData, CaseListJidObject.class);
+                                                    Members members = new Members();
+                                                    List<String> listJid = new ArrayList();
+                                                    final List<PubsubObject> listNotify = new ArrayList<PubsubObject>();
+                                                    Calendar c = Calendar.getInstance();
+                                                    for (JidData e : listObject.getData()) {
+                                                        if (!e.getJid().isEmpty() && e.getJid() != null) {
+                                                            listJid.add(e.getJid());
+                                                            PubsubObject pub = new PubsubObject();
+                                                            pub.setUsername(e.getJid().split("@")[0]);
+                                                            pub.setImage(displayImage);
+                                                            Log.e("TAG", "getList Success  JIID " + e.getJid());
+                                                            pub.setDisplayData(c.getTime().toString());
+                                                            // pub.setPrimarykey(complainId);
+                                                            if (complainId == 0) {
+                                                                pub.setAction("เปิดเคส");
+                                                            } else {
+                                                                pub.setAction("อัพเดทเคส");
+                                                            }
+                                                            pub.setComplainId(updateResult.getPrimaryKeyId());
+                                                            pub.setCaseId(caseId);
+                                                            pub.setName(displayName);
+                                                            pub.setTitle(caseMainObject.getComplaintName());
+
+                                                            listNotify.add(pub);
+                                                        }
+
+                                                    }
+                                                    members.setMember(listJid);
+                                                    chatRoomObject.setMembers(members);
+
+                                                    //Recreate chat room`
+                                                    openfireQuearyJson.createChatRoom(chatRoomObject, new Callback<Response>() {
+                                                        @Override
+                                                        public void success(Response response, Response response2) {
+                                                            Log.e("TAG", "Create Room Success  ");
+                                                            //System.out.println("response = [" + response + "], response2 = [" + response2 + "]");
+                                                            for (PubsubObject e : listNotify) {
+                                                                XMPPManage.getInstance().new TaskSendNotify(e).execute();
+                                                            }
+                                                            DatabaseChatHelper.init().clearCaseTable();
+                                                            runOnUiThread(new Runnable() {
+                                                                public void run() {
+                                                                    BusProvider.getInstance().post("update_case_list");
+                                                                    Toast.makeText(getApplication(), "success", Toast.LENGTH_SHORT).show();
+                                                                    Intent i = new Intent();
+                                                                    setResult(Activity.RESULT_OK, i);
+
+                                                                    ringProgressDialog.dismiss();
+                                                                    finish();
+
+                                                                }
+                                                            });
+
+
+                                                        }
+
+                                                        @Override
+                                                        public void failure(RetrofitError error) {
+                                                            runOnUiThread(new Runnable() {
+                                                                public void run() {
+                                                                    ringProgressDialog.dismiss();
+                                                                }
+                                                            });
+                                                            Toast.makeText(getApplication(), "Unable connect server. Please try again", Toast.LENGTH_SHORT).show();
+                                                        }
+                                                    });
+
 
                                                 }
 
                                                 @Override
                                                 public void failure(RetrofitError error) {
-                                                    ringProgressDialog.dismiss();
+                                                    runOnUiThread(new Runnable() {
+                                                        public void run() {
+                                                            ringProgressDialog.dismiss();
+                                                        }
+                                                    });
                                                     Toast.makeText(getApplication(), "Unable connect server. Please try again", Toast.LENGTH_SHORT).show();
                                                 }
                                             });
 
 
+                                        } else {
+                                            runOnUiThread(new Runnable() {
+                                                public void run() {
+                                                    ringProgressDialog.dismiss();
+                                                }
+                                            });
+                                            Toast.makeText(getApplication(), "Cannot save this case please try again", Toast.LENGTH_SHORT).show();
                                         }
 
-                                        @Override
-                                        public void failure(RetrofitError error) {
-                                            ringProgressDialog.dismiss();
-                                            Toast.makeText(getApplication(), "Unable connect server. Please try again", Toast.LENGTH_SHORT).show();
-                                        }
-                                    });
+                                    }
 
-
-                                } else {
-                                    ringProgressDialog.dismiss();
-                                    Toast.makeText(getApplication(), "Cannot save this case please try again", Toast.LENGTH_SHORT).show();
+                                    @Override
+                                    public void failure(RetrofitError error) {
+                                        System.out.println("error = [" + error + "]");
+                                        Toast.makeText(getApplication(), "Please check your internet connection and try again", Toast.LENGTH_SHORT).show();
+                                        runOnUiThread(new Runnable() {
+                                            public void run() {
+                                                ringProgressDialog.dismiss();
+                                            }
+                                        });
+                                    }
                                 }
 
-                            }
-
-                            @Override
-                            public void failure(RetrofitError error) {
-                                System.out.println("error = [" + error + "]");
-                                Toast.makeText(getApplication(), "Please check your internet connection and try again", Toast.LENGTH_SHORT).show();
-                                ringProgressDialog.dismiss();
-                            }
-                        }
-
-                );
+                        );
 
 
+                    }
+
+                    @Override
+                    public void failure(RetrofitError error) {
+                        System.out.println("error get user data = [" + error + "]");
+                        ringProgressDialog.dismiss();
+                        Toast.makeText(getApplication(), "Unable connect server. Please try again", Toast.LENGTH_SHORT).show();
+                    }
+                });
+                return null;
             }
-
-            @Override
-            public void failure(RetrofitError error) {
-                System.out.println("error get user data = [" + error + "]");
-                ringProgressDialog.dismiss();
-                Toast.makeText(getApplication(), "Unable connect server. Please try again", Toast.LENGTH_SHORT).show();
-            }
-        });
+        }.execute();
 
 
     }
@@ -596,13 +630,14 @@ public class CaseAddAndEditActivity extends ActionBarActivity implements View.On
 
     }
 
-    class TaskResizeUpload extends AsyncTask<Void,Void,Boolean>{
+    class TaskResizeUpload extends AsyncTask<Void, Void, Boolean> {
 
         ProgressDialog ringProgressDialog;
+
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
-            ringProgressDialog = ProgressDialog.show(CaseAddAndEditActivity.this, getResources().getString(R.string.uploading), getResources().getString(R.string.please_wait), true);
+            ringProgressDialog = ProgressDialog.show(CaseAddAndEditActivity.this, null, getResources().getString(R.string.please_wait), true);
             ringProgressDialog.setCancelable(true);
         }
 
@@ -656,8 +691,6 @@ public class CaseAddAndEditActivity extends ActionBarActivity implements View.On
                         }
 
                         final long totalSize = file.length();
-
-
 
 
                         final int finalImageCount = imageCount;
@@ -743,6 +776,7 @@ public class CaseAddAndEditActivity extends ActionBarActivity implements View.On
 
             } else {
                 dataCaseDetail.setInfoImageList(listImageURL);
+                ringProgressDialog.dismiss();
                 saveData();
 
             }

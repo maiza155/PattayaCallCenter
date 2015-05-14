@@ -22,7 +22,6 @@ import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.gcm.GoogleCloudMessaging;
 import com.pattaya.pattayacallcenter.Data.MasterData;
 import com.pattaya.pattayacallcenter.R;
-import com.pattaya.pattayacallcenter.chat.XMPPManageOfficial;
 import com.pattaya.pattayacallcenter.chat.XMPPServiceOfficial;
 import com.pattaya.pattayacallcenter.member.Adapter.AdapterPager;
 
@@ -66,12 +65,7 @@ public class MemberMainActivity extends ActionBarActivity implements View.OnClic
         viewPager.setAdapter(adapterPager);
         tabs.setViewPager(viewPager);
         if (isOfficial) {
-            if (XMPPManageOfficial.getInstance() == null
-                    || XMPPManageOfficial.getInstance().getmConnection() == null
-                    || !XMPPManageOfficial.getInstance().getmConnection().isConnected()) {
-                startService(new Intent(this, XMPPServiceOfficial.class));
-
-            }
+            startService(new Intent(this, XMPPServiceOfficial.class));
         }
 
 

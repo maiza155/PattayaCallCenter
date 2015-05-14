@@ -70,6 +70,7 @@ public class CaseDetailActivity extends ActionBarActivity implements View.OnClic
     String token;
     String clientId;
     SharedPreferences sp;
+    Boolean isOfficial;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -80,6 +81,9 @@ public class CaseDetailActivity extends ActionBarActivity implements View.OnClic
         sp = getSharedPreferences(MasterData.SHARED_NAME_CONFIG_FILE, Context.MODE_PRIVATE);
         token = sp.getString(MasterData.SHARED_CONFIG_TOKEN, "null");
         clientId = sp.getString(MasterData.SHARED_CONFIG_CLIENT_ID, "null");
+
+        SharedPreferences spUser = getSharedPreferences(MasterData.SHARED_NAME_USER_FILE, Context.MODE_PRIVATE);
+        isOfficial = spUser.getBoolean(MasterData.SHARED_IS_OFFICIAL, false);
 
         Bundle data = getIntent().getExtras();
         complainId = data.getInt("id");
@@ -113,6 +117,12 @@ public class CaseDetailActivity extends ActionBarActivity implements View.OnClic
         btnDelete.setOnClickListener(this);
         adapterRest = webserviceConnector.create(RestFulQueary.class);
         getData();
+
+
+        if (isOfficial) {
+            btnEdit.setVisibility(View.GONE);
+            btnDelete.setVisibility(View.GONE);
+        }
     }
 
 

@@ -36,13 +36,12 @@ import retrofit.client.Response;
  */
 public class ExpandableListAdapter extends BaseExpandableListAdapter {
 
-    Activity context;
-    private Map<String, List<InviteFriendObject>> laptopCollections;
-    private List<String> laptops;
     final RestAdapter restAdapterOpenFire = RestAdapterOpenFire.getInstanceJson();
     final OpenfireQueary openfireQueary = restAdapterOpenFire.create(OpenfireQueary.class);
-
+    Activity context;
     String jid;
+    private Map<String, List<InviteFriendObject>> laptopCollections;
+    private List<String> laptops;
 
 
     public ExpandableListAdapter(Activity context, List<String> groupList,
@@ -170,7 +169,7 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
                         public void success(Response response, Response response2) {
                             System.out.println("response = [" + response + "], response2 = [" + response2 + "]");
                             removeAt(groupPosition, childPosition);
-                            XMPPManage.setJoinRoom(laptop.getJid());
+                            XMPPManage.getInstance().setJoinRoom(laptop.getJid());
                             BusProvider.getInstance().post("add_roster_complete");
                         }
 

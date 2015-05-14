@@ -130,6 +130,9 @@ public class LoginActivity extends Activity {
         if (token != null) {
             String org = sp.getString(MasterData.SHARED_USER_USER_TYPE, null);
             showIntent(org);
+        } else {
+            SharedPreferences settings = Application.getContext().getSharedPreferences(MasterData.SHARED_CASE_COUNT, Context.MODE_PRIVATE);
+            settings.edit().clear().commit();
         }
 
     }
@@ -146,6 +149,7 @@ public class LoginActivity extends Activity {
                 startActivity(intent);
                 finish();
             } else {
+                startService(new Intent(this, XMPPService.class));
                 Intent intent = new Intent(getApplicationContext(), CaseListActivity.class);
                 startActivity(intent);
                 finish();

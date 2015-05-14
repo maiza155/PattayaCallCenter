@@ -10,12 +10,20 @@ import java.util.List;
  * Created by SWF on 3/30/2015.
  */
 public class CaseDataObject implements Parcelable {
+    public static final Parcelable.Creator CREATOR = new Parcelable.Creator() {
+        public CaseDataObject createFromParcel(Parcel in) {
+            return new CaseDataObject(in);
+        }
+
+        public CaseDataObject[] newArray(int size) {
+            return new CaseDataObject[size];
+        }
+    };
     String houseNumber;
     String village;
     String soi;
     String road;
     String nameContact;
-    int casesId;
     String telephone;
     Boolean isAnonymousString;
     String moreInformation;
@@ -25,17 +33,7 @@ public class CaseDataObject implements Parcelable {
     String province;
     String postCode;
     String email;
-
-
     List<ImageObject> infoImageList = new ArrayList<>();
-
-    @Override
-    public String toString() {
-        return " " + houseNumber
-                + " " + village
-                + " " + soi
-                + " " + road;
-    }
 
     public CaseDataObject() {
     }
@@ -57,13 +55,12 @@ public class CaseDataObject implements Parcelable {
         p.readTypedList(infoImageList, ImageObject.CREATOR);
     }
 
-
-    public int getCasesId() {
-        return casesId;
-    }
-
-    public void setCasesId(int casesId) {
-        this.casesId = casesId;
+    @Override
+    public String toString() {
+        return " " + houseNumber
+                + " " + village
+                + " " + soi
+                + " " + road;
     }
 
     public List<ImageObject> getInfoImageList() {
@@ -183,14 +180,4 @@ public class CaseDataObject implements Parcelable {
         dest.writeTypedList(infoImageList);
 
     }
-
-    public static final Parcelable.Creator CREATOR = new Parcelable.Creator() {
-        public CaseDataObject createFromParcel(Parcel in) {
-            return new CaseDataObject(in);
-        }
-
-        public CaseDataObject[] newArray(int size) {
-            return new CaseDataObject[size];
-        }
-    };
 }

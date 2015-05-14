@@ -2,7 +2,9 @@ package com.pattaya.pattayacallcenter.member.Adapter;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.drawable.Drawable;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,10 +13,13 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.pattaya.pattayacallcenter.Application;
+import com.pattaya.pattayacallcenter.Data.MasterData;
 import com.pattaya.pattayacallcenter.R;
 import com.pattaya.pattayacallcenter.guest.CaseDetailActivity;
 import com.pattaya.pattayacallcenter.member.CaseChatMemberActivity;
 import com.pattaya.pattayacallcenter.webservice.object.casedata.CaseListMemberData;
+import com.readystatesoftware.viewbadger.BadgeView;
 
 import java.util.List;
 
@@ -30,9 +35,9 @@ import static com.pattaya.pattayacallcenter.R.drawable.custom_date_bg_yellow;
  */
 public class AdpterListCase extends BaseAdapter {
     List<CaseListMemberData> data;
+    SharedPreferences settings;
     private LayoutInflater mInflater;
     private Context context;
-
     public AdpterListCase(List<CaseListMemberData> caseListMemberDataList, Context context) {
         this.data = caseListMemberDataList;
         this.context = context;
@@ -76,6 +81,19 @@ public class AdpterListCase extends BaseAdapter {
         holder.txtName.setText(name);
         holder.txtDate.setText(data.get(position).getDate());
         holder.layout.removeAllViews();
+        settings = Application.getContext().getSharedPreferences(MasterData.SHARED_CASE_COUNT, Context.MODE_PRIVATE);
+        final String caseStr = "id_" + data.get(position).getComplaintId();
+        int count = settings.getInt(caseStr, 0);
+
+        if (count > 0) {
+            String strCount = (count > 9) ? "N" : String.valueOf(count);
+            holder.badge.setText(strCount);
+            holder.badge.setBackgroundResource(R.drawable.custom_budget);
+            holder.badge.setGravity(Gravity.CENTER);
+            holder.badge.setTextSize(13);
+            holder.badge.show();
+        } else
+            holder.badge.hide();
 
 
         if (data.get(position).getCasesId() > 0) {
@@ -118,6 +136,8 @@ public class AdpterListCase extends BaseAdapter {
         convertView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                settings.edit().putInt(caseStr, 0).commit();
+                notifyDataSetChanged();
                 if (data.get(position).getCasesId() != 0) {
                     System.out.println("case" + data.get(position).getCasesId());
                     Intent intent = new Intent(context, CaseChatMemberActivity.class);
@@ -144,12 +164,17 @@ public class AdpterListCase extends BaseAdapter {
     class Holder {
         TextView txtName, txtDate, txtProgress;
         LinearLayout layout;
+        View budget;
+        BadgeView badge = null;
 
         Holder(View v) {
             layout = (LinearLayout) v.findViewById(R.id.imageLayout);
             txtName = (TextView) v.findViewById(R.id.name);
             txtDate = (TextView) v.findViewById(R.id.date);
             txtProgress = (TextView) v.findViewById(R.id.progress_time);
+
+            budget = v.findViewById(R.id.badge);
+            badge = new BadgeView(context, budget);
         }
     }
 }

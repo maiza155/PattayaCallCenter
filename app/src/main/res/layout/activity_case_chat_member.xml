@@ -17,34 +17,66 @@
             android:layout_height="match_parent"
             android:orientation="vertical">
 
-            <TextView
-                android:id="@+id/case_name"
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:animateLayoutChanges="true"
-                android:padding="10dp"
-                android:textStyle="bold"
                 android:background="@color/brownLightColor"
-                android:minHeight="70dp"
-                android:maxHeight="200dp" />
+                android:orientation="horizontal">
 
-            <com.github.ksoichiro.android.observablescrollview.ObservableListView
-                android:layout_marginTop="10dp"
-                android:paddingLeft="@dimen/horizontal_margin"
-                android:paddingRight="@dimen/horizontal_margin"
-                android:id="@+id/chat"
-                android:divider="@null"
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text=" เรื่อง - " />
 
-                android:stackFromBottom="true"
-                android:transcriptMode="alwaysScroll"
-                android:dividerHeight="0dp"
-                android:listSelector="@android:color/transparent"
-                android:clickable="false"
-                android:focusable="false"
-                android:layout_gravity="bottom"
-                android:gravity="bottom"
+                <TextView
+                    android:id="@+id/case_name"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:animateLayoutChanges="true"
+                    android:ellipsize="end"
+                    android:lines="2"
+                    android:maxHeight="200dp"
+                    android:minHeight="70dp"
+                    android:padding="10dp"
+                    android:scrollHorizontally="false"
+                    android:textStyle="bold" />
+
+            </LinearLayout>
+
+
+            <RelativeLayout
                 android:layout_width="match_parent"
-                android:layout_height="fill_parent" />
+                android:layout_height="match_parent"
+                android:layout_marginTop="10dp"
+                android:orientation="vertical"
+                android:paddingLeft="@dimen/horizontal_margin"
+                android:paddingRight="@dimen/horizontal_margin">
+
+                <com.github.ksoichiro.android.observablescrollview.ObservableListView
+                    android:id="@+id/chat"
+                    android:layout_width="match_parent"
+                    android:layout_height="fill_parent"
+                    android:layout_gravity="bottom"
+                    android:layout_marginTop="10dp"
+
+                    android:clickable="false"
+                    android:divider="@null"
+                    android:dividerHeight="0dp"
+                    android:focusable="false"
+                    android:gravity="bottom"
+                    android:listSelector="@android:color/transparent"
+                    android:paddingLeft="@dimen/horizontal_margin"
+                    android:paddingRight="@dimen/horizontal_margin"
+                    android:stackFromBottom="true"
+                    android:transcriptMode="alwaysScroll" />
+
+                <ProgressBar
+                    android:id="@+id/progress"
+                    style="?android:attr/progressBarStyleInverse"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerInParent="true" />
+            </RelativeLayout>
         </LinearLayout>
 
 
@@ -82,8 +114,8 @@
         <View
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:background="@color/grayDarkColor"
-            android:alpha="0.4" />
+            android:alpha="0.4"
+            android:background="@color/grayDarkColor" />
 
         <GridView
             android:id="@+id/menugrid"

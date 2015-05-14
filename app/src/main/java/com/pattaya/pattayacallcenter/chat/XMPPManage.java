@@ -132,60 +132,6 @@ public class XMPPManage implements MessageListener {
         XMPPManage.chat = chat;
     }
 
-    private static void setChatRoomInvitationListener() {
-        //MultiUserChat.getHostedRooms(mConnection,"");
-        MultiUserChat.addInvitationListener(mConnection,
-                new InvitationListener() {
-                    @Override
-                    public void invitationReceived(XMPPConnection xmppConnection, String room, String invite, String reason, String unknown, Message message) {
-                        Log.e("XMPPManage", "Invite Room ::" + "room" + room + "  invite" + invite);
-                        setJoinRoom(room);
-
-
-                    }
-                });
-    }
-
-    public static void setJoinRoom(String room) {
-        if (mConnection != null && mConnection.isConnected()) {
-            MultiUserChat muc = new MultiUserChat(mConnection, room);
-            try {
-
-                //Log.e("XMPPManage", "Join ? 1: " + room + "   " + muc.isJoined());
-                String name = mConnection.getUser().split("@")[0];
-                muc.join(name);
-                //Log.e("XMPPManage", "mConnector  1: " + room + "   " + muc.isJoined());
-                Log.e("XMPPManage", "Join ? 1 : " + room + "   " + muc.isJoined());
-
-            } catch (SmackException.NoResponseException e) {
-                e.printStackTrace();
-            } catch (XMPPException.XMPPErrorException e) {
-                e.printStackTrace();
-            } catch (SmackException.NotConnectedException e) {
-                e.printStackTrace();
-            } catch (XMPPException e) {
-                e.printStackTrace();
-            }
-        }
-
-
-    }
-
-    public static void initConnection() {
-        // Initialization de la connexion
-        Log.e("XMPPManage", "Login");
-        config = new ConnectionConfiguration(HOST, PORT, SERVICE);
-        config.setSecurityMode(ConnectionConfiguration.SecurityMode.disabled);
-        config.setDebuggerEnabled(true);
-        config.setSendPresence(true);
-        // config.
-        mConnection = new XMPPTCPConnection(config);
-        messageReceiver();
-
-        setChatRoomInvitationListener();
-
-    }
-
     static void login() {
         try {
             mConnection.connect();
@@ -296,7 +242,7 @@ public class XMPPManage implements MessageListener {
                     String checkcase = room.split("@")[0];
                     checkcase = checkcase.split("-")[0];
                     Log.e("IsOfficial is flase >>>", "    " + checkcase);
-
+                    isOfficial = sp.getBoolean(MasterData.SHARED_IS_OFFICIAL, false);
                     if (checkcase.matches("case") && isOfficial) {
                         Log.e("IsOfficial is true >>>", "    JA");
 
@@ -470,23 +416,26 @@ public class XMPPManage implements MessageListener {
                     databaseChatHelper.addLogs(messages);
                     BusProvider.getInstance().post(messages);
                     alert = spConfig.getBoolean(MasterData.SHARED_CONFIG_ALERT, true);
-                    if (alert) {
-                        if (messages.getRoom().matches(messages.getSender())) {
-                            NotifyChat.setNotifyChat(users.getName(), users.getJid(), messages.getMessage());
+                    if (!messages.getSender().equalsIgnoreCase(mConnection.getUser().split("/")[0])) {
+                        if (alert) {
+                            if (messages.getRoom().matches(messages.getSender())) {
+                                NotifyChat.setNotifyChat(users.getName(), users.getJid(), messages.getMessage());
+                            }
+
+                            String checkCase = messages.getRoom().split("@")[0];
+                            String[] room = checkCase.split("-");
+
+                            System.out.println("indatabase " + checkCase);
+
+                            if (room[0].matches("pattaya")) {
+                                NotifyChat.setNotifyChat(users.getName(), messages.getRoom(), messages.getMessage());
+                            } else if (room[0].matches("case")) {
+                                NotifyCase.setNotifyChatCase(users.getName(), room[1], messages.getMessage());
+                            }
+
                         }
-
-                        String checkCase = messages.getRoom().split("@")[0];
-                        String[] room = checkCase.split("-");
-
-                        System.out.println("indatabase " + checkCase);
-
-                        if (room[0].matches("pattaya")) {
-                            NotifyChat.setNotifyChat(users.getName(), messages.getRoom(), messages.getMessage());
-                        } else if (room[0].matches("case")) {
-                            NotifyCase.setNotifyChatCase(users.getName(), room[1], messages.getMessage());
-                        }
-
                     }
+
 
                 } else {
                     new TaskGetFriend(Application.getContext()).execute();
@@ -500,23 +449,26 @@ public class XMPPManage implements MessageListener {
                             databaseChatHelper.addLogs(messages);
                             BusProvider.getInstance().post(messages);
                             alert = spConfig.getBoolean(MasterData.SHARED_CONFIG_ALERT, true);
-                            if (alert) {
-                                if (messages.getRoom().matches(messages.getSender())) {
-                                    NotifyChat.setNotifyChat(user.getName(), user.getUsername() + "@pattaya-data", messages.getMessage());
+                            if (!messages.getSender().equalsIgnoreCase(mConnection.getUser().split("/")[0])) {
+                                if (alert) {
+                                    if (messages.getRoom().matches(messages.getSender())) {
+                                        NotifyChat.setNotifyChat(user.getName(), user.getUsername() + "@pattaya-data", messages.getMessage());
+                                    }
+
+                                    String checkCase = messages.getRoom().split("@")[0];
+                                    String[] room = checkCase.split("-");
+                                    System.out.println("in server " + checkCase);
+
+                                    if (room[0].matches("pattaya")) {
+                                        NotifyChat.setNotifyChat(user.getName(), messages.getRoom(), messages.getMessage());
+                                    } else if (room[0].matches("case")) {
+                                        NotifyCase.setNotifyChatCase(user.getName(), room[1], messages.getMessage());
+                                    }
+
+
                                 }
-
-                                String checkCase = messages.getRoom().split("@")[0];
-                                String[] room = checkCase.split("-");
-                                System.out.println("in server " + checkCase);
-
-                                if (room[0].matches("pattaya")) {
-                                    NotifyChat.setNotifyChat(user.getName(), messages.getRoom(), messages.getMessage());
-                                } else if (room[0].matches("case")) {
-                                    NotifyCase.setNotifyChatCase(user.getName(), room[1], messages.getMessage());
-                                }
-
-
                             }
+
                         }
 
                         @Override
@@ -533,69 +485,76 @@ public class XMPPManage implements MessageListener {
     }
 
     public static void createPubSub() {
-        ConnectionConfiguration config = new ConnectionConfiguration(HOST, PORT, SERVICE);
-        config.setSecurityMode(ConnectionConfiguration.SecurityMode.disabled);
-        config.setDebuggerEnabled(true);
-        XMPPTCPConnection admin = new XMPPTCPConnection(config);
-        PubSubManager manager;
-        String username = USERNAME + "_notify";
-        try {
-            admin.connect();
-            admin.login("admin", "admin", "Android");
-            Log.e("XMPPManage", "Admin Connection is : " + admin.isConnected());
-            ConfigureForm form = new ConfigureForm(FormType.submit);
-            form.setAccessModel(AccessModel.open);
-            form.setDeliverPayloads(true);
-            form.setNotifyRetract(true);
-            form.setNotifyDelete(true);
-            form.setPublishModel(PublishModel.open);
-            manager = new PubSubManager(admin);
-            try {
-                System.out.println("///////////////////////////////////////////////////////");
-                LeafNode myNode = (LeafNode) manager.createNode(username, form);
-                subscribePubSub();
-                String itemData =
-                        "<x xmlns='jabber:x:data' type='result'>" +
-                                "<field var='title'>" +
-                                "<value>Subscribe Complete</value>" +
-                                "</field>" +
-                                "<field var='author'>" +
-                                "<value>" + USERNAME + "</value>" +
-                                "</field>" +
-                                "</x>";
+        new AsyncTask<Void, Void, Boolean>() {
+            @Override
+            protected Boolean doInBackground(Void... params) {
+                ConnectionConfiguration config = new ConnectionConfiguration(HOST, PORT, SERVICE);
+                config.setSecurityMode(ConnectionConfiguration.SecurityMode.disabled);
+                config.setDebuggerEnabled(true);
+                XMPPTCPConnection admin = new XMPPTCPConnection(config);
+                PubSubManager manager;
+                String username = USERNAME + "_notify";
+                try {
+                    admin.connect();
+                    admin.login("admin", "admin", "Android");
+                    Log.e("XMPPManage", "Admin Connection is : " + admin.isConnected());
+                    ConfigureForm form = new ConfigureForm(FormType.submit);
+                    form.setAccessModel(AccessModel.open);
+                    form.setDeliverPayloads(true);
+                    form.setNotifyRetract(true);
+                    form.setNotifyDelete(true);
+                    form.setPublishModel(PublishModel.open);
+                    manager = new PubSubManager(admin);
+                    try {
+                        System.out.println("///////////////////////////////////////////////////////");
+                        LeafNode myNode = (LeafNode) manager.createNode(username, form);
+                        subscribePubSub();
+                        String itemData =
+                                "<x xmlns='jabber:x:data' type='result'>" +
+                                        "<field var='title'>" +
+                                        "<value>Subscribe Complete</value>" +
+                                        "</field>" +
+                                        "<field var='author'>" +
+                                        "<value>" + USERNAME + "</value>" +
+                                        "</field>" +
+                                        "</x>";
 
-                SimplePayload payload = new SimplePayload(
-                        "x",
-                        "pubsub:" + username + ":x",
-                        itemData);
+                        SimplePayload payload = new SimplePayload(
+                                "x",
+                                "pubsub:" + username + ":x",
+                                itemData);
 
 
-                PayloadItem<SimplePayload> item = new PayloadItem(
-                        null, payload);
-                myNode.publish(item);
-                System.out.println("///////////////////////////////////////////////////////");
+                        PayloadItem<SimplePayload> item = new PayloadItem(
+                                null, payload);
+                        myNode.publish(item);
+                        System.out.println("///////////////////////////////////////////////////////");
 
-            } catch (SmackException.NoResponseException e) {
-                e.printStackTrace();
-            } catch (XMPPException.XMPPErrorException e) {
-                e.printStackTrace();
-            } catch (SmackException.NotConnectedException e) {
-                e.printStackTrace();
+                    } catch (SmackException.NoResponseException e) {
+                        e.printStackTrace();
+                    } catch (XMPPException.XMPPErrorException e) {
+                        e.printStackTrace();
+                    } catch (SmackException.NotConnectedException e) {
+                        e.printStackTrace();
+                    }
+                } catch (SmackException e) {
+                    e.printStackTrace();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                } catch (XMPPException e) {
+                    e.printStackTrace();
+                }
+
+                try {
+                    admin.disconnect();
+                    //mConnection.connect();
+                } catch (SmackException.NotConnectedException e) {
+                    e.printStackTrace();
+                }
+                return null;
             }
-        } catch (SmackException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (XMPPException e) {
-            e.printStackTrace();
-        }
+        }.execute();
 
-        try {
-            admin.disconnect();
-            //mConnection.connect();
-        } catch (SmackException.NotConnectedException e) {
-            e.printStackTrace();
-        }
     }
 
     public static void subscribePubSub() {
@@ -628,6 +587,41 @@ public class XMPPManage implements MessageListener {
             return false;
         } else
             return true;
+    }
+
+    private void setChatRoomInvitationListener() {
+        //MultiUserChat.getHostedRooms(mConnection,"");
+        MultiUserChat.addInvitationListener(mConnection,
+                new InvitationListener() {
+                    @Override
+                    public void invitationReceived(XMPPConnection xmppConnection, String room, String invite, String reason, String unknown, Message message) {
+                        Log.e("XMPPManage", "Invite Room ::" + "room" + room + "  invite" + invite);
+                        setJoinRoom(room);
+
+
+                    }
+                });
+    }
+
+    public void setJoinRoom(String room) {
+        new TaskJoin(room).execute();
+
+
+    }
+
+    public void initConnection() {
+        // Initialization de la connexion
+        Log.e("XMPPManage", "Login");
+        config = new ConnectionConfiguration(HOST, PORT, SERVICE);
+        config.setSecurityMode(ConnectionConfiguration.SecurityMode.disabled);
+        config.setDebuggerEnabled(true);
+        config.setSendPresence(true);
+        // config.
+        mConnection = new XMPPTCPConnection(config);
+        messageReceiver();
+
+        setChatRoomInvitationListener();
+
     }
 
     public XMPPTCPConnection getmConnection() {
@@ -936,125 +930,133 @@ public class XMPPManage implements MessageListener {
 
     }
 
-    public void sendMessageNotify(PubsubObject pubsubObject) {
+    public void sendMessageNotify(final PubsubObject pubsubObject) {
         Log.e("AG", "/////////////////////////////////////////////////////////");
 
-        final String image = (pubsubObject.getImage() == null) ? "" : pubsubObject.getImage();
-        final String name = (pubsubObject.getName() == null) ? "" : pubsubObject.getName();
-        final String title = (pubsubObject.getTitle() == null) ? "" : pubsubObject.getTitle();
-        final String displayData = (pubsubObject.getDisplayData() == null) ? "" : pubsubObject.getDisplayData();
-        final String action = (pubsubObject.getAction() == null) ? "" : pubsubObject.getAction();
-        final Integer primarykey = pubsubObject.getPrimarykey();
-        final Integer caseId = pubsubObject.getCaseId();
-        final Integer complainId = pubsubObject.getComplainId();
+        new AsyncTask<Void, Void, Boolean>() {
+            @Override
+            protected Boolean doInBackground(Void... params) {
+                final String image = (pubsubObject.getImage() == null) ? "" : pubsubObject.getImage();
+                final String name = (pubsubObject.getName() == null) ? "" : pubsubObject.getName();
+                final String title = (pubsubObject.getTitle() == null) ? "" : pubsubObject.getTitle();
+                final String displayData = (pubsubObject.getDisplayData() == null) ? "" : pubsubObject.getDisplayData();
+                final String action = (pubsubObject.getAction() == null) ? "" : pubsubObject.getAction();
+                final Integer primarykey = pubsubObject.getPrimarykey();
+                final Integer caseId = pubsubObject.getCaseId();
+                final Integer complainId = pubsubObject.getComplainId();
 
 
-        ConnectionConfiguration config = new ConnectionConfiguration(HOST, PORT, SERVICE);
-        config.setSecurityMode(ConnectionConfiguration.SecurityMode.disabled);
-        config.setDebuggerEnabled(true);
-        admin = new XMPPTCPConnection(config);
-        manager = new PubSubManager(admin);
-        final String username = pubsubObject.getUsername() + "_notify";
-
-        try {
-            if (isNetworkConnected()) {
-                admin.connect();
-                admin.login("admin", "admin", "Android");
-
-                Log.e("XMPPManage", "Admin Connection is SendMessage : " + admin.isConnected());
-                ConfigureForm form = new ConfigureForm(FormType.submit);
-                form.setAccessModel(AccessModel.open);
-                form.setDeliverPayloads(true);
-                form.setNotifyRetract(true);
-                form.setNotifyDelete(true);
-                form.setPublishModel(PublishModel.open);
+                ConnectionConfiguration config = new ConnectionConfiguration(HOST, PORT, SERVICE);
+                config.setSecurityMode(ConnectionConfiguration.SecurityMode.disabled);
+                config.setDebuggerEnabled(true);
+                admin = new XMPPTCPConnection(config);
                 manager = new PubSubManager(admin);
-                LeafNode myNode = manager.getNode(username);
+                final String username = pubsubObject.getUsername() + "_notify";
 
-                DataForm dataForm = new DataForm("result");
+                try {
+                    if (isNetworkConnected()) {
+                        admin.connect();
+                        admin.login("admin", "admin", "Android");
 
-                ///////////////  ownerImage ////////////////////
-                FormField formImage = new FormField("ownerImage");
-                formImage.addValue(image);
+                        Log.e("XMPPManage", "Admin Connection is SendMessage : " + admin.isConnected());
+                        ConfigureForm form = new ConfigureForm(FormType.submit);
+                        form.setAccessModel(AccessModel.open);
+                        form.setDeliverPayloads(true);
+                        form.setNotifyRetract(true);
+                        form.setNotifyDelete(true);
+                        form.setPublishModel(PublishModel.open);
+                        manager = new PubSubManager(admin);
+                        LeafNode myNode = manager.getNode(username);
 
-                dataForm.addField(formImage);
+                        DataForm dataForm = new DataForm("result");
 
-                ///////////////  ownerName ////////////////////
-                FormField formName = new FormField("ownerName");
-                formName.addValue(name);
+                        ///////////////  ownerImage ////////////////////
+                        FormField formImage = new FormField("ownerImage");
+                        formImage.addValue(image);
 
-                dataForm.addField(formName);
+                        dataForm.addField(formImage);
 
-                ///////////////  Title ////////////////////
-                FormField formTitle = new FormField("title");
-                formTitle.addValue(title);
+                        ///////////////  ownerName ////////////////////
+                        FormField formName = new FormField("ownerName");
+                        formName.addValue(name);
 
+                        dataForm.addField(formName);
 
-                dataForm.addField(formTitle);
-
-
-                ///////////////  Action ////////////////////
-                FormField formAction = new FormField("action");
-                formAction.addValue(action);
-
-                dataForm.addField(formAction);
-
-
-                ///////////////  primaryKey ////////////////////
-                FormField formKey = new FormField("primaryKey");
-                formKey.addValue(String.valueOf(primarykey));
-
-                dataForm.addField(formKey);
-
-                ///////////////  primaryKey ////////////////////
-                FormField formCaseKey = new FormField("caseId");
-                formCaseKey.addValue(String.valueOf(caseId));
-
-                dataForm.addField(formCaseKey);
-
-                ///////////////  primaryKey ////////////////////
-                FormField formComplainKey = new FormField("complainId");
-                formComplainKey.addValue(String.valueOf(complainId));
-
-                dataForm.addField(formComplainKey);
+                        ///////////////  Title ////////////////////
+                        FormField formTitle = new FormField("title");
+                        formTitle.addValue(title);
 
 
-                ///////////////  displayDate ////////////////////
-                FormField formDate = new FormField("displayDate");
-                formDate.addValue(displayData);
-
-                dataForm.addField(formDate);
-
-                SimplePayload payload = new SimplePayload(
-                        "x",
-                        "pubsub:" + username + ":x",
-                        dataForm.toXML().toString());
+                        dataForm.addField(formTitle);
 
 
-                PayloadItem<SimplePayload> item = new PayloadItem(
-                        null, payload);
-                myNode.send(item);
-                //System.out.println("///////////////////////////////////////////////////////");
+                        ///////////////  Action ////////////////////
+                        FormField formAction = new FormField("action");
+                        formAction.addValue(action);
 
-            } else {
+                        dataForm.addField(formAction);
 
+
+                        ///////////////  primaryKey ////////////////////
+                        FormField formKey = new FormField("primaryKey");
+                        formKey.addValue(String.valueOf(primarykey));
+
+                        dataForm.addField(formKey);
+
+                        ///////////////  primaryKey ////////////////////
+                        FormField formCaseKey = new FormField("caseId");
+                        formCaseKey.addValue(String.valueOf(caseId));
+
+                        dataForm.addField(formCaseKey);
+
+                        ///////////////  primaryKey ////////////////////
+                        FormField formComplainKey = new FormField("complainId");
+                        formComplainKey.addValue(String.valueOf(complainId));
+
+                        dataForm.addField(formComplainKey);
+
+
+                        ///////////////  displayDate ////////////////////
+                        FormField formDate = new FormField("displayDate");
+                        formDate.addValue(displayData);
+
+                        dataForm.addField(formDate);
+
+                        SimplePayload payload = new SimplePayload(
+                                "x",
+                                "pubsub:" + username + ":x",
+                                dataForm.toXML().toString());
+
+
+                        PayloadItem<SimplePayload> item = new PayloadItem(
+                                null, payload);
+                        myNode.send(item);
+                        //System.out.println("///////////////////////////////////////////////////////");
+
+                    } else {
+
+                    }
+
+                } catch (SmackException e) {
+                    e.printStackTrace();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                } catch (XMPPException e) {
+                    //subscribePubSub();
+                    e.printStackTrace();
+                }
+
+                try {
+
+                    admin.disconnect();
+                } catch (SmackException.NotConnectedException e) {
+                    e.printStackTrace();
+                }
+                return null;
             }
+        }.execute();
 
-        } catch (SmackException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (XMPPException e) {
-            //subscribePubSub();
-            e.printStackTrace();
-        }
 
-        try {
-
-            admin.disconnect();
-        } catch (SmackException.NotConnectedException e) {
-            e.printStackTrace();
-        }
     }
 
     public class TaskSendNotify extends AsyncTask<Void, Void, Boolean> {
@@ -1068,6 +1070,42 @@ public class XMPPManage implements MessageListener {
         @Override
         protected Boolean doInBackground(Void... params) {
             sendMessageNotify(pubsubObject);
+
+            return null;
+        }
+    }
+
+
+    public class TaskJoin extends AsyncTask<Void, Void, Boolean> {
+        String room;
+
+        public TaskJoin(String room) {
+            this.room = room;
+        }
+
+
+        @Override
+        protected Boolean doInBackground(Void... params) {
+            if (mConnection != null && mConnection.isConnected()) {
+                MultiUserChat muc = new MultiUserChat(mConnection, room);
+                try {
+
+                    // Log.e("XMPPManage", "Join ? 1: " + room + "   " + muc.isJoined());
+                    String name = mConnection.getUser().split("@")[0];
+                    muc.join(name);
+                    //  Log.e("XMPPManage", "mConnector  1: " + room + "   " + muc.isJoined());
+                    //Log.e("XMPPManage", "Join ? 1 : " + room + "   " + muc.isJoined());
+
+                } catch (SmackException.NoResponseException e) {
+                    e.printStackTrace();
+                } catch (XMPPException.XMPPErrorException e) {
+                    e.printStackTrace();
+                } catch (SmackException.NotConnectedException e) {
+                    e.printStackTrace();
+                } catch (XMPPException e) {
+                    e.printStackTrace();
+                }
+            }
 
             return null;
         }

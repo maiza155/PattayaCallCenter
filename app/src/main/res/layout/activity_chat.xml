@@ -35,7 +35,6 @@
                 android:stackFromBottom="true"
                 android:transcriptMode="alwaysScroll" />
 
-
             <ProgressBar
                 android:id="@+id/progress"
                 style="?android:attr/progressBarStyleInverse"

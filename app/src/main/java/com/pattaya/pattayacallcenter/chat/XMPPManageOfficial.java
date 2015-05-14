@@ -119,60 +119,6 @@ public class XMPPManageOfficial implements MessageListener {
         XMPPManageOfficial.chat = chat;
     }
 
-    private static void setChatRoomInvitationListener() {
-        //MultiUserChat.getHostedRooms(mConnection,"");
-        MultiUserChat.addInvitationListener(mConnection,
-                new InvitationListener() {
-                    @Override
-                    public void invitationReceived(XMPPConnection xmppConnection, String room, String invite, String reason, String unknown, Message message) {
-                        Log.e("XMPPManage", "Invite Room ::" + "room" + room + "  invite" + invite);
-                        setJoinRoom(room);
-
-
-                    }
-                });
-    }
-
-    public static void setJoinRoom(String room) {
-        if (mConnection != null && mConnection.isConnected()) {
-            MultiUserChat muc = new MultiUserChat(mConnection, room);
-            try {
-
-                // Log.e("XMPPManage", "Join ? 1: " + room + "   " + muc.isJoined());
-                String name = mConnection.getUser().split("@")[0];
-                muc.join(name);
-                //  Log.e("XMPPManage", "mConnector  1: " + room + "   " + muc.isJoined());
-                Log.e("XMPPManage", "Join ? 1 : " + room + "   " + muc.isJoined());
-
-            } catch (SmackException.NoResponseException e) {
-                e.printStackTrace();
-            } catch (XMPPException.XMPPErrorException e) {
-                e.printStackTrace();
-            } catch (SmackException.NotConnectedException e) {
-                e.printStackTrace();
-            } catch (XMPPException e) {
-                e.printStackTrace();
-            }
-        }
-
-
-    }
-
-    public static void initConnection() {
-        // Initialization de la connexion
-        Log.e("XMPPManage", "Login");
-        config = new ConnectionConfiguration(HOST, PORT, SERVICE);
-        config.setSecurityMode(ConnectionConfiguration.SecurityMode.disabled);
-        config.setDebuggerEnabled(true);
-        config.setSendPresence(true);
-        // config.
-        mConnection = new XMPPTCPConnection(config);
-        messageReceiver();
-
-        setChatRoomInvitationListener();
-
-    }
-
     static void login() {
         try {
             mConnection.connect();
@@ -356,7 +302,7 @@ public class XMPPManageOfficial implements MessageListener {
             public void processPacket(Packet packet) throws SmackException.NotConnectedException {
 
                 new TaskGetFriend(Application.getContext()).execute();
-                Log.d("TAG SET >>>", "" + packet);
+                Log.d("TAG SET  Official>>>", "" + packet);
 
             }
         }, new IQTypeFilter(IQ.Type.SET));
@@ -365,7 +311,7 @@ public class XMPPManageOfficial implements MessageListener {
         mConnection.addPacketListener(new PacketListener() {
             @Override
             public void processPacket(Packet packet) throws SmackException.NotConnectedException {
-                Log.d("TAG SET >>>", "" + packet);
+                Log.d("TAG SET Official>>>", "" + packet);
 
 
             }
@@ -392,20 +338,22 @@ public class XMPPManageOfficial implements MessageListener {
                     databaseChatHelper.addLogs(messages);
                     BusProvider.getInstance().post(messages);
                     alert = spConfig.getBoolean(MasterData.SHARED_CONFIG_ALERT, true);
-                    if (alert) {
-                        if (messages.getRoom().matches(messages.getSender())) {
-                            // NotifyChat.setNotifyChat("From : " + users.getName(), users.getJid());
+                    if (!messages.getSender().equalsIgnoreCase(mConnection.getUser().split("/")[0])) {
+                        if (alert) {
+                            if (messages.getRoom().matches(messages.getSender())) {
+                                // NotifyChat.setNotifyChat("From : " + users.getName(), users.getJid());
+                            }
+
+                            String checkCase = messages.getRoom().split("@")[0];
+                            String[] room = checkCase.split("-");
+                            System.out.println(checkCase);
+
+                            if (room[0].matches("case")) {
+                                NotifyCase.setNotifyChatCase(users.getName(), room[1], messages.getMessage());
+                            }
                         }
-
-                        String checkCase = messages.getRoom().split("@")[0];
-                        checkCase = checkCase.split("-")[0];
-                        System.out.println(checkCase);
-
-                        if (checkCase.matches("pattaya")) {
-                            // NotifyChat.setNotifyChat("From : " + users.getName(), messages.getRoom());
-                        }
-
                     }
+
 
                 } else {
                     new TaskGetFriend(Application.getContext()).execute();
@@ -419,13 +367,17 @@ public class XMPPManageOfficial implements MessageListener {
                             databaseChatHelper.addLogs(messages);
                             BusProvider.getInstance().post(messages);
                             alert = spConfig.getBoolean(MasterData.SHARED_CONFIG_ALERT, true);
-                            if (alert) {
-                                if (messages.getRoom().matches(messages.getSender())) {
-                                    // NotifyChat.setNotifyChat("From : " + user.getName(), user.getUsername() + "@pattaya-data");
+                            if (!messages.getSender().equalsIgnoreCase(mConnection.getUser().split("/")[0])) {
+                                if (alert) {
+                                    String checkCase = messages.getRoom().split("@")[0];
+                                    String[] room = checkCase.split("-");
+                                    if (room[0].matches("case")) {
+                                        NotifyCase.setNotifyChatCase(user.getName(), room[1], messages.getMessage());
+                                    }
+
                                 }
-
-
                             }
+
                         }
 
                         @Override
@@ -443,69 +395,78 @@ public class XMPPManageOfficial implements MessageListener {
     }
 
     public static void createPubSub() {
-        ConnectionConfiguration config = new ConnectionConfiguration(HOST, PORT, SERVICE);
-        config.setSecurityMode(ConnectionConfiguration.SecurityMode.disabled);
-        config.setDebuggerEnabled(true);
-        XMPPTCPConnection admin = new XMPPTCPConnection(config);
-        PubSubManager manager;
-        String username = USERNAME + "_notify";
-        try {
-            admin.connect();
-            admin.login("admin", "admin", "Android");
-            Log.e("XMPPManage", "Admin Connection is : " + admin.isConnected());
-            ConfigureForm form = new ConfigureForm(FormType.submit);
-            form.setAccessModel(AccessModel.open);
-            form.setDeliverPayloads(true);
-            form.setNotifyRetract(true);
-            form.setNotifyDelete(true);
-            form.setPublishModel(PublishModel.open);
-            manager = new PubSubManager(admin);
-            try {
-                System.out.println("///////////////////////////////////////////////////////");
-                LeafNode myNode = (LeafNode) manager.createNode(username, form);
-                subscribePubSub();
-                String itemData =
-                        "<x xmlns='jabber:x:data' type='result'>" +
-                                "<field var='title'>" +
-                                "<value>Subscribe Complete</value>" +
-                                "</field>" +
-                                "<field var='author'>" +
-                                "<value>" + USERNAME + "</value>" +
-                                "</field>" +
-                                "</x>";
+        new AsyncTask<Void, Void, Boolean>() {
 
-                SimplePayload payload = new SimplePayload(
-                        "x",
-                        "pubsub:" + username + ":x",
-                        itemData);
+            @Override
+            protected Boolean doInBackground(Void... params) {
+                ConnectionConfiguration config = new ConnectionConfiguration(HOST, PORT, SERVICE);
+                config.setSecurityMode(ConnectionConfiguration.SecurityMode.disabled);
+                config.setDebuggerEnabled(true);
+                XMPPTCPConnection admin = new XMPPTCPConnection(config);
+                PubSubManager manager;
+                String username = USERNAME + "_notify";
+                try {
+                    admin.connect();
+                    admin.login("admin", "admin", "Android");
+                    Log.e("XMPPManage", "Admin Connection is : " + admin.isConnected());
+                    ConfigureForm form = new ConfigureForm(FormType.submit);
+                    form.setAccessModel(AccessModel.open);
+                    form.setDeliverPayloads(true);
+                    form.setNotifyRetract(true);
+                    form.setNotifyDelete(true);
+                    form.setPublishModel(PublishModel.open);
+                    manager = new PubSubManager(admin);
+                    try {
+                        System.out.println("///////////////////////////////////////////////////////");
+                        LeafNode myNode = (LeafNode) manager.createNode(username, form);
+                        subscribePubSub();
+                        String itemData =
+                                "<x xmlns='jabber:x:data' type='result'>" +
+                                        "<field var='title'>" +
+                                        "<value>Subscribe Complete</value>" +
+                                        "</field>" +
+                                        "<field var='author'>" +
+                                        "<value>" + USERNAME + "</value>" +
+                                        "</field>" +
+                                        "</x>";
+
+                        SimplePayload payload = new SimplePayload(
+                                "x",
+                                "pubsub:" + username + ":x",
+                                itemData);
 
 
-                PayloadItem<SimplePayload> item = new PayloadItem(
-                        null, payload);
-                myNode.publish(item);
-                System.out.println("///////////////////////////////////////////////////////");
+                        PayloadItem<SimplePayload> item = new PayloadItem(
+                                null, payload);
+                        myNode.publish(item);
+                        System.out.println("///////////////////////////////////////////////////////");
 
-            } catch (SmackException.NoResponseException e) {
-                e.printStackTrace();
-            } catch (XMPPException.XMPPErrorException e) {
-                e.printStackTrace();
-            } catch (SmackException.NotConnectedException e) {
-                e.printStackTrace();
+                    } catch (SmackException.NoResponseException e) {
+                        e.printStackTrace();
+                    } catch (XMPPException.XMPPErrorException e) {
+                        e.printStackTrace();
+                    } catch (SmackException.NotConnectedException e) {
+                        e.printStackTrace();
+                    }
+                } catch (SmackException e) {
+                    e.printStackTrace();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                } catch (XMPPException e) {
+                    e.printStackTrace();
+                }
+
+                try {
+                    admin.disconnect();
+                    //mConnection.connect();
+                } catch (SmackException.NotConnectedException e) {
+                    e.printStackTrace();
+                }
+
+                return null;
             }
-        } catch (SmackException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (XMPPException e) {
-            e.printStackTrace();
-        }
+        }.execute();
 
-        try {
-            admin.disconnect();
-            //mConnection.connect();
-        } catch (SmackException.NotConnectedException e) {
-            e.printStackTrace();
-        }
     }
 
     public static void subscribePubSub() {
@@ -538,6 +499,39 @@ public class XMPPManageOfficial implements MessageListener {
             return false;
         } else
             return true;
+    }
+
+    private void setChatRoomInvitationListener() {
+        //MultiUserChat.getHostedRooms(mConnection,"");
+        MultiUserChat.addInvitationListener(mConnection,
+                new InvitationListener() {
+                    @Override
+                    public void invitationReceived(XMPPConnection xmppConnection, String room, String invite, String reason, String unknown, Message message) {
+                        Log.e("XMPPManage", "Invite Room ::" + "room" + room + "  invite" + invite);
+                        setJoinRoom(room);
+
+
+                    }
+                });
+    }
+
+    public void setJoinRoom(String room) {
+        new TaskJoin(room).execute();
+    }
+
+    public void initConnection() {
+        // Initialization de la connexion
+        Log.e("XMPPManage", "Login");
+        config = new ConnectionConfiguration(HOST, PORT, SERVICE);
+        config.setSecurityMode(ConnectionConfiguration.SecurityMode.disabled);
+        config.setDebuggerEnabled(true);
+        config.setSendPresence(true);
+        // config.
+        mConnection = new XMPPTCPConnection(config);
+        messageReceiver();
+
+        setChatRoomInvitationListener();
+
     }
 
     public XMPPTCPConnection getmConnection() {
@@ -823,17 +817,36 @@ public class XMPPManageOfficial implements MessageListener {
         }
     }
 
-    public class TaskSendNotify extends AsyncTask<Void, Void, Boolean> {
-        PubsubObject pubsubObject;
+    public class TaskJoin extends AsyncTask<Void, Void, Boolean> {
+        String room;
 
-        public TaskSendNotify(PubsubObject pubsubObject) {
-            this.pubsubObject = pubsubObject;
-
+        public TaskJoin(String room) {
+            this.room = room;
         }
+
 
         @Override
         protected Boolean doInBackground(Void... params) {
-            sendMessageNotify(pubsubObject);
+            if (mConnection != null && mConnection.isConnected()) {
+                MultiUserChat muc = new MultiUserChat(mConnection, room);
+                try {
+
+                    // Log.e("XMPPManage", "Join ? 1: " + room + "   " + muc.isJoined());
+                    String name = mConnection.getUser().split("@")[0];
+                    muc.join(name);
+                    //  Log.e("XMPPManage", "mConnector  1: " + room + "   " + muc.isJoined());
+                    //  Log.e("XMPPManage", "Join ? 1 : " + room + "   " + muc.isJoined());
+
+                } catch (SmackException.NoResponseException e) {
+                    e.printStackTrace();
+                } catch (XMPPException.XMPPErrorException e) {
+                    e.printStackTrace();
+                } catch (SmackException.NotConnectedException e) {
+                    e.printStackTrace();
+                } catch (XMPPException e) {
+                    e.printStackTrace();
+                }
+            }
 
             return null;
         }

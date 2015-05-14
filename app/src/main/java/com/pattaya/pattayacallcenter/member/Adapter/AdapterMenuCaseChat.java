@@ -98,6 +98,14 @@ public class AdapterMenuCaseChat extends BaseAdapter {
 
 
         mMenuList.put(4, listFour);
+
+
+        List<Integer> listOfficial = new ArrayList<>();
+        listOfficial.add(1);
+        listOfficial.add(3);
+
+
+        mMenuList.put(5, listOfficial);
     }
 
     public void SetOnItemClickListener(final OnItemClickListener mItemClickListener) {

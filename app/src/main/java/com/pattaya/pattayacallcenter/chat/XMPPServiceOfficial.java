@@ -3,6 +3,7 @@ package com.pattaya.pattayacallcenter.chat;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Handler;
@@ -10,12 +11,26 @@ import android.os.IBinder;
 import android.os.Message;
 import android.util.Log;
 
-import com.pattaya.pattayacallcenter.Data.Users;
+import com.google.gson.Gson;
+import com.pattaya.pattayacallcenter.Application;
+import com.pattaya.pattayacallcenter.Data.MasterData;
+import com.pattaya.pattayacallcenter.webservice.RestFulQueary;
+import com.pattaya.pattayacallcenter.webservice.WebserviceConnector;
+import com.pattaya.pattayacallcenter.webservice.object.casedata.CaseListMemberData;
+import com.pattaya.pattayacallcenter.webservice.object.casedata.CaseListMemberObject;
+import com.pattaya.pattayacallcenter.webservice.object.casedata.GetCaseListData;
 
 import org.jivesoftware.smack.SmackException;
 import org.jivesoftware.smack.packet.Presence;
 
-import java.util.List;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+
+import retrofit.Callback;
+import retrofit.RestAdapter;
+import retrofit.RetrofitError;
+import retrofit.client.Response;
 
 /**
  * Created by SWF on 2/24/2015.
@@ -25,6 +40,8 @@ public class XMPPServiceOfficial extends Service {
     static XMPPManageOfficial xmppManage = XMPPManageOfficial.getInstance();
     private static XMPPServiceOfficial instance = null;
     ThreadXMPP td = new ThreadXMPP();
+    RestAdapter webserviceConnector = WebserviceConnector.getInstanceCase();
+    RestFulQueary adapterRest = webserviceConnector.create(RestFulQueary.class);
     private Handler handler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
@@ -102,15 +119,54 @@ public class XMPPServiceOfficial extends Service {
                         } else {
                             Log.e("XMPPSerVICE", "Break .. .. ... .. ." + xmppManage.getmConnection().isConnected());
                             xmppManage.createPubSub();
+                            SharedPreferences spConfig = Application.getContext().getSharedPreferences(MasterData.SHARED_NAME_CONFIG_FILE, Context.MODE_PRIVATE);
+                            String token = spConfig.getString("TOKEN", "null");
+                            String clientId = spConfig.getString("CLIENT_ID", "null");
 
-                            List<Users> arrUsers = DatabaseChatHelper.init().getUsers();
-                            for (Users e : arrUsers) {
-                                if (e.getType() == Users.TYPE_GROUP) {
-                                    System.out.println("join room >> " + e.getJid());
-                                    xmppManage.setJoinRoom(e.getJid());
+                            GetCaseListData getCaseListData = new GetCaseListData();
+                            getCaseListData.setFilterType(3);
+
+                            getCaseListData.setAccessToken(token);
+                            getCaseListData.setClientId(clientId);
+
+                            adapterRest.getCaseList(getCaseListData, new Callback<Response>() {
+                                @Override
+                                public void success(Response result, Response response2) {
+                                    DatabaseChatHelper.init().clearCaseTable();
+                                    BufferedReader reader;
+                                    StringBuilder sb = new StringBuilder();
+                                    try {
+                                        reader = new BufferedReader(new InputStreamReader(result.getBody().in()));
+                                        String line;
+
+                                        try {
+                                            while ((line = reader.readLine()) != null) {
+                                                sb.append(line);
+                                            }
+                                        } catch (IOException e) {
+                                            e.printStackTrace();
+                                        }
+                                    } catch (IOException e) {
+                                        e.printStackTrace();
+                                    }
+                                    String JsonConvertData = "{data:" + sb.toString() + "}";
+                                    System.out.println(JsonConvertData);
+                                    CaseListMemberObject caseListObject = new Gson().fromJson(JsonConvertData, CaseListMemberObject.class);
+                                    for (CaseListMemberData e : caseListObject.getData()) {
+                                        String roomName = "case-" + e.getComplaintId() + "@" + "conference.pattaya-data";
+                                        xmppManage.setJoinRoom(roomName);
+                                    }
+
+
                                 }
 
-                            }
+                                @Override
+                                public void failure(RetrofitError error) {
+                                    System.out.println("error = [" + error + "]");
+
+                                }
+                            });
+
 
                             stopSelf();
                             break;
@@ -133,4 +189,6 @@ public class XMPPServiceOfficial extends Service {
             }
         }
     }
+
+
 }

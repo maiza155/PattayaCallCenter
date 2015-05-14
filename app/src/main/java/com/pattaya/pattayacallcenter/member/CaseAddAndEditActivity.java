@@ -54,6 +54,7 @@ import com.pattaya.pattayacallcenter.webservice.RestFulQueary;
 import com.pattaya.pattayacallcenter.webservice.WebserviceConnector;
 import com.pattaya.pattayacallcenter.webservice.object.AccessUserObject;
 import com.pattaya.pattayacallcenter.webservice.object.GetUserObject;
+import com.pattaya.pattayacallcenter.webservice.object.PersonalObject;
 import com.pattaya.pattayacallcenter.webservice.object.UpdateResult;
 import com.pattaya.pattayacallcenter.webservice.object.casedata.CaseAssignObject;
 import com.pattaya.pattayacallcenter.webservice.object.casedata.CaseDataMemberObject;
@@ -93,7 +94,9 @@ public class CaseAddAndEditActivity extends ActionBarActivity implements View.On
     private static SharedPreferences spConfig;
     private static SharedPreferences sp;
     RestAdapter webserviceConnectorUser = WebserviceConnector.getInstance();
+    RestAdapter webserviceConnectorPersonal = WebserviceConnector.getInstancePersonal();
     ProgressDialog ringProgressDialog;
+    private RestFulQueary adapterRestPersonal = null;
     private TextView txtPlace;
     private TextView txtTo;
     private EditText txtName;
@@ -146,7 +149,7 @@ public class CaseAddAndEditActivity extends ActionBarActivity implements View.On
         adapterRestUpload = webserviceConnectorUpload.create(RestFulQueary.class);
         adapterRest = webserviceConnector.create(RestFulQueary.class);
         adapterRestUser = webserviceConnectorUser.create(RestFulQueary.class);
-
+        adapterRestPersonal = webserviceConnectorPersonal.create(RestFulQueary.class);
 
         checkAnonymous = (CheckBox) findViewById(R.id.check);
         txtDetail = (EditText) findViewById(R.id.edit_textdetail);
@@ -243,7 +246,13 @@ public class CaseAddAndEditActivity extends ActionBarActivity implements View.On
 
     }
 
+    @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        finish();
+        startActivity(intent);
 
+    }
     void init() {
         Intent intent = getIntent();
         caseId = intent.getIntExtra("id", 0);
@@ -454,6 +463,34 @@ public class CaseAddAndEditActivity extends ActionBarActivity implements View.On
                         }
 
 
+                        PersonalObject personalObject = new PersonalObject();
+                        personalObject.setAddress(accessUserObject.getAddress());
+                        personalObject.setAmphur(accessUserObject.getAmphur());
+                        personalObject.setDistrict(accessUserObject.getDistrict());
+                        personalObject.setEmail(accessUserObject.getEmail());
+                        personalObject.setFirstname(accessUserObject.getFirstname());
+                        personalObject.setLastname(accessUserObject.getLastname());
+                        personalObject.setIdCard(accessUserObject.getIdCard());
+                        personalObject.setProvince(accessUserObject.getProvince());
+                        personalObject.setPostCode(accessUserObject.getPostCode());
+                        personalObject.setPersonalImage(accessUserObject.getUserImage());
+                        personalObject.setMobile(accessUserObject.getMobile());
+
+
+                        adapterRestPersonal.savePersonalAndChkMobile(personalObject, new Callback<UpdateResult>() {
+                            @Override
+                            public void success(UpdateResult updateResult, Response response) {
+                                System.out.println("updateResult adapterRestPersonal  = [" + updateResult.getResult() + "], response = [" + response + "]");
+                            }
+
+                            @Override
+                            public void failure(RetrofitError error) {
+                                System.out.println("error = [" + error + "]");
+
+                            }
+                        });
+
+
                         openCaseAssignObject.setContactInfo(caseDataObject);
 
                         //save data
@@ -659,7 +696,7 @@ public class CaseAddAndEditActivity extends ActionBarActivity implements View.On
     void updateCase() {
         runOnUiThread(new Runnable() {
             public void run() {
-                ringProgressDialog = ProgressDialog.show(CaseAddAndEditActivity.this, getResources().getString(R.string.update_data), getResources().getString(R.string.please_wait), true);
+                ringProgressDialog = ProgressDialog.show(CaseAddAndEditActivity.this, null, getResources().getString(R.string.please_wait), true);
                 ringProgressDialog.setCancelable(true);
             }
         });

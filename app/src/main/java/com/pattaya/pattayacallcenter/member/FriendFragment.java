@@ -350,13 +350,21 @@ public class FriendFragment extends Fragment implements SwipeRefreshLayout.OnRef
 
     class querySreachTask extends AsyncTask<Void, Void, Boolean> {
         ArrayList<Users> arrUsers;
-        ArrayList<Users> arrFriend = new ArrayList<>();
-        ArrayList<Users> arrGroup = new ArrayList<>();
-        ArrayList<Users> arrFavor = new ArrayList<>();
+        ArrayList<Users> arrFriend;
+        ArrayList<Users> arrGroup;
+        ArrayList<Users> arrFavor;
         String search;
 
         querySreachTask(String search) {
             this.search = search;
+        }
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            arrFriend = new ArrayList<>();
+            arrGroup = new ArrayList<>();
+            arrFavor = new ArrayList<>();
         }
 
         @Override

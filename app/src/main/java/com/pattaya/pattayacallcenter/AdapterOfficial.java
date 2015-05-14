@@ -516,6 +516,7 @@ public class AdapterOfficial extends BaseAdapter {
             }
 
             System.out.println("finish database");
+            BusProvider.getInstance().post("fin_updateChat");
             //setListViewInBtm();
         }
     }

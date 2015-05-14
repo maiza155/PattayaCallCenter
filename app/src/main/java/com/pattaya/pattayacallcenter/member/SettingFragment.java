@@ -19,7 +19,9 @@ import com.facebook.login.LoginManager;
 import com.pattaya.pattayacallcenter.Data.MasterData;
 import com.pattaya.pattayacallcenter.R;
 import com.pattaya.pattayacallcenter.chat.XMPPManage;
+import com.pattaya.pattayacallcenter.chat.XMPPManageOfficial;
 import com.pattaya.pattayacallcenter.chat.XMPPService;
+import com.pattaya.pattayacallcenter.chat.XMPPServiceOfficial;
 import com.pattaya.pattayacallcenter.share.AlertSettingActivity;
 import com.pattaya.pattayacallcenter.share.ChangePasswordActivity;
 import com.pattaya.pattayacallcenter.share.LoginActivity;
@@ -114,12 +116,14 @@ public class SettingFragment extends Fragment implements View.OnClickListener {
     public void onClick(View v) {
         if (v == btnClose) {
             XMPPManage.getInstance().disConnect();
+            XMPPManageOfficial.getInstance().disConnect();
             editor.putString(MasterData.SHARED_CONFIG_TOKEN, null);
             editor.commit();
 
             editorUser.putBoolean(MasterData.SHARED_IS_OFFICIAL, false);
             editorUser.commit();
             v.getContext().stopService(new Intent(v.getContext(), XMPPService.class));
+            v.getContext().stopService(new Intent(v.getContext(), XMPPServiceOfficial.class));
             LoginManager.getInstance().logOut();
 
             Intent intent = new Intent(getActivity(), LoginActivity.class);

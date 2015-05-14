@@ -8,6 +8,7 @@ import com.pattaya.pattayacallcenter.webservice.object.GetTokenObject;
 import com.pattaya.pattayacallcenter.webservice.object.GetUserObject;
 import com.pattaya.pattayacallcenter.webservice.object.LoginObject;
 import com.pattaya.pattayacallcenter.webservice.object.OfficialObject;
+import com.pattaya.pattayacallcenter.webservice.object.PersonalObject;
 import com.pattaya.pattayacallcenter.webservice.object.RegistObject;
 import com.pattaya.pattayacallcenter.webservice.object.SaveFacebookObject;
 import com.pattaya.pattayacallcenter.webservice.object.SavePostObject;
@@ -242,4 +243,16 @@ public interface RestFulQueary {
     @Headers("Content-Type:application/json;charset=UTF-8")
     @GET("/cases2/getUserRelateByComplaintId/{id}")
     void getUserListJid(@Path("id") int id, Callback<Response> json);
+
+
+    /**
+     * Personal
+     */
+
+    @Headers("Content-Type:application/json;charset=UTF-8")
+    @POST("/personal/savePersonalAndChkMobile")
+    void savePersonalAndChkMobile(@Body PersonalObject object, Callback<UpdateResult> json);
+
+
+
 }

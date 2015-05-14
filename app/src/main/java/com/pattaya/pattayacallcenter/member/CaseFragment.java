@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.drawable.BitmapDrawable;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -197,6 +198,10 @@ public class CaseFragment extends Fragment implements View.OnClickListener
     public void updateListData(String s) {
         if (s.matches("update_case_list")) {
             getCaseList("");
+        } else if (s.matches("case_count")) {
+            if (adpterListCase != null) {
+                adpterListCase.notifyDataSetChanged();
+            }
         }
 
     }
@@ -361,91 +366,133 @@ public class CaseFragment extends Fragment implements View.OnClickListener
     }
 
 
-    void getCaseList(String s) {
-        txtEmpty.setVisibility(View.GONE);
-        GetCaseListData getCaseListData = new GetCaseListData();
-        if (isOfficial) {
-            getCaseListData.setFilterType(3);
-        } else {
-            getCaseListData.setFilterType(2);
-            getCaseListData.setUserId(userId);
-        }
+    void getCaseList(final String s) {
+        new AsyncTask<Void, Void, Boolean>() {
 
-        getCaseListData.setAccessToken(token);
-        getCaseListData.setTextSearch(s);
-        adapterRest.getCaseList(getCaseListData, new Callback<Response>() {
             @Override
-            public void success(Response result, Response response2) {
-                DatabaseChatHelper.init().clearCaseTable();
-                BufferedReader reader;
-                StringBuilder sb = new StringBuilder();
-                try {
-                    reader = new BufferedReader(new InputStreamReader(result.getBody().in()));
-                    String line;
+            protected void onPreExecute() {
+                super.onPreExecute();
+                txtEmpty.setVisibility(View.GONE);
+            }
 
-                    try {
-                        while ((line = reader.readLine()) != null) {
-                            sb.append(line);
+            @Override
+            protected Boolean doInBackground(Void... params) {
+                GetCaseListData getCaseListData = new GetCaseListData();
+                if (isOfficial) {
+                    getCaseListData.setFilterType(3);
+                } else {
+                    getCaseListData.setFilterType(2);
+                    getCaseListData.setUserId(userId);
+                }
+
+                getCaseListData.setAccessToken(token);
+                getCaseListData.setTextSearch(s);
+                adapterRest.getCaseList(getCaseListData, new Callback<Response>() {
+                    @Override
+                    public void success(Response result, Response response2) {
+                        DatabaseChatHelper.init().clearCaseTable();
+                        BufferedReader reader;
+                        StringBuilder sb = new StringBuilder();
+                        try {
+                            reader = new BufferedReader(new InputStreamReader(result.getBody().in()));
+                            String line;
+
+                            try {
+                                while ((line = reader.readLine()) != null) {
+                                    sb.append(line);
+                                }
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }
+                        } catch (IOException e) {
+                            e.printStackTrace();
                         }
-                    } catch (IOException e) {
-                        e.printStackTrace();
+                        String JsonConvertData = "{data:" + sb.toString() + "}";
+                        System.out.println(JsonConvertData);
+                        CaseListMemberObject caseListObject = new Gson().fromJson(JsonConvertData, CaseListMemberObject.class);
+
+                        dataList = caseListObject.getData();
+
+                        getActivity().runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                progressBar.setVisibility(View.GONE);
+                                txtEmpty.setVisibility(View.VISIBLE);
+
+
+                                adpterListCase.resetAdpter(dataList);
+                                mSwipeRefreshLayout.setRefreshing(false);
+                            }
+                        });
+
+
                     }
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-                String JsonConvertData = "{data:" + sb.toString() + "}";
-                System.out.println(JsonConvertData);
-                CaseListMemberObject caseListObject = new Gson().fromJson(JsonConvertData, CaseListMemberObject.class);
 
-                dataList = caseListObject.getData();
-                progressBar.setVisibility(View.GONE);
-                txtEmpty.setVisibility(View.VISIBLE);
+                    @Override
+                    public void failure(RetrofitError error) {
+                        System.out.println("error = [" + error + "]");
+                        getActivity().runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                progressBar.setVisibility(View.GONE);
+                                if (adpterListCase.getCount() == 0) {
+                                    txtEmpty.setVisibility(View.VISIBLE);
+                                }
 
 
-                adpterListCase.resetAdpter(dataList);
-                mSwipeRefreshLayout.setRefreshing(false);
+                                mSwipeRefreshLayout.setRefreshing(false);
 
+                            }
+                        });
+
+                    }
+                });
+
+                return null;
             }
+        }.execute();
 
-            @Override
-            public void failure(RetrofitError error) {
-                progressBar.setVisibility(View.GONE);
-                if (adpterListCase.getCount() == 0) {
-                    txtEmpty.setVisibility(View.VISIBLE);
-                }
-
-                System.out.println("error = [" + error + "]");
-                mSwipeRefreshLayout.setRefreshing(false);
-
-            }
-        });
     }
 
     void getUserOfficialData() {
-        adapterRestUser.getUserOfficialData(userId, new Callback<OfficialObject>() {
+        new AsyncTask<Void, Void, Void>() {
             @Override
-            public void success(OfficialObject officialObject, Response response) {
-                if (listUsers.size() == 1) {
-                    listUsers.add(new DataPopUp(officialObject.getUserImage(), officialObject.getDisplayname()));
-                    System.out.println("officialObject = [" + officialObject + "], response = [" + response + "]");
-                    ImageView rootView = (ImageView) btn;
-                    if (rootView != null && isOfficial) {
-                        Glide.with(getActivity())
-                                .load(listUsers.get(1).getImage())
-                                .override(300, 300)
-                                .fitCenter()
-                                .into(rootView);
+            protected Void doInBackground(Void... params) {
+                adapterRestUser.getUserOfficialData(userId, new Callback<OfficialObject>() {
+                    @Override
+                    public void success(OfficialObject officialObject, Response response) {
+                        if (listUsers.size() == 1) {
+                            listUsers.add(new DataPopUp(officialObject.getUserImage(), officialObject.getDisplayname()));
+                            System.out.println("officialObject = [" + officialObject + "], response = [" + response + "]");
+
+                            getActivity().runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    ImageView rootView = (ImageView) btn;
+                                    if (rootView != null && isOfficial) {
+                                        Glide.with(getActivity())
+                                                .load(listUsers.get(1).getImage())
+                                                .override(300, 300)
+                                                .fitCenter()
+                                                .into(rootView);
+
+                                    }
+                                }
+                            });
+
+                        }
 
                     }
-                }
 
+                    @Override
+                    public void failure(RetrofitError error) {
+                        System.out.println("error = [" + error + "]");
+                    }
+                });
+                return null;
             }
+        }.execute();
 
-            @Override
-            public void failure(RetrofitError error) {
-                System.out.println("error = [" + error + "]");
-            }
-        });
     }
 
 

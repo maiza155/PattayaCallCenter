@@ -40,6 +40,7 @@ import com.pattaya.pattayacallcenter.Data.Messages;
 import com.pattaya.pattayacallcenter.Data.Users;
 import com.pattaya.pattayacallcenter.R;
 import com.pattaya.pattayacallcenter.chat.DatabaseChatHelper;
+import com.pattaya.pattayacallcenter.chat.NotifyChat;
 import com.pattaya.pattayacallcenter.chat.StrickLoaderService;
 import com.pattaya.pattayacallcenter.chat.jsonobject.ChatRoomObject;
 import com.pattaya.pattayacallcenter.chat.restadatper.OpenfireQueary;
@@ -80,6 +81,7 @@ public class CaseChatMemberActivity extends ActionBarActivity implements View.On
     ProgressDialog ringProgressDialog;
     Boolean isOfficial;
     AdapterOfficial adapterOfficial;
+    ProgressBar progressBarChat;
     private FrameLayout mMenuContainer;
     private Users otherUser;
     private AdapterChat adapterChat;
@@ -145,7 +147,7 @@ public class CaseChatMemberActivity extends ActionBarActivity implements View.On
         listChat = (ObservableListView) findViewById(R.id.chat);
         //listChat.setScrollViewCallbacks(this);
         caseName = (caseName == null) ? "no name" : caseName;
-        caseTitle.setText("เรื่อง - " + caseName);
+        caseTitle.setText(caseName);
         ////////////////////////////////////////////////////////////////////////////////////////////
 
 
@@ -166,6 +168,7 @@ public class CaseChatMemberActivity extends ActionBarActivity implements View.On
         btnCommit = (Button) findViewById(R.id.btn_commit);
         btnAdd = (ImageButton) findViewById(R.id.btn_add);
         btnSticker = (ImageButton) findViewById(R.id.btn_sticker);
+        progressBarChat = (ProgressBar) findViewById(R.id.progress);
 
         mSlideMenuManageImage = new SlideMenuManage(mSlideMenuImage, this);
         mSlideMenuManageImage.setStateAnimate(mSlideMenuManageImage.STATE_BOTTOM);
@@ -243,8 +246,6 @@ public class CaseChatMemberActivity extends ActionBarActivity implements View.On
             jid = spUser.getString(MasterData.SHARED_USER_JID, "null");
 
         }
-
-
         userId = spUser.getInt(MasterData.SHARED_USER_USER_ID, 0);
 
 
@@ -264,31 +265,38 @@ public class CaseChatMemberActivity extends ActionBarActivity implements View.On
             System.out.println("complainId >>" + complainId);
 
             String type = data.getString("type");
-            if (type != null) {
-                System.out.println("Type : " + type);
-                String[] dataType = type.split(",");
+            if (isOfficial) {
                 menu = new ArrayList<>();
-                for (String e : dataType) {
-                    switch (e) {
-                        case "IsOper":
-                            menu.add(1);
-                            break;
-                        case "IsOwner":
-                            menu.add(2);
-                            break;
-                        case "IsNoti":
-                            menu.add(3);
-                            break;
-                        case "IsClose":
-                            menu.add(4);
-                            break;
-                    }
-
-                }
+                menu.add(5);
                 adapterMenuCaseChat.resetAdapter(menu);
             } else {
-                getTypeList();
+                if (type != null) {
+                    System.out.println("Type : " + type);
+                    String[] dataType = type.split(",");
+                    menu = new ArrayList<>();
+                    for (String e : dataType) {
+                        switch (e) {
+                            case "IsOper":
+                                menu.add(1);
+                                break;
+                            case "IsOwner":
+                                menu.add(2);
+                                break;
+                            case "IsNoti":
+                                menu.add(3);
+                                break;
+                            case "IsClose":
+                                menu.add(4);
+                                break;
+                        }
+
+                    }
+                    adapterMenuCaseChat.resetAdapter(menu);
+                } else {
+                    getTypeList();
+                }
             }
+
 
 
         }
@@ -451,6 +459,9 @@ public class CaseChatMemberActivity extends ActionBarActivity implements View.On
             }
             btnUpdateStricker.setVisibility(View.VISIBLE);
             progressBar.setVisibility(View.GONE);
+        } else if (event.matches("fin_updateChat")) {
+            progressBarChat.setVisibility(View.GONE);
+
         }
 
     }
@@ -464,7 +475,7 @@ public class CaseChatMemberActivity extends ActionBarActivity implements View.On
                 DatabaseChatHelper.init().clearCountLastMessage(messages.getRoom());
                 if (!messages.getSender().matches(jid)) {
                     System.out.println("Hello");
-                    // NotifyChat.cancelNotification(NotifyChat.NOTIFY_CHAT_ID);
+                    NotifyChat.cancelNotification(NotifyChat.NOTIFY_CHAT_ID);
                     if (isOfficial) {
                         adapterOfficial.queryChatLogsNoReset(messages, false);
                     } else {

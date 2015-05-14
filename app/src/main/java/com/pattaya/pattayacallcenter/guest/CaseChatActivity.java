@@ -34,6 +34,7 @@ import com.pattaya.pattayacallcenter.R;
 import com.pattaya.pattayacallcenter.chat.DatabaseChatHelper;
 import com.pattaya.pattayacallcenter.chat.NotifyChat;
 import com.pattaya.pattayacallcenter.chat.StrickLoaderService;
+import com.pattaya.pattayacallcenter.chat.jsonobject.ChatRoomObject;
 import com.pattaya.pattayacallcenter.chat.restadatper.OpenfireQueary;
 import com.pattaya.pattayacallcenter.chat.restadatper.RestAdapterOpenFire;
 import com.pattaya.pattayacallcenter.chat.xmlobject.Chatroom.ChatRoom;
@@ -89,7 +90,7 @@ public class CaseChatActivity extends ActionBarActivity implements View.OnClickL
     Boolean isOfficial;
     RestAdapter openfireConnectorJson = RestAdapterOpenFire.getInstanceJson();
     OpenfireQueary openfireQuearyJson = openfireConnectorJson.create(OpenfireQueary.class);
-
+    ProgressBar progressBarChat;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -106,7 +107,7 @@ public class CaseChatActivity extends ActionBarActivity implements View.OnClickL
         listChat = (ObservableListView) findViewById(R.id.chat);
         //listChat.setScrollViewCallbacks(this);
         caseName = (caseName == null) ? "no name" : caseName;
-        caseTitle.setText("เรื่อง - " + caseName);
+        caseTitle.setText(caseName);
 
         mSlideMenuImage = findViewById(R.id.menu_slide);
         txtMsg = (EditText) findViewById(R.id.txt_msg);
@@ -116,7 +117,7 @@ public class CaseChatActivity extends ActionBarActivity implements View.OnClickL
         btnCommit = (Button) findViewById(R.id.btn_commit);
         btnAdd = (ImageButton) findViewById(R.id.btn_add);
         btnSticker = (ImageButton) findViewById(R.id.btn_sticker);
-
+        progressBarChat = (ProgressBar) findViewById(R.id.progress);
 
         mSlideMenuManage = new SlideMenuManage(mSlideMenuImage, this);
         mSlideMenuManage.setStateAnimate(mSlideMenuManage.STATE_BOTTOM);
@@ -195,6 +196,13 @@ public class CaseChatActivity extends ActionBarActivity implements View.OnClickL
 
     }
 
+    @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        finish();
+        startActivity(intent);
+
+    }
     void setActionBar() {
         /** Set Title Center Actionbar*/
         LayoutInflater inflater = LayoutInflater.from(this);
@@ -264,6 +272,9 @@ public class CaseChatActivity extends ActionBarActivity implements View.OnClickL
             }
             btnUpdateStricker.setVisibility(View.VISIBLE);
             progressBar.setVisibility(View.GONE);
+        } else if (event.matches("fin_updateChat")) {
+            progressBarChat.setVisibility(View.GONE);
+
         }
 
     }
@@ -348,6 +359,7 @@ public class CaseChatActivity extends ActionBarActivity implements View.OnClickL
 
     void setRoom() {
         final String roomName = "case-" + complainId;
+        Log.e("ChatRoom", "" + roomName);
         openfireQueary.getChatRoomDetail("case-" + complainId, new Callback<ChatRoom>() {
             @Override
             public void success(ChatRoom chatRoom, Response response) {
@@ -362,10 +374,43 @@ public class CaseChatActivity extends ActionBarActivity implements View.OnClickL
 
             @Override
             public void failure(RetrofitError error) {
-                System.out.println("error = [" + error + "]");
-                Toast.makeText(getApplication(),
-                        "Please check your internet connection", Toast.LENGTH_SHORT)
-                        .show();
+                if (error.getResponse() != null) {
+                    if (error.getResponse().getStatus() == 404) {
+                        final ChatRoomObject chatRoomObject = new ChatRoomObject();
+                        chatRoomObject.setRoomName(roomName);
+                        chatRoomObject.setNaturalName(roomName);
+                        chatRoomObject.setDescription(roomName);
+
+                        if (chatRoomObject != null) {
+                            //chatRoomObject.setDescription(img);
+                            openfireQuearyJson.createChatRoom(chatRoomObject, new Callback<Response>() {
+                                @Override
+                                public void success(Response response, Response response2) {
+                                    //System.out.println("response = [" + response + "], response2 = [" + response2 + "]");
+
+                                    roomIsCreated = true;
+                                    otherUser = new Users();
+                                    otherUser.setJid(chatRoomObject.getRoomName() + "@" + "conference.pattaya-data");
+                                    otherUser.setName(chatRoomObject.getRoomName());
+                                    otherUser.setType(Users.TYPE_GROUP);
+                                    initAdapter();
+                                }
+
+                                @Override
+                                public void failure(RetrofitError error) {
+                                    // System.out.println("error = [" + error + "]");
+                                }
+                            });
+                        }
+
+
+                    }
+
+                } else {
+                    Toast.makeText(getApplication(),
+                            "Please check your internet connection", Toast.LENGTH_SHORT)
+                            .show();
+                }
 
             }
         });
