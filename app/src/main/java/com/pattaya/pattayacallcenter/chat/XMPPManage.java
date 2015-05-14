@@ -336,7 +336,7 @@ public class XMPPManage implements MessageListener {
                     } else if (e.getVariable().matches("title")) {
                         pubsubObject.setTitle(e.getValues().get(0));
                     } else if (e.getVariable().matches("displayDate")) {
-                        pubsubObject.setDisplayData(e.getValues().get(0));
+                        pubsubObject.setDisplayData(String.valueOf(System.currentTimeMillis()));
                     } else if (e.getVariable().matches("action")) {
                         pubsubObject.setAction(e.getValues().get(0));
                     } else if (e.getVariable().matches("primaryKey")) {
@@ -476,11 +476,14 @@ public class XMPPManage implements MessageListener {
                         }
 
                         String checkCase = messages.getRoom().split("@")[0];
-                        checkCase = checkCase.split("-")[0];
+                        String[] room = checkCase.split("-");
+
                         System.out.println("indatabase " + checkCase);
 
-                        if (checkCase.matches("pattaya")) {
+                        if (room[0].matches("pattaya")) {
                             NotifyChat.setNotifyChat(users.getName(), messages.getRoom(), messages.getMessage());
+                        } else if (room[0].matches("case")) {
+                            NotifyCase.setNotifyChatCase(users.getName(), room[1], messages.getMessage());
                         }
 
                     }
@@ -503,11 +506,13 @@ public class XMPPManage implements MessageListener {
                                 }
 
                                 String checkCase = messages.getRoom().split("@")[0];
-                                checkCase = checkCase.split("-")[0];
+                                String[] room = checkCase.split("-");
                                 System.out.println("in server " + checkCase);
 
-                                if (checkCase.matches("pattaya")) {
+                                if (room[0].matches("pattaya")) {
                                     NotifyChat.setNotifyChat(user.getName(), messages.getRoom(), messages.getMessage());
+                                } else if (room[0].matches("case")) {
+                                    NotifyCase.setNotifyChatCase(user.getName(), room[1], messages.getMessage());
                                 }
 
 

@@ -12,7 +12,7 @@
         android:orientation="vertical">
 
 
-        <LinearLayout
+        <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_marginTop="10dp"
@@ -22,19 +22,27 @@
 
             <ListView
                 android:id="@+id/chat"
+                android:layout_width="match_parent"
+                android:layout_height="fill_parent"
+                android:layout_gravity="bottom"
+                android:clickable="false"
                 android:divider="@null"
                 android:dividerHeight="0dp"
-                android:listSelector="@android:color/transparent"
-                android:clickable="false"
                 android:focusable="false"
-                android:layout_gravity="bottom"
-                android:gravity="bottom"
 
+                android:gravity="bottom"
+                android:listSelector="@android:color/transparent"
                 android:stackFromBottom="true"
-                android:transcriptMode="alwaysScroll"
-                android:layout_width="match_parent"
-                android:layout_height="fill_parent"/>
-        </LinearLayout>
+                android:transcriptMode="alwaysScroll" />
+
+
+            <ProgressBar
+                android:id="@+id/progress"
+                style="?android:attr/progressBarStyleInverse"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true" />
+        </RelativeLayout>
 
 
     </LinearLayout>

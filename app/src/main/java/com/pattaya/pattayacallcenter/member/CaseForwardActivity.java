@@ -273,7 +273,8 @@ public class CaseForwardActivity extends ActionBarActivity implements View.OnCli
     void saveData() {
         runOnUiThread(new Runnable() {
             public void run() {
-                ringProgressDialog = ProgressDialog.show(CaseForwardActivity.this, getResources().getString(R.string.update_data), getResources().getString(R.string.please_wait), true);
+                ringProgressDialog = ProgressDialog.show(CaseForwardActivity.this, null, getResources().getString(R.string.please_wait), true);
+                ringProgressDialog.setCancelable(true);
             }
         });
         if (data != null) {
@@ -502,7 +503,8 @@ public class CaseForwardActivity extends ActionBarActivity implements View.OnCli
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
-            ringProgressDialog = ProgressDialog.show(CaseForwardActivity.this, getResources().getString(R.string.uploading), getResources().getString(R.string.please_wait), true);
+            ringProgressDialog = ProgressDialog.show(CaseForwardActivity.this, null, getResources().getString(R.string.please_wait), true);
+            ringProgressDialog.setCancelable(true);
         }
 
         @Override

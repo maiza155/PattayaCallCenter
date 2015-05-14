@@ -501,6 +501,7 @@ public class AdapterChat extends BaseAdapter {
             } else {
                 add(message);
             }
+            BusProvider.getInstance().post("fin_updateChat");
             //setListViewInBtm();
         }
     }

@@ -67,7 +67,7 @@ public class ChatActivity extends ActionBarActivity implements View.OnClickListe
     ArrayList dataChat;
     ArrayList dataUser;
     ArrayList listStiker;
-
+    ProgressBar progressBarChat;
     ////// XMPP Manage//////
     DatabaseChatHelper databaseChatHelper;
 
@@ -82,8 +82,9 @@ public class ChatActivity extends ActionBarActivity implements View.OnClickListe
     @Override
     protected void onNewIntent(Intent intent) {
         super.onNewIntent(intent);
-        startActivity(intent);
         finish();
+        startActivity(intent);
+
     }
 
 
@@ -103,7 +104,7 @@ public class ChatActivity extends ActionBarActivity implements View.OnClickListe
         btnImage = (Button) findViewById(R.id.btn_image);
         btnPlace = (Button) findViewById(R.id.btn_place);
         btnCommit = (Button) findViewById(R.id.btn_commit);
-
+        progressBarChat = (ProgressBar) findViewById(R.id.progress);
 
         btnAdd = (ImageButton) findViewById(R.id.btn_add);
         btnSticker = (ImageButton) findViewById(R.id.btn_sticker);
@@ -255,6 +256,9 @@ public class ChatActivity extends ActionBarActivity implements View.OnClickListe
             }
             btnUpdateStricker.setVisibility(View.VISIBLE);
             progressBar.setVisibility(View.GONE);
+        } else if (event.matches("fin_updateChat")) {
+            progressBarChat.setVisibility(View.GONE);
+
         }
 
     }
