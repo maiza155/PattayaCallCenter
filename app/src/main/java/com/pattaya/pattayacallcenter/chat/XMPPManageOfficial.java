@@ -203,7 +203,7 @@ public class XMPPManageOfficial implements MessageListener {
                     } else if (e.getVariable().matches("title")) {
                         pubsubObject.setTitle(e.getValues().get(0));
                     } else if (e.getVariable().matches("displayDate")) {
-                        pubsubObject.setDisplayData(e.getValues().get(0));
+                        pubsubObject.setDisplayData(String.valueOf(System.currentTimeMillis()));
                     } else if (e.getVariable().matches("action")) {
                         pubsubObject.setAction(e.getValues().get(0));
                     } else if (e.getVariable().matches("primaryKey")) {
@@ -405,6 +405,7 @@ public class XMPPManageOfficial implements MessageListener {
                 XMPPTCPConnection admin = new XMPPTCPConnection(config);
                 PubSubManager manager;
                 String username = USERNAME + "_notify";
+                Log.e("subscribePubSub", username);
                 try {
                     admin.connect();
                     admin.login("admin", "admin", "Android");
@@ -470,6 +471,7 @@ public class XMPPManageOfficial implements MessageListener {
     }
 
     public static void subscribePubSub() {
+        Log.e("subscribePubSub", USERNAME);
         String username = USERNAME + "_notify";
         PubSubManager mPubSubManager = new PubSubManager(mConnection);
         SubscribeForm subscriptionForm = new SubscribeForm(FormType.submit);
@@ -479,7 +481,7 @@ public class XMPPManageOfficial implements MessageListener {
         subscriptionForm.setIncludeBody(true);
         try {
             LeafNode existingNode = mPubSubManager.getNode(username);
-            existingNode.subscribe(jid, subscriptionForm);
+            existingNode.subscribe(USERNAME + "@" + SERVICE, subscriptionForm);
         } catch (SmackException.NoResponseException e) {
             e.printStackTrace();
         } catch (XMPPException.XMPPErrorException e) {

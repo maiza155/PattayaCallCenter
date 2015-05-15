@@ -139,6 +139,8 @@ public class CaseAddAndEditActivity extends ActionBarActivity implements View.On
     private int complainId;
     private String displayName;
     private String displayImage;
+    private String jid;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -270,6 +272,7 @@ public class CaseAddAndEditActivity extends ActionBarActivity implements View.On
         userId = sp.getInt(MasterData.SHARED_USER_USER_ID, -10);
         displayImage = sp.getString(MasterData.SHARED_USER_IMAGE, null);
         displayName = sp.getString(MasterData.SHARED_USER_DISPLAY_NAME, null);
+        jid = sp.getString(MasterData.SHARED_USER_JID, null);
 
         spConfig = Application.getContext().getSharedPreferences(MasterData.SHARED_NAME_CONFIG_FILE, Context.MODE_PRIVATE);
         token = spConfig.getString(MasterData.SHARED_CONFIG_TOKEN, null);
@@ -349,11 +352,14 @@ public class CaseAddAndEditActivity extends ActionBarActivity implements View.On
                 if (view == spinner1) {
                     listData = new ArrayList();
                     for (CaseTypeObject e : caseTypeObject.getData()) {
-                        list.add(e.getName());
-                        listData.add(e);
-                        System.out.println(e.getName());
+                        if (!e.getName().matches("สอบถามข้อมูล")) {
+                            list.add(e.getName());
+                            listData.add(e);
+                            System.out.println(e.getName());
+                            System.out.println(e.getId());
+                        }
                     }
-
+                    setTypeMain(2, spinner2);
                 } else if (view == spinner2) {
                     listSubData = new ArrayList<>();
                     for (CaseTypeObject e : caseTypeObject.getData()) {
@@ -365,13 +371,11 @@ public class CaseAddAndEditActivity extends ActionBarActivity implements View.On
                 if (view == spinner1) {
                     adapter.clear();
                     // listData.addAll(list);
-                    adapter.add("บริการ");
                     adapter.addAll(list);
                 } else if (view == spinner2) {
 
                     //adapter2.clear();
                     //listSubData
-                    adapter2.add("ประเภท");
                     adapter2.addAll(list2);
                     spinner2.setSelection(0);
 
@@ -522,7 +526,10 @@ public class CaseAddAndEditActivity extends ActionBarActivity implements View.On
                                                 pub.setComplainId(updateResult.getPrimaryKeyId());
                                                 pub.setName(displayName);
                                                 pub.setTitle(openCaseAssignObject.getCasesName());
-                                                listNotify.add(pub);
+                                                if (!e.getJid().matches(jid)) {
+                                                    listNotify.add(pub);
+                                                }
+
                                             }
 
                                         }
@@ -765,7 +772,9 @@ public class CaseAddAndEditActivity extends ActionBarActivity implements View.On
                                         pub.setName(displayName);
                                         pub.setTitle(openCaseAssignObject.getCasesName());
 
-                                        listNotify.add(pub);
+                                        if (!e.getJid().matches(jid)) {
+                                            listNotify.add(pub);
+                                        }
                                     }
 
                                 }

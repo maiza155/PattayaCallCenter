@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
+import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.v7.app.ActionBar;
@@ -22,10 +23,11 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.animation.GlideAnimation;
+import com.bumptech.glide.request.target.SimpleTarget;
+import com.pattaya.pattayacallcenter.Application;
 import com.pattaya.pattayacallcenter.R;
 
-
-import java.io.File;
 import java.util.ArrayList;
 
 
@@ -162,9 +164,9 @@ public class CustomGalleryActivity extends ActionBarActivity {
      */
 
     public class ImageAdapter extends BaseAdapter {
-        private LayoutInflater mInflater;
         Context context;
         ArrayList mArray;
+        private LayoutInflater mInflater;
 
         public ImageAdapter(Context context, ArrayList mArray) {
             mInflater = LayoutInflater.from(context);
@@ -189,7 +191,7 @@ public class CustomGalleryActivity extends ActionBarActivity {
         }
 
         @Override
-        public View getView(int position, View convertView, ViewGroup parent) {
+        public View getView(final int position, View convertView, ViewGroup parent) {
             //Log.e("TAG","GETVIEW");
 
             final ViewHolder holder;
@@ -208,16 +210,22 @@ public class CustomGalleryActivity extends ActionBarActivity {
             holder.bgImage.setId(position);
 
             //Log.e("TAG","=====> Array path => " + holder.imgThumb.getId());
-            File file = new File((String) mArray.get(position));
-            Glide.
-                    with(getApplication()).
-                    load(file).
-                    placeholder(R.drawable.loading).
-                    error(R.drawable.img_not_found).
-                    override(200, 200).
-                    thumbnail(0.1f).
-                    centerCrop().
-                    into(holder.imgThumb);
+
+            Glide.with(Application.getContext())
+                    .load(mArray.get(position))
+                    .asBitmap()
+                    .fitCenter()
+
+                    .into(new SimpleTarget<Bitmap>(200, 200) {
+                        @Override
+                        public void onResourceReady(Bitmap bitmap, GlideAnimation anim) {
+                            // Do something with bitmap here.
+                            if (bitmap != null && bitmap.getHeight() > 100 && bitmap.getWidth() > 100) {
+                                holder.imgThumb.setImageBitmap(bitmap);
+                            }
+                        }
+                    });
+
 
             if (thumbnailsselection[position]) {
                 holder.chkImage.setVisibility(View.VISIBLE);

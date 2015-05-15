@@ -123,7 +123,12 @@ public class FullscreenActivity extends Activity {
                         finish();
                     }
                 });
-                alertDialog.show();
+                try {
+                    alertDialog.show();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+
             }
 
         }

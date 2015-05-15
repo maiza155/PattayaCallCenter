@@ -211,7 +211,7 @@
 
     <string name="invite_friend">ชวนเพื่อนเข้ากลุ่ม</string>
     <string name="invited_friend">เพื่อนที่จะได้รับคำเชิญเข้ากลุ่มนี้</string>
-    <string name="request_friend">คำขอแป็นเพื่อน</string>
+    <string name="request_friend">คำขอเป็นเพื่อน</string>
     <string name="request_group">คำชวนเข้ากลุ่ม</string>
 
     <string name="old_pass">รหัสผ่านเก่า</string>

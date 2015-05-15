@@ -397,26 +397,7 @@ public class LoginActivity extends Activity {
                             mProfileTracker.startTracking();
                         }
 
-/*
-                        mProfileTracker = new ProfileTracker() {
-                            @Override
-                            protected void onCurrentProfileChanged(Profile profile, Profile profile2) {
-                                facebookData.setFirstName(profile2.getFirstName());
-                                facebookData.setLastName(profile2.getLastName());
-                                facebookData.setImage(profile2.getProfilePictureUri(100, 100).toString());
-                                System.out.println("image " + profile2.getProfilePictureUri(100, 100).toString());
-                                mProfileTracker.stopTracking();
 
-                                boolprofile[0] = true;
-                                if (boolprofile[0] && boolprofile[1]) {
-                                    seveFacebook(facebookData);
-                                    ringProgressDialog.dismiss();
-                                }
-
-                            }
-                        };
-                        mProfileTracker.startTracking();
-*/
                         GraphRequest request = GraphRequest.newMeRequest(loginResult.getAccessToken(),
                                 new GraphRequest.GraphJSONObjectCallback() {
 

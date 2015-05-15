@@ -8,6 +8,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
@@ -76,6 +77,8 @@ public class CaseChatMemberActivity extends ActionBarActivity implements View.On
 
     private final int EDIT_ACTIVITY = 390;
     private final int TAG_INTENT_PLACE = 909;
+    private final int TAG_INTENT_CLOSE = 910;
+    private final int TAG_INTENT_FORWARD = 911;
     private final RestAdapter restAdapterOpenFire = RestAdapterOpenFire.getInstance();
     private final OpenfireQueary openfireQueary = restAdapterOpenFire.create(OpenfireQueary.class);
     ProgressDialog ringProgressDialog;
@@ -350,7 +353,8 @@ public class CaseChatMemberActivity extends ActionBarActivity implements View.On
                         intent = new Intent(getApplicationContext(), CaseForwardActivity.class);
                         intent.putExtra("id", idCase);
                         intent.putExtra("complainid", complainId);
-                        startActivity(intent);
+                        intent.putExtra("casename", caseName);
+                        startActivityForResult(intent, TAG_INTENT_FORWARD);
                         break;
                     case 6:
                         intent = new Intent(getApplicationContext(), CaseWorkDateActivity.class);
@@ -362,7 +366,7 @@ public class CaseChatMemberActivity extends ActionBarActivity implements View.On
                         intent.putExtra("id", idCase);
                         intent.putExtra("complainid", complainId);
                         intent.putExtra("casename", caseName);
-                        startActivity(intent);
+                        startActivityForResult(intent, TAG_INTENT_CLOSE);
                         break;
 
 
@@ -496,63 +500,82 @@ public class CaseChatMemberActivity extends ActionBarActivity implements View.On
     }
 
     void setRoom() {
-        final String roomName = "case-" + complainId;
-        openfireQueary.getChatRoomDetail("case-" + complainId, new Callback<ChatRoom>() {
-            @Override
-            public void success(ChatRoom chatRoom, Response response) {
-                System.out.println("chatRoom = [" + chatRoom.getRoomName() + "], response = [" + response + "]");
-                roomIsCreated = true;
-                otherUser = new Users();
-                otherUser.setJid(chatRoom.getRoomName() + "@" + "conference.pattaya-data");
-                otherUser.setName(chatRoom.getRoomName());
-                otherUser.setType(Users.TYPE_GROUP);
-                initAdapter();
-
-            }
+        new AsyncTask<Void, Void, Boolean>() {
 
             @Override
-            public void failure(RetrofitError error) {
-                if (error.getResponse() != null) {
-                    if (error.getResponse().getStatus() == 404) {
-                        final ChatRoomObject chatRoomObject = new ChatRoomObject();
-                        chatRoomObject.setRoomName(roomName);
-                        chatRoomObject.setNaturalName(roomName);
-                        chatRoomObject.setDescription(roomName);
-
-                        if (chatRoomObject != null) {
-                            //chatRoomObject.setDescription(img);
-                            openfireQuearyJson.createChatRoom(chatRoomObject, new Callback<Response>() {
-                                @Override
-                                public void success(Response response, Response response2) {
-                                    //System.out.println("response = [" + response + "], response2 = [" + response2 + "]");
-
-                                    roomIsCreated = true;
-                                    otherUser = new Users();
-                                    otherUser.setJid(chatRoomObject.getRoomName() + "@" + "conference.pattaya-data");
-                                    otherUser.setName(chatRoomObject.getRoomName());
-                                    otherUser.setType(Users.TYPE_GROUP);
-                                    initAdapter();
-                                }
-
-                                @Override
-                                public void failure(RetrofitError error) {
-                                    // System.out.println("error = [" + error + "]");
-                                }
-                            });
-                        }
+            protected Boolean doInBackground(Void... params) {
+                final String roomName = "case-" + complainId;
+                openfireQueary.getChatRoomDetail("case-" + complainId, new Callback<ChatRoom>() {
+                    @Override
+                    public void success(ChatRoom chatRoom, Response response) {
+                        System.out.println("chatRoom = [" + chatRoom.getRoomName() + "], response = [" + response + "]");
+                        roomIsCreated = true;
+                        otherUser = new Users();
+                        otherUser.setJid(chatRoom.getRoomName() + "@" + "conference.pattaya-data");
+                        otherUser.setName(chatRoom.getRoomName());
+                        otherUser.setType(Users.TYPE_GROUP);
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                initAdapter();
+                            }
+                        });
 
 
                     }
 
-                } else {
-                    Toast.makeText(getApplication(),
-                            "Please check your internet connection", Toast.LENGTH_SHORT)
-                            .show();
-                }
+                    @Override
+                    public void failure(RetrofitError error) {
+                        if (error.getResponse() != null) {
+                            if (error.getResponse().getStatus() == 404) {
+                                final ChatRoomObject chatRoomObject = new ChatRoomObject();
+                                chatRoomObject.setRoomName(roomName);
+                                chatRoomObject.setNaturalName(roomName);
+                                chatRoomObject.setDescription(roomName);
+
+                                if (chatRoomObject != null) {
+                                    //chatRoomObject.setDescription(img);
+                                    openfireQuearyJson.createChatRoom(chatRoomObject, new Callback<Response>() {
+                                        @Override
+                                        public void success(Response response, Response response2) {
+                                            //System.out.println("response = [" + response + "], response2 = [" + response2 + "]");
+
+                                            roomIsCreated = true;
+                                            otherUser = new Users();
+                                            otherUser.setJid(chatRoomObject.getRoomName() + "@" + "conference.pattaya-data");
+                                            otherUser.setName(chatRoomObject.getRoomName());
+                                            otherUser.setType(Users.TYPE_GROUP);
+                                            runOnUiThread(new Runnable() {
+                                                @Override
+                                                public void run() {
+                                                    initAdapter();
+                                                }
+                                            });
+                                        }
+
+                                        @Override
+                                        public void failure(RetrofitError error) {
+                                            // System.out.println("error = [" + error + "]");
+                                        }
+                                    });
+                                }
 
 
+                            }
+
+                        } else {
+                            Toast.makeText(getApplication(),
+                                    "Please check your internet connection", Toast.LENGTH_SHORT)
+                                    .show();
+                        }
+
+
+                    }
+                });
+                return null;
             }
-        });
+        }.execute();
+
     }
 
 
@@ -640,6 +663,7 @@ public class CaseChatMemberActivity extends ActionBarActivity implements View.On
                     }
                     // setListViewInBtm();
                 }
+                hideKeyboard();
                 txtMsg.setText(null);
             }
 
@@ -672,75 +696,101 @@ public class CaseChatMemberActivity extends ActionBarActivity implements View.On
 
 
     void getTypeList() {
-        ringProgressDialog = ProgressDialog.show(CaseChatMemberActivity.this, null, getResources().getString(R.string.please_wait), true);
-        ringProgressDialog.setCancelable(true);
-        GetCaseListData getCaseListData = new GetCaseListData();
-        getCaseListData.setCasesId(idCase);
-        getCaseListData.setUserId(userId);
-        getCaseListData.setFilterType(2);
-        getCaseListData.setAccessToken(token);
-        getCaseListData.setClientId(clientId);
-        Gson gson = new Gson();
-        String json = gson.toJson(getCaseListData);
-        System.out.println(json);
+        new AsyncTask<Void, Void, Boolean>() {
 
-        adapterRest.getCaseList(getCaseListData, new Callback<Response>() {
             @Override
-            public void success(Response result, Response response2) {
-                DatabaseChatHelper.init().clearCaseTable();
-                BufferedReader reader;
-                StringBuilder sb = new StringBuilder();
-                try {
-                    reader = new BufferedReader(new InputStreamReader(result.getBody().in()));
-                    String line;
+            protected void onPreExecute() {
+                super.onPreExecute();
+                ringProgressDialog = ProgressDialog.show(CaseChatMemberActivity.this, null, getResources().getString(R.string.please_wait), true);
+                ringProgressDialog.setCancelable(true);
+            }
 
-                    try {
-                        while ((line = reader.readLine()) != null) {
-                            sb.append(line);
+            @Override
+            protected Boolean doInBackground(Void... params) {
+                GetCaseListData getCaseListData = new GetCaseListData();
+                getCaseListData.setCasesId(idCase);
+                getCaseListData.setUserId(userId);
+                getCaseListData.setFilterType(2);
+                getCaseListData.setAccessToken(token);
+                getCaseListData.setClientId(clientId);
+                Gson gson = new Gson();
+                String json = gson.toJson(getCaseListData);
+                System.out.println(json);
+
+                adapterRest.getCaseList(getCaseListData, new Callback<Response>() {
+                    @Override
+                    public void success(Response result, Response response2) {
+                        DatabaseChatHelper.init().clearCaseTable();
+                        BufferedReader reader;
+                        StringBuilder sb = new StringBuilder();
+                        try {
+                            reader = new BufferedReader(new InputStreamReader(result.getBody().in()));
+                            String line;
+
+                            try {
+                                while ((line = reader.readLine()) != null) {
+                                    sb.append(line);
+                                }
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }
+                        } catch (IOException e) {
+                            e.printStackTrace();
                         }
-                    } catch (IOException e) {
-                        e.printStackTrace();
+                        String JsonConvertData = "{data:" + sb.toString() + "}";
+                        System.out.println(userId);
+                        System.out.println(JsonConvertData);
+                        CaseListMemberObject caseListObject = new Gson().fromJson(JsonConvertData, CaseListMemberObject.class);
+                        String type = caseListObject.getData().get(0).getCasesType();
+                        String[] dataType = type.split(",");
+                        menu = new ArrayList<>();
+                        for (String e : dataType) {
+                            switch (e) {
+                                case "IsOper":
+                                    menu.add(1);
+                                    break;
+                                case "IsOwner":
+                                    menu.add(2);
+                                    break;
+                                case "IsNoti":
+                                    menu.add(3);
+                                    break;
+                                case "IsClose":
+                                    menu.add(4);
+                                    break;
+                            }
+
+                        }
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                adapterMenuCaseChat.resetAdapter(menu);
+                                ringProgressDialog.dismiss();
+                            }
+                        });
+
+
                     }
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-                String JsonConvertData = "{data:" + sb.toString() + "}";
-                System.out.println(userId);
-                System.out.println(JsonConvertData);
-                CaseListMemberObject caseListObject = new Gson().fromJson(JsonConvertData, CaseListMemberObject.class);
-                String type = caseListObject.getData().get(0).getCasesType();
-                String[] dataType = type.split(",");
-                menu = new ArrayList<>();
-                for (String e : dataType) {
-                    switch (e) {
-                        case "IsOper":
-                            menu.add(1);
-                            break;
-                        case "IsOwner":
-                            menu.add(2);
-                            break;
-                        case "IsNoti":
-                            menu.add(3);
-                            break;
-                        case "IsClose":
-                            menu.add(4);
-                            break;
+
+                    @Override
+                    public void failure(RetrofitError error) {
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                ringProgressDialog.dismiss();
+                            }
+                        });
+
+                        Toast.makeText(getApplication(), "Unable connect server. Please try again", Toast.LENGTH_SHORT).show();
+                        System.out.println("error = [" + error + "]");
+
                     }
-
-                }
-                adapterMenuCaseChat.resetAdapter(menu);
-                ringProgressDialog.dismiss();
-
+                });
+                return null;
             }
+        }.execute();
 
-            @Override
-            public void failure(RetrofitError error) {
-                ringProgressDialog.dismiss();
-                Toast.makeText(getApplication(), "Unable connect server. Please try again", Toast.LENGTH_SHORT).show();
-                System.out.println("error = [" + error + "]");
 
-            }
-        });
     }
 
     @Override
@@ -823,6 +873,27 @@ public class CaseChatMemberActivity extends ActionBarActivity implements View.On
                     }
                     // setListViewInBtm();
                 }
+
+            }
+        }
+
+        if (requestCode == TAG_INTENT_CLOSE) {
+            if (resultCode == Activity.RESULT_OK) {
+                finish();
+
+            }
+        }
+
+        if (requestCode == TAG_INTENT_FORWARD) {
+            if (resultCode == Activity.RESULT_OK) {
+                finish();
+
+            }
+        }
+
+        if (requestCode == EDIT_ACTIVITY) {
+            if (resultCode == Activity.RESULT_OK) {
+                //finish();
 
             }
         }

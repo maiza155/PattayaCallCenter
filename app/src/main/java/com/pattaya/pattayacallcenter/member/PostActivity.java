@@ -152,7 +152,7 @@ public class PostActivity extends ActionBarActivity implements View.OnClickListe
                         .show();
 
             } else {
-              new TaskReSizeImage().execute();
+                new TaskReSizeImage().execute();
             }
 
             return true;
@@ -160,7 +160,6 @@ public class PostActivity extends ActionBarActivity implements View.OnClickListe
 
         return super.onOptionsItemSelected(item);
     }
-
 
 
     void savePost() {
@@ -250,10 +249,12 @@ public class PostActivity extends ActionBarActivity implements View.OnClickListe
 
                 try {
                     File imgFile = new File(cameraMange.fileUri.getPath());
-
-
                     if (imgFile.exists()) {
-                        mGridAdapter.addItem(imgFile.getPath());
+                        if (mGridAdapter.getCount() < 6) {
+                            mGridAdapter.addItem(imgFile.getPath());
+                        } else {
+                            Toast.makeText(getApplication(), "You can upload about 6 photos per case.", Toast.LENGTH_SHORT).show();
+                        }
                     }
 
                 } catch (Exception e) {
@@ -271,7 +272,12 @@ public class PostActivity extends ActionBarActivity implements View.OnClickListe
 
                 String[] imagesPath = data.getStringExtra("data").split("\\|");
                 for (int i = 0; i < imagesPath.length; i++) {
-                    mGridAdapter.addItem(imagesPath[i]);
+                    if (mGridAdapter.getCount() < 6) {
+                        mGridAdapter.addItem(imagesPath[i]);
+                    } else {
+                        Toast.makeText(getApplication(), "You can upload about 6 photos per case.", Toast.LENGTH_SHORT).show();
+                        break;
+                    }
                 }
 
             }
@@ -280,164 +286,154 @@ public class PostActivity extends ActionBarActivity implements View.OnClickListe
 
     }
 
-   class TaskReSizeImage extends AsyncTask<Void ,Void, Boolean>{
-       ProgressDialog ringProgressDialog;
+    class TaskReSizeImage extends AsyncTask<Void, Void, Boolean> {
+        ProgressDialog ringProgressDialog;
 
-       @Override
-       protected void onPreExecute() {
-           super.onPreExecute();
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            ringProgressDialog = ProgressDialog.show(PostActivity.this, null, getResources().getString(R.string.please_wait), true);
+            ringProgressDialog.setCancelable(true);
+        }
 
-           ringProgressDialog = ProgressDialog.show(PostActivity.this, getResources().getString(R.string.post), getResources().getString(R.string.please_wait), true);
-           ringProgressDialog.setCancelable(true);
-       }
+        @Override
+        protected Boolean doInBackground(Void... params) {
+            savePostObject = new SavePostObject();
+            savePostObject.setDetail(txt_detail.getText().toString());
+            savePostObject.setPostById(userId);
+            savePostObject.setPostType("0");
+            if (imageData.size() > 0) {
+                imageUploadURL = new ArrayList();
+                int imageCount = 0;
+                final boolean[] fail = {false};
+                for (String e : imageData) {
+                    imageCount++;
+                    System.out.println(e);
+                    int randomNum = 500 + (int) ((Math.random() * 1204006080) / Math.random());
+                    File file = new File(getCacheDir(), "pattaya-post" + randomNum);
+                    try {
+                        file.createNewFile();
+                    } catch (IOException error) {
+                        error.printStackTrace();
+                    }
+                    Bitmap bitmap = null;
+                    try {
+                        bitmap = Glide.with(Application.getContext())
+                                .load(e)
+                                .asBitmap()
+                                .fitCenter()
+                                .into(500, 500) // Width and height
+                                .get();
+                    } catch (InterruptedException error) {
+                        error.printStackTrace();
+                    } catch (ExecutionException error) {
+                        error.printStackTrace();
+                    }
 
-       @Override
-       protected Boolean doInBackground(Void... params) {
-           savePostObject = new SavePostObject();
-           savePostObject.setDetail(txt_detail.getText().toString());
-           savePostObject.setPostById(userId);
-           savePostObject.setPostType("0");
-           if (imageData.size() > 0) {
-               imageUploadURL = new ArrayList();
-               int imageCount = 0;
-               final boolean[] fail = {false};
-               for (String e : imageData) {
-                   imageCount++;
-                   System.out.println(e);
-                   int randomNum = 500 + (int) ((Math.random() * 1204006080) / Math.random());
-                   File file = new File(getCacheDir(), "pattaya-post"+randomNum);
-                   try {
-                       file.createNewFile();
-                   } catch (IOException error) {
-                       error.printStackTrace();
-                   }
-                   Bitmap bitmap = null;
-                   try {
-                       bitmap = Glide.with(Application.getContext())
-                               .load(e)
-                               .asBitmap()
-                               .fitCenter()
-                               .into(500, 500) // Width and height
-                               .get();
-                   } catch (InterruptedException error) {
-                       error.printStackTrace();
-                   } catch (ExecutionException error) {
-                       error.printStackTrace();
-                   }
-
-                   System.out.println(bitmap);
-                   ByteArrayOutputStream bos = new ByteArrayOutputStream();
-                   bitmap.compress(Bitmap.CompressFormat.JPEG, MasterData.PERCEN_OF_IMAGE_FILE, bos);
-                   byte[] bitmapdata = bos.toByteArray();
-                   FileOutputStream fos = null;
-                   try {
-                       fos = new FileOutputStream(file);
-                   } catch (FileNotFoundException error) {
-                       error.printStackTrace();
-                   }
-                   try {
-                       fos.write(bitmapdata);
-                       fos.flush();
-                       fos.close();
-                   } catch (IOException error) {
-                       error.printStackTrace();
-                   }
-
+                    System.out.println(bitmap);
+                    ByteArrayOutputStream bos = new ByteArrayOutputStream();
+                    bitmap.compress(Bitmap.CompressFormat.JPEG, MasterData.PERCEN_OF_IMAGE_FILE, bos);
+                    byte[] bitmapdata = bos.toByteArray();
+                    FileOutputStream fos = null;
+                    try {
+                        fos = new FileOutputStream(file);
+                    } catch (FileNotFoundException error) {
+                        error.printStackTrace();
+                    }
+                    try {
+                        fos.write(bitmapdata);
+                        fos.flush();
+                        fos.close();
+                    } catch (IOException error) {
+                        error.printStackTrace();
+                    }
 
 
-                   //String mimeType = URLConnection.guessContentTypeFromName(file.getName());
-                   System.out.println(file.getName().toString());
-                   final long totalSize = file.length();
-                   final int finalImageCount = imageCount;
-                   listener = new ProgressListener() {
-                       String fileID = "Please wait... \nimage" + finalImageCount + " upload complete";
+                    //String mimeType = URLConnection.guessContentTypeFromName(file.getName());
+                    System.out.println(file.getName().toString());
+                    final long totalSize = file.length();
+                    final int finalImageCount = imageCount;
+                    listener = new ProgressListener() {
+                        String fileID = "Please wait... \nimage" + finalImageCount + " upload complete";
 
-                       @Override
-                       public void transferred(long num) {
-                           final int[] count = {Math.round(((num / (float) totalSize) * 100))};
-                           runOnUiThread(new Thread(new Runnable() {
-                               public void run() {
-                                   if (count[0] == 100) {
-                                       ringProgressDialog.setMessage(fileID);
-                                   }
-                               }
-                           }));
-
-
-                       }
-                   };
-
-                   restFulQuearyUpload.uploadImage(new CountingTypedFile("image/jpeg", file, listener), new Callback<Response>() {
-                       @Override
-                       public void success(Response result, Response response) {
-
-                           BufferedReader reader = null;
-                           StringBuilder sb = new StringBuilder();
-                           try {
-
-                               reader = new BufferedReader(new InputStreamReader(result.getBody().in()));
-
-                               String line;
-
-                               try {
-                                   while ((line = reader.readLine()) != null) {
-                                       sb.append(line);
-                                   }
-                               } catch (IOException e) {
-                                   e.printStackTrace();
-                               }
-                           } catch (IOException e) {
-                               e.printStackTrace();
-                           }
+                        @Override
+                        public void transferred(long num) {
+                            final int[] count = {Math.round(((num / (float) totalSize) * 100))};
+                            runOnUiThread(new Thread(new Runnable() {
+                                public void run() {
+                                    if (count[0] == 100) {
+                                        ringProgressDialog.setMessage(fileID);
+                                    }
+                                }
+                            }));
 
 
-                           String JsonConvertData = "{data:" + sb.toString() + "}";
+                        }
+                    };
 
-                           FileListObject fileListObject = new Gson().fromJson(JsonConvertData, FileListObject.class);
+                    restFulQuearyUpload.uploadImage(new CountingTypedFile("image/jpeg", file, listener), new Callback<Response>() {
+                        @Override
+                        public void success(Response result, Response response) {
 
-                           imageUploadURL.add(fileListObject.getData().get(0).getUrl());
-                           if (imageUploadURL.size() == imageData.size()) {
-                               savePostObject.setPostImageList(imageUploadURL);
-                               runOnUiThread(new Thread(new Runnable() {
-                                   public void run() {
-                                       ringProgressDialog.dismiss();
-                                   }
-                               }));
-                               savePost();
-                           }
+                            BufferedReader reader = null;
+                            StringBuilder sb = new StringBuilder();
+                            try {
 
-                       }
+                                reader = new BufferedReader(new InputStreamReader(result.getBody().in()));
 
-                       @Override
-                       public void failure(RetrofitError error) {
-                           System.out.println("error = [" + error + "]");
-                           fail[0] = true;
+                                String line;
 
-                           alertDialogFailtoServer();
-                           runOnUiThread(new Thread(new Runnable() {
-                               public void run() {
-                                   ringProgressDialog.dismiss();
-                               }
-                           }));
-                       }
-                   });
-
-                   if (fail[0]) break;
+                                try {
+                                    while ((line = reader.readLine()) != null) {
+                                        sb.append(line);
+                                    }
+                                } catch (IOException e) {
+                                    e.printStackTrace();
+                                }
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }
 
 
-               }
-           }else {
-               runOnUiThread(new Thread(new Runnable() {
-                   public void run() {
-                       ringProgressDialog.dismiss();
-                   }
-               }));
-               savePost();
-           }
+                            String JsonConvertData = "{data:" + sb.toString() + "}";
 
-           return null;
-       }
-   }
+                            FileListObject fileListObject = new Gson().fromJson(JsonConvertData, FileListObject.class);
+
+                            imageUploadURL.add(fileListObject.getData().get(0).getUrl());
+                            if (imageUploadURL.size() == imageData.size()) {
+                                savePostObject.setPostImageList(imageUploadURL);
+
+                                ringProgressDialog.dismiss();
+
+                                savePost();
+                            }
+
+                        }
+
+                        @Override
+                        public void failure(RetrofitError error) {
+                            System.out.println("error = [" + error + "]");
+                            fail[0] = true;
+
+                            alertDialogFailtoServer();
+
+                            ringProgressDialog.dismiss();
+
+                        }
+                    });
+
+                    if (fail[0]) break;
+
+
+                }
+            } else {
+                ringProgressDialog.dismiss();
+                savePost();
+            }
+
+            return null;
+        }
+    }
 
 
 }

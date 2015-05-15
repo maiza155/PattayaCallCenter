@@ -42,12 +42,13 @@ import retrofit.client.Response;
 
 import static com.pattaya.pattayacallcenter.R.drawable.asset_icon_status_flag;
 import static com.pattaya.pattayacallcenter.R.drawable.asset_icon_status_gray;
-import static com.pattaya.pattayacallcenter.R.drawable.asset_icon_status_green;
 import static com.pattaya.pattayacallcenter.R.drawable.custom_date_bg_green;
 import static com.pattaya.pattayacallcenter.R.drawable.custom_date_bg_red;
 import static com.pattaya.pattayacallcenter.R.drawable.custom_date_bg_yellow;
 
 public class CaseDetailMemberActivity extends ActionBarActivity {
+    private static SharedPreferences spConfig;
+    private static SharedPreferences sp;
     private ImageButton btn;
     private TextView titleTextView;
     private LinearLayout layout;
@@ -58,12 +59,6 @@ public class CaseDetailMemberActivity extends ActionBarActivity {
     private List<ImageObject> imageData;
     private RestAdapter webserviceConnector = WebserviceConnector.getInstanceCase();
     private RestFulQueary adapterRest = null;
-
-
-    private static SharedPreferences spConfig;
-    private static SharedPreferences sp;
-
-
     private CaseDataObject dataPlace;
     private int caseId;
     private String token;
@@ -118,13 +113,28 @@ public class CaseDetailMemberActivity extends ActionBarActivity {
     void setTextTO() {
         if (arrayList.size() > 0) {
             if (STATE_FORWARD == 1) {
-                txtTo.setText(arrayList.get(0).getName() + " เเละอีก 2 หน่วยงาน");
+                if (arrayList.size() == 1) {
+                    txtTo.setText(arrayList.get(0).getName());
+                } else if (arrayList.size() == 2) {
+                    txtTo.setText(arrayList.get(0).getName() + " เเละ " + arrayList.get(1).getName());
+                } else {
+                    txtTo.setText(arrayList.get(0).getName() + " เเละอีก 2 หน่วยงาน");
+                }
+
             } else if (STATE_FORWARD == 2) {
-                txtTo.setText(arrayList.get(0).getName() + " เเละอีก 2 คน");
+                if (arrayList.size() == 1) {
+                    txtTo.setText(arrayList.get(0).getName());
+                } else if (arrayList.size() == 2) {
+                    txtTo.setText(arrayList.get(0).getName() + " เเละ " + arrayList.get(1).getName());
+                } else {
+                    txtTo.setText(arrayList.get(0).getName() + " เเละอีก 2 คน");
+                }
+
             }
         } else {
-            txtTo.setText(getResources().getString(R.string.no_result));
+            txtTo.setText("ไม่มีข้อมูล");
         }
+
 
     }
 
@@ -227,7 +237,7 @@ public class CaseDetailMemberActivity extends ActionBarActivity {
                     layout.addView(image);
                 } else {
                     ImageView image = new ImageView(CaseDetailMemberActivity.this);
-                    Drawable drawable = getResources().getDrawable(asset_icon_status_green);
+                    Drawable drawable = getResources().getDrawable(asset_icon_status_gray);
                     image.setImageDrawable(drawable);
                     layout.addView(image);
                 }

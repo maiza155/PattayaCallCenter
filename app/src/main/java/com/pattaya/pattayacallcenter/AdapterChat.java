@@ -7,13 +7,16 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Point;
 import android.os.AsyncTask;
 import android.util.Base64;
 import android.util.Log;
+import android.view.Display;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.widget.BaseAdapter;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
@@ -519,6 +522,12 @@ public class AdapterChat extends BaseAdapter {
 
 
         Holder(View v) {
+            WindowManager wm = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
+            Display display = wm.getDefaultDisplay();
+            Point size = new Point();
+            display.getSize(size);
+            int width = size.x;
+            int height = size.y;
             pic = (RoundedImageView) v.findViewById(R.id.pic_profile);
             txtTime = (TextView) v.findViewById(R.id.txt_time);
             txtMessage = (TextView) v.findViewById(R.id.txt_msg);
@@ -528,6 +537,8 @@ public class AdapterChat extends BaseAdapter {
             imageContrainer = (RelativeLayout) v.findViewById(R.id.image_container);
             progress = (ProgressBar) v.findViewById(R.id.progress);
             imageViewMsg = (ImageView) v.findViewById(R.id.image);
+
+            txtMessage.setMaxWidth(width / 2);
 
 
         }

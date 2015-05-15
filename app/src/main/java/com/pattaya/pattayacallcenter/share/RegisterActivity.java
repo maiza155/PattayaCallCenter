@@ -32,6 +32,15 @@ import retrofit.client.Response;
 
 
 public class RegisterActivity extends BaseActivity implements AlertMessageFragment.OnFragmentInteractionListener {
+    public final Pattern EMAIL_ADDRESS_PATTERN = Pattern.compile(
+            "[a-zA-Z0-9\\+\\.\\_\\%\\-\\+]{1,256}" +
+                    "\\@" +
+                    "[a-zA-Z0-9][a-zA-Z0-9\\-]{0,64}" +
+                    "(" +
+                    "\\." +
+                    "[a-zA-Z0-9][a-zA-Z0-9\\-]{0,25}" +
+                    ")+"
+    );
     Button btnSave;
     ImageButton btn;
     TextView titleTextView;
@@ -64,23 +73,13 @@ public class RegisterActivity extends BaseActivity implements AlertMessageFragme
         setClickListener();
     }
 
-    public final Pattern EMAIL_ADDRESS_PATTERN = Pattern.compile(
-            "[a-zA-Z0-9\\+\\.\\_\\%\\-\\+]{1,256}" +
-                    "\\@" +
-                    "[a-zA-Z0-9][a-zA-Z0-9\\-]{0,64}" +
-                    "(" +
-                    "\\." +
-                    "[a-zA-Z0-9][a-zA-Z0-9\\-]{0,25}" +
-                    ")+"
-    );
-
     void regist() {
         final ProgressDialog ringProgressDialog = ProgressDialog.show(this, getResources().getString(R.string.register), getResources().getString(R.string.please_wait), true);
         ringProgressDialog.setCancelable(false);
         RegistObject registObject = new RegistObject();
 
         registObject.setUsername(email.getText().toString());
-        registObject.setFristname(name.getText().toString());
+        registObject.setFirstname(name.getText().toString());
 
         registObject.setUserPassword(pass.getText().toString());
         registObject.setEmail(email.getText().toString());

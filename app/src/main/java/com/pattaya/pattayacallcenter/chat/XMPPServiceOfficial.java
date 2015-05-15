@@ -119,6 +119,8 @@ public class XMPPServiceOfficial extends Service {
                         } else {
                             Log.e("XMPPSerVICE", "Break .. .. ... .. ." + xmppManage.getmConnection().isConnected());
                             xmppManage.createPubSub();
+                            xmppManage.subscribePubSub();
+
                             SharedPreferences spConfig = Application.getContext().getSharedPreferences(MasterData.SHARED_NAME_CONFIG_FILE, Context.MODE_PRIVATE);
                             String token = spConfig.getString("TOKEN", "null");
                             String clientId = spConfig.getString("CLIENT_ID", "null");

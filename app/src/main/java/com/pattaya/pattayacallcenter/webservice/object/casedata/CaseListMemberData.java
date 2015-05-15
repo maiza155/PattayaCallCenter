@@ -13,7 +13,7 @@ public class CaseListMemberData {
     Boolean isNew;
     int percentSuccess;
     String date;
-    Integer priority;
+    Integer priorityString;
     String casesType;
 
     public String getCasesType() {
@@ -21,7 +21,7 @@ public class CaseListMemberData {
     }
 
     public Integer getPriority() {
-        return priority;
+        return priorityString;
     }
 
     public String getDate() {

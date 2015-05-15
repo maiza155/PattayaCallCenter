@@ -61,7 +61,14 @@ public class NotifyChat {
         // Gets an instance of the NotificationManager service
 
         // Builds the notification and issues it.
-        mNotifyMgr.notify(mNotificationId, notification);
+        try {
+            mNotifyMgr.notify(mNotificationId, notification);
+        } catch (SecurityException se) {
+            se.printStackTrace();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
     }
 
 

@@ -84,6 +84,9 @@ public class CloseCaseActivity extends ActionBarActivity implements View.OnClick
     // widget
     View btn;
     TextView titleTextView;
+
+
+    TextView btnImg;
     int userId;
     String token;
     String clientId;
@@ -95,6 +98,7 @@ public class CloseCaseActivity extends ActionBarActivity implements View.OnClick
     RestAdapter webserviceConnector = WebserviceConnector.getInstanceCase();
     RestFulQueary adapterRest = null;
     ProgressDialog ringProgressDialog;
+    String jid;
     private int year, month, day, hour, minute;
     private Calendar calendar;
     private String displayName;
@@ -111,7 +115,7 @@ public class CloseCaseActivity extends ActionBarActivity implements View.OnClick
         txtDetail = (EditText) findViewById(R.id.edit_textdetail);
         time = (EditText) findViewById(R.id.time);
         data = new CloseCaseObject();
-
+        btnImg = (TextView) findViewById(R.id.btn_image);
 
         adapterRest = webserviceConnector.create(RestFulQueary.class);
         adapterRestUpload = webserviceConnectorUpload.create(RestFulQueary.class);
@@ -126,6 +130,9 @@ public class CloseCaseActivity extends ActionBarActivity implements View.OnClick
         time.setOnClickListener(this);
         initImageManage();
 
+        time.setText(dateFormatter.format(calendar.getTime()));
+        btnImg.setOnClickListener(this);
+        btnImg.setOnCreateContextMenuListener(this);
 
     }
 
@@ -138,6 +145,7 @@ public class CloseCaseActivity extends ActionBarActivity implements View.OnClick
         userId = sp.getInt(MasterData.SHARED_USER_USER_ID, -10);
         displayImage = sp.getString(MasterData.SHARED_USER_IMAGE, null);
         displayName = sp.getString(MasterData.SHARED_USER_DISPLAY_NAME, null);
+        jid = sp.getString(MasterData.SHARED_USER_JID, null);
         spConfig = Application.getContext().getSharedPreferences(MasterData.SHARED_NAME_CONFIG_FILE, Context.MODE_PRIVATE);
         token = spConfig.getString(MasterData.SHARED_CONFIG_TOKEN, null);
         clientId = spConfig.getString(MasterData.SHARED_CONFIG_CLIENT_ID, null);
@@ -238,12 +246,18 @@ public class CloseCaseActivity extends ActionBarActivity implements View.OnClick
                                 pub.setPrimarykey(complainId);
                                 pub.setName(displayName);
                                 pub.setTitle(caseName);
+                                if (!e.getJid().matches(jid)) {
+                                    XMPPManage.getInstance().new TaskSendNotify(pub).execute();
+                                }
 
-                                XMPPManage.getInstance().new TaskSendNotify(pub).execute();
+
                             }
 
                             ringProgressDialog.dismiss();
                             BusProvider.getInstance().post("update_case_list");
+                            Intent i = new Intent();
+                            setResult(Activity.RESULT_OK, i);
+
                             finish();
 
                         }
@@ -330,6 +344,8 @@ public class CloseCaseActivity extends ActionBarActivity implements View.OnClick
             finish();
         } else if (v == time) {
             fromDatePickerDialog.show();
+        } else if (v == btnImg) {
+            v.showContextMenu();
         }
 
     }

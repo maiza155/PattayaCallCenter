@@ -7,7 +7,7 @@ public class RegistObject {
     String username;
     String userPassword;
     String email;
-    String fristname;
+    String firstname;
     String lastname;
     String idCard;
     String mobile;
@@ -37,11 +37,11 @@ public class RegistObject {
     }
 
     public String getFristname() {
-        return fristname;
+        return firstname;
     }
 
-    public void setFristname(String fristname) {
-        this.fristname = fristname;
+    public void setFirstname(String fristname) {
+        this.firstname = fristname;
     }
 
     public String getLastname() {

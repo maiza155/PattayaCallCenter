@@ -109,6 +109,7 @@ public class CaseForwardActivity extends ActionBarActivity implements View.OnCli
     private RestAdapter openfireConnectorJson = RestAdapterOpenFire.getInstanceJson();
     private OpenfireQueary openfireQuearyJson = openfireConnectorJson.create(OpenfireQueary.class);
     private int STATE_FORWARD = 0;
+    private String jid;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -155,6 +156,8 @@ public class CaseForwardActivity extends ActionBarActivity implements View.OnCli
         userId = sp.getInt(MasterData.SHARED_USER_USER_ID, -10);
         displayImage = sp.getString(MasterData.SHARED_USER_IMAGE, null);
         displayName = sp.getString(MasterData.SHARED_USER_DISPLAY_NAME, null);
+        jid = sp.getString(MasterData.SHARED_USER_JID, null);
+
         spConfig = Application.getContext().getSharedPreferences(MasterData.SHARED_NAME_CONFIG_FILE, Context.MODE_PRIVATE);
         token = spConfig.getString(MasterData.SHARED_CONFIG_TOKEN, null);
         clientId = spConfig.getString(MasterData.SHARED_CONFIG_CLIENT_ID, null);
@@ -266,7 +269,7 @@ public class CaseForwardActivity extends ActionBarActivity implements View.OnCli
 
 
     void uploadImage() {
-       new  TaskResizeUpload().execute();
+        new TaskResizeUpload().execute();
 
     }
 
@@ -332,8 +335,9 @@ public class CaseForwardActivity extends ActionBarActivity implements View.OnCli
                                     pub.setCaseId(caseId);
                                     pub.setName(displayName);
                                     pub.setTitle(caseName);
-
-                                    listNotify.add(pub);
+                                    if (!e.getJid().matches(jid)) {
+                                        listNotify.add(pub);
+                                    }
                                 }
                                 members.setMember(listJid);
                                 chatRoomObject.setMembers(members);
@@ -347,8 +351,10 @@ public class CaseForwardActivity extends ActionBarActivity implements View.OnCli
                                             XMPPManage.getInstance().new TaskSendNotify(e).execute();
                                         }
                                         ringProgressDialog.dismiss();
-                                        finish();
                                         BusProvider.getInstance().post("update_case_list");
+                                        Intent i = new Intent();
+                                        setResult(Activity.RESULT_OK, i);
+                                        finish();
 
                                     }
 
@@ -501,6 +507,7 @@ public class CaseForwardActivity extends ActionBarActivity implements View.OnCli
 
     class TaskResizeUpload extends AsyncTask<Void, Void, Boolean> {
         ProgressDialog ringProgressDialog;
+
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
@@ -560,9 +567,6 @@ public class CaseForwardActivity extends ActionBarActivity implements View.OnCli
                         final long totalSize = file.length();
 
 
-
-
-
                         final int finalImageCount = imageCount;
                         ProgressListener listener = new ProgressListener() {
                             String fileID = "Please wait... \nimage" + finalImageCount + " upload complete";
@@ -618,15 +622,23 @@ public class CaseForwardActivity extends ActionBarActivity implements View.OnCli
                                     data.setTaskImageList(listImageURL);
                                     saveData();
 
+                                    runOnUiThread(new Thread(new Runnable() {
+                                        public void run() {
+                                            ringProgressDialog.dismiss();
+                                        }
+                                    }));
 
-                                    ringProgressDialog.dismiss();
                                 }
                             }
 
                             @Override
                             public void failure(RetrofitError error) {
                                 System.out.println("error = [" + error + "]");
-                                ringProgressDialog.dismiss();
+                                runOnUiThread(new Thread(new Runnable() {
+                                    public void run() {
+                                        ringProgressDialog.dismiss();
+                                    }
+                                }));
                                 Toast.makeText(getApplication(), "Cannot upload file please try again", Toast.LENGTH_SHORT).show();
 
                             }
@@ -636,7 +648,11 @@ public class CaseForwardActivity extends ActionBarActivity implements View.OnCli
                         imageObject.setTaskImage(e.getPath());
                         listImageURL.add(imageObject);
                         if (listImageURL.size() == mGridAdapter.getData().size()) {
-                            ringProgressDialog.dismiss();
+                            runOnUiThread(new Thread(new Runnable() {
+                                public void run() {
+                                    ringProgressDialog.dismiss();
+                                }
+                            }));
                             data.setTaskImageList(listImageURL);
                             saveData();
 
@@ -645,6 +661,11 @@ public class CaseForwardActivity extends ActionBarActivity implements View.OnCli
                 }
 
             } else {
+                runOnUiThread(new Thread(new Runnable() {
+                    public void run() {
+                        ringProgressDialog.dismiss();
+                    }
+                }));
                 data.setTaskImageList(listImageURL);
                 saveData();
 

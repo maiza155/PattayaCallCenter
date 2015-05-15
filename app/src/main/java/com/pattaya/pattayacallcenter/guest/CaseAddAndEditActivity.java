@@ -223,7 +223,7 @@ public class CaseAddAndEditActivity extends ActionBarActivity implements View.On
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        ringProgressDialog = ProgressDialog.show(CaseAddAndEditActivity.this, getResources().getString(R.string.save), getResources().getString(R.string.please_wait), true);
+                        ringProgressDialog = ProgressDialog.show(CaseAddAndEditActivity.this, null, getResources().getString(R.string.please_wait), true);
                         ringProgressDialog.setCancelable(true);
                     }
                 });
@@ -418,7 +418,7 @@ public class CaseAddAndEditActivity extends ActionBarActivity implements View.On
     }
 
     void getData() {
-        final ProgressDialog ringProgressDialog = ProgressDialog.show(this, getResources().getString(R.string.load_data), getResources().getString(R.string.please_wait), true);
+        final ProgressDialog ringProgressDialog = ProgressDialog.show(this, null, getResources().getString(R.string.please_wait), true);
         ringProgressDialog.setCancelable(true);
         GetComplainObject getComplainObject = new GetComplainObject();
         getComplainObject.setAccessToken(token);

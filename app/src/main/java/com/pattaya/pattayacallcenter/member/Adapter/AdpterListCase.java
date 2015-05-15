@@ -38,6 +38,7 @@ public class AdpterListCase extends BaseAdapter {
     SharedPreferences settings;
     private LayoutInflater mInflater;
     private Context context;
+
     public AdpterListCase(List<CaseListMemberData> caseListMemberDataList, Context context) {
         this.data = caseListMemberDataList;
         this.context = context;
@@ -115,6 +116,8 @@ public class AdpterListCase extends BaseAdapter {
                 image.setImageDrawable(drawable);
                 holder.layout.addView(image);
             }
+
+
         }
 
 

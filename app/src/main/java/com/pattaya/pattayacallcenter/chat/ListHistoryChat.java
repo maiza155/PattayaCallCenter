@@ -1,5 +1,10 @@
 package com.pattaya.pattayacallcenter.chat;
 
+import android.content.Context;
+import android.content.SharedPreferences;
+
+import com.pattaya.pattayacallcenter.Application;
+import com.pattaya.pattayacallcenter.Data.MasterData;
 import com.pattaya.pattayacallcenter.Data.Messages;
 
 import org.jivesoftware.smack.packet.IQ;
@@ -25,6 +30,8 @@ public class ListHistoryChat implements IQProvider {
     DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault());
     ChatHistoryData chatHistoryData = ChatHistoryData.getInstance();
 
+
+
     @Override
     public IQ parseIQ(XmlPullParser parser) throws Exception {
         ArrayList<Messages> messageArr = new ArrayList<>();
@@ -32,6 +39,8 @@ public class ListHistoryChat implements IQProvider {
         Messages messages = null;
         long time = 0;
         int eventType = parser.getEventType();
+        SharedPreferences spUser = Application.getContext().getSharedPreferences(MasterData.SHARED_NAME_USER_FILE, Context.MODE_PRIVATE);
+        Boolean isOfficial = spUser.getBoolean(MasterData.SHARED_IS_OFFICIAL, false);
         /*
         DOM2XmlPullBuilder dom2XmlPullBuilder = new DOM2XmlPullBuilder();
         Element element = dom2XmlPullBuilder.parseSubTree(parser);
@@ -78,8 +87,12 @@ public class ListHistoryChat implements IQProvider {
                     Date d = new Date((time + tempTimp) * 1000);
                     // String from = parser.getAttributeValue("", "jid");
                     // Log.d("FROM >>>>>>>>>>>>>", "" + from);
+                    if(isOfficial){
+                        messages.setSender(XMPPManageOfficial.getInstance().getmConnection().getUser().split("/")[0]);
+                    }else{
+                        messages.setSender(XMPPManage.getInstance().getmConnection().getUser().split("/")[0]);
+                    }
 
-                    messages.setSender(XMPPManage.getInstance().getmConnection().getUser().split("/")[0]);
                     messages.setTime(dateFormat.format(d)); // set Time
                     if (map.get(messages.getTime()) == null) {
                         map.put(messages.getTime(), null);

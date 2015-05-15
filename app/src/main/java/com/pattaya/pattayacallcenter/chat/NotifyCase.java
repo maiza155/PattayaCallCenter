@@ -51,7 +51,7 @@ public class NotifyCase {
         SharedPreferences spConfig = Application.getContext().getSharedPreferences(MasterData.SHARED_NAME_CONFIG_FILE, Context.MODE_PRIVATE);
         Boolean alertSound = spConfig.getBoolean(MasterData.SHARED_CONFIG_ALERT_SOUND, true);
         Boolean alert = spConfig.getBoolean(MasterData.SHARED_CONFIG_ALERT, true);
-
+        System.out.println(object.getDisplayData());
 
         Long millis = Long.parseLong(object.getDisplayData(), 10);
         SimpleDateFormat mysdf = new SimpleDateFormat("d MMM yyyy HH:mm ");
@@ -118,14 +118,20 @@ public class NotifyCase {
 
         }
 
-
+        //BusProvider.getInstance().post("update_case_list");
         notification.flags |= Notification.FLAG_AUTO_CANCEL;
         // Sets an ID for the notification
         int mNotificationId = NOTIFY_CHAT_ID;
         // Gets an instance of the NotificationManager service
 
         // Builds the notification and issues it.
-        mNotifyMgr.notify(mNotificationId, notification);
+        try {
+            mNotifyMgr.notify(mNotificationId, notification);
+        } catch (SecurityException se) {
+            se.printStackTrace();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     public static void setNotifyChatCase(String name, String complainId, String msg) {
@@ -173,7 +179,7 @@ public class NotifyCase {
                 public void success(CaseMainObject caseMainObject, Response response) {
                     RemoteViews contentView = new RemoteViews(Application.getContext().getPackageName(),
                             R.layout.notification_layout);
-
+                    Log.e("TAG Notification CaseID", "" + caseMainObject.getRefCasesId());
                     contentView.setTextViewText(R.id.header, "สนทนาเคส");
                     contentView.setTextViewText(R.id.title, "ชื่อเรื่อง:" + Application.getContext().getResources().getString(R.string.tab) + caseMainObject.getComplaintName());
                     contentView.setTextViewText(R.id.name, "ชื่อผู้เเจ้ง:" + Application.getContext().getResources().getString(R.string.tab) + name);
@@ -246,7 +252,13 @@ public class NotifyCase {
                     // Gets an instance of the NotificationManager service
 
                     // Builds the notification and issues it.
-                    mNotifyMgr.notify(mNotificationId, notification);
+                    try {
+                        mNotifyMgr.notify(mNotificationId, notification);
+                    } catch (SecurityException se) {
+                        se.printStackTrace();
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
 
 
                 }

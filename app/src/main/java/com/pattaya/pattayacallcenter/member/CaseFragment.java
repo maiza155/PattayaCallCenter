@@ -1,5 +1,6 @@
 package com.pattaya.pattayacallcenter.member;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -196,8 +197,12 @@ public class CaseFragment extends Fragment implements View.OnClickListener
 
     @Subscribe
     public void updateListData(String s) {
+        Activity activity = getActivity();
         if (s.matches("update_case_list")) {
-            getCaseList("");
+            if (activity != null) {
+                getCaseList("");
+            }
+
         } else if (s.matches("case_count")) {
             if (adpterListCase != null) {
                 adpterListCase.notifyDataSetChanged();
@@ -367,8 +372,8 @@ public class CaseFragment extends Fragment implements View.OnClickListener
 
 
     void getCaseList(final String s) {
-        new AsyncTask<Void, Void, Boolean>() {
 
+        new AsyncTask<Void, Void, Boolean>() {
             @Override
             protected void onPreExecute() {
                 super.onPreExecute();
@@ -396,15 +401,12 @@ public class CaseFragment extends Fragment implements View.OnClickListener
                         try {
                             reader = new BufferedReader(new InputStreamReader(result.getBody().in()));
                             String line;
-
-                            try {
-                                while ((line = reader.readLine()) != null) {
-                                    sb.append(line);
-                                }
-                            } catch (IOException e) {
-                                e.printStackTrace();
+                            while ((line = reader.readLine()) != null) {
+                                sb.append(line);
                             }
+
                         } catch (IOException e) {
+                            System.out.println("result = [" + result + "], response2 = [" + response2 + "]");
                             e.printStackTrace();
                         }
                         String JsonConvertData = "{data:" + sb.toString() + "}";
@@ -514,6 +516,7 @@ public class CaseFragment extends Fragment implements View.OnClickListener
 
     @Override
     public void afterTextChanged(Editable s) {
+
         String text = s.toString();
         getCaseList(text);
 

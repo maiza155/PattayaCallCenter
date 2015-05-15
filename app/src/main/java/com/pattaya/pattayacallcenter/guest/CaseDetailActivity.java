@@ -119,7 +119,7 @@ public class CaseDetailActivity extends ActionBarActivity implements View.OnClic
         getData();
 
 
-        if (isOfficial) {
+        if (isOfficial && caseId > 0) {
             btnEdit.setVisibility(View.GONE);
             btnDelete.setVisibility(View.GONE);
         }
@@ -141,7 +141,7 @@ public class CaseDetailActivity extends ActionBarActivity implements View.OnClic
     }
 
     void getData() {
-        final ProgressDialog ringProgressDialog = ProgressDialog.show(this, getResources().getString(R.string.save), getResources().getString(R.string.please_wait), true);
+        final ProgressDialog ringProgressDialog = ProgressDialog.show(this, null, getResources().getString(R.string.please_wait), true);
         ringProgressDialog.setCancelable(false);
         GetComplainObject getComplainObject = new GetComplainObject();
         getComplainObject.setAccessToken(token);

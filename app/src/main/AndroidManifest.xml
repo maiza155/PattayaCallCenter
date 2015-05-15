@@ -14,7 +14,7 @@
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="com.google.android.c2dm.permission.RECEIVE" />
-
+    <uses-permission android:name="android.permission.VIBRATE"></uses-permission>
     <!--
          The following two permissions are not required to use
          Google Maps Android API v2, but are recommended.
@@ -60,8 +60,7 @@
         </activity>
         <activity
             android:name=".share.RegisterActivity"
-            android:label="@string/title_activity_register"
-            android:windowSoftInputMode="adjustPan" />
+            android:label="@string/title_activity_register" />
         <activity
             android:name=".share.ForgetPasswordActivity"
             android:label="@string/title_activity_forget_password" />
@@ -186,8 +185,7 @@
             android:label="@string/title_activity_case_forward_to" />
         <activity
             android:name=".member.CloseCaseActivity"
-            android:label="@string/title_activity_close_case"
-            android:windowSoftInputMode="adjustPan"></activity>
+            android:label="@string/title_activity_close_case"></activity>
         <activity
             android:name=".member.PostActivity"
             android:label="@string/title_activity_post"></activity>

@@ -15,6 +15,7 @@ import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.PopupWindow;
 
+import com.bumptech.glide.Glide;
 import com.pattaya.pattayacallcenter.chat.DatabaseChatHelper;
 import com.pattaya.pattayacallcenter.customview.SlideMenuManage;
 
@@ -25,31 +26,12 @@ import java.util.ArrayList;
  * Created by SWF on 2/6/2015.
  */
 public class AdapterStricker extends BaseAdapter {
-    private LayoutInflater mInflater;
-    private int layoutResourceId = R.layout.custom_image_grid;
     Context context;
     ArrayList<byte[]> mArray;
-
     SlideMenuManage slideMenuManage;
     OnItemClickListener mItemClickListener;
-
-
-    public SlideMenuManage getSlideMenuManage() {
-        return slideMenuManage;
-    }
-
-    public interface OnItemClickListener {
-        public void onItemClick(String base64);
-    }
-
-    public void SetOnItemClickListener(final OnItemClickListener mItemClickListener) {
-        this.mItemClickListener = mItemClickListener;
-    }
-
-
-    public void setSlideMenuManage(SlideMenuManage slideMenuManage) {
-        this.slideMenuManage = slideMenuManage;
-    }
+    private LayoutInflater mInflater;
+    private int layoutResourceId = R.layout.custom_image_grid;
 
 
     public AdapterStricker(Context context, int resource, ArrayList mArray) {
@@ -57,6 +39,18 @@ public class AdapterStricker extends BaseAdapter {
         this.context = context;
         this.layoutResourceId = resource;
         this.mArray = mArray;
+    }
+
+    public SlideMenuManage getSlideMenuManage() {
+        return slideMenuManage;
+    }
+
+    public void setSlideMenuManage(SlideMenuManage slideMenuManage) {
+        this.slideMenuManage = slideMenuManage;
+    }
+
+    public void SetOnItemClickListener(final OnItemClickListener mItemClickListener) {
+        this.mItemClickListener = mItemClickListener;
     }
 
     public void addItem(byte[] data) {
@@ -84,7 +78,6 @@ public class AdapterStricker extends BaseAdapter {
         return 0;
     }
 
-
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         final int pos = position;
@@ -99,9 +92,13 @@ public class AdapterStricker extends BaseAdapter {
         }
 
         byte[] data = mArray.get(position);
-        Bitmap bitmap = BitmapFactory.decodeByteArray(data, 0, data.length);
+        Glide.with(context)
+                .load(data)
+                .override(200, 200)
+                .fitCenter()
+                .into(holder.imgSticker);
 
-        holder.imgSticker.setImageBitmap(bitmap);
+
         holder.imgSticker.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -152,11 +149,14 @@ public class AdapterStricker extends BaseAdapter {
         });
     }
 
-
     public void querySticker() {
         new queryStrickerTask().execute();
     }
 
+
+    public interface OnItemClickListener {
+        public void onItemClick(String base64);
+    }
 
     /**
      * Inner class

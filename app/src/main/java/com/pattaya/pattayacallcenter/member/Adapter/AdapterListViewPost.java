@@ -149,7 +149,7 @@ public class AdapterListViewPost extends BaseAdapter {
             Glide.with(context).load(listData.get(position).getPostImageList().get(0))
                     .error(R.drawable.img_not_found)
                     .placeholder(R.drawable.loading)
-                    .override(500, 500)
+                    .override(600, 600)
                     .fitCenter()
                     .into(holder.image1);
             holder.image1.setVisibility(View.VISIBLE);
@@ -158,14 +158,14 @@ public class AdapterListViewPost extends BaseAdapter {
             Glide.with(context).load((listData.get(position).getPostImageList().get(0).matches("")) ? "NoImage" : listData.get(position).getPostImageList().get(0))
                     .error(R.drawable.img_not_found)
                     .placeholder(R.drawable.loading)
-                    .override(200, 200)
-                    .centerCrop()
+                    .override(300, 300)
+                    .fitCenter()
                     .into(holder.image1);
             Glide.with(context).load((listData.get(position).getPostImageList().get(1).matches("")) ? "NoImage" : listData.get(position).getPostImageList().get(1))
                     .error(R.drawable.img_not_found)
                     .placeholder(R.drawable.loading)
-                    .override(200, 200)
-                    .centerCrop()
+                    .override(300, 300)
+                    .fitCenter()
                     .into(holder.image2);
             holder.image1.setVisibility(View.VISIBLE);
             holder.image2.setVisibility(View.VISIBLE);

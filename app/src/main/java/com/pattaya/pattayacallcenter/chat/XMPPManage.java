@@ -155,204 +155,208 @@ public class XMPPManage implements MessageListener {
     }
 
     static void messageReceiver() {
-        PacketFilter filter = new MessageTypeFilter(Message.Type.chat);
-        mConnection.addPacketListener(new PacketListener() {
-            public void processPacket(Packet packet) {
-                Log.e("XMPPManage", "Packet Reciver >>" + packet);
-                DelayInformation inf = null;
-                try {
-                    inf = packet.getExtension("x", "jabber:x:delay");
-                } catch (Exception e) {
-                    Log.e("XMPPManage Error", "" + e);
-                }
-                // get offline message timestamp
-                if (inf != null) {
-                    Date date = inf.getStamp();
-                    Log.e("XMPPManage", "Time Stamp" + date);
+        new AsyncTask<Void, Void, Boolean>() {
 
-                }
-                final Message message = (Message) packet;
-                String from = message.getFrom().split("/")[0];
-                Log.e("XMPPManage", "////////////// User  Chat //////////////////////////");
-                Log.e("XMPPManage", "From :: " + " >> " + from);
-                Log.e("XMPPManage", "Received message :: " + " >> " + message.getBody());
-                Log.d("XMPPManage", "XML Message  " + " >> " + message);
-
-                if (!from.equalsIgnoreCase(mConnection.getUser().split("/")[0])
-                        && DatabaseChatHelper.init().getOneUsers(from) != null) {
-                    Calendar c = Calendar.getInstance();
-                    System.out.println(sdf.format(c.getTime())); //2014/08/06 16:00:22
-                    final Messages messages = new Messages();
-                    messages.setMessage(message.getBody());
-                    messages.setRoom(from);
-                    messages.setSender(from);
-                    messages.setTime(sdf.format(c.getTime()));
-                    //BusProvider.getInstance().post(messages);
-                    getUserData(messages);
-
-
-                } else if (from.equalsIgnoreCase(xmppManage.getmConnection().getUser().split("/")[0])) {
-                    String room = message.getSubject();
-                    System.out.println("XMPPManage  " + "room = [" + room + "]");
-                    if (room != null) {
-                        Calendar c = Calendar.getInstance();
-                        System.out.println(sdf.format(c.getTime())); //2014/08/06 16:00:22
-                        Messages messages = new Messages();
-                        messages.setMessage(message.getBody());
-                        messages.setRoom(room);
-                        messages.setSender(from);
-                        messages.setTime(sdf.format(c.getTime()));
-                        // DataChat mData = new DataChat(otherUser, messages);
-                        databaseChatHelper.addLogs(messages);
-                        BusProvider.getInstance().post(messages);
-                    }
-
-                }
-
-
-            }
-        }, filter);
-        PacketFilter filterMulti = new MessageTypeFilter(Message.Type.groupchat);
-        mConnection.addPacketListener(new PacketListener() {
-            public void processPacket(Packet packet) {
-                Message message = (Message) packet;
-                DelayInformation inf = null;
-                try {
-                    inf = packet.getExtension("x", "jabber:x:delay");
-                } catch (Exception e) {
-                    Log.e("XMPPManage Error", "" + e);
-                }
-                //Log.e("TAG DELAY TIME", "" + inf);
-                if (inf == null) {
-                    String[] arry = message.getFrom().split("/");
-                    String room = arry[0];
-                    String from = arry[1] + "@" + SERVICE;
-                    Log.e("XMPPManage", "////////////// MultiUser  Chat //////////////////////////");
-                    Log.e("XMPPManage", "From :: " + " >> " + from);
-                    Log.e("XMPPManage", "room :: " + " >> " + room);
-                    Log.e("XMPPManage", "Received message :: " + " >> " + message.getBody());
-                    Log.d("XMPPManage", "XML Message :: " + " >> " + message);
-                    Calendar c = Calendar.getInstance();
-                    System.out.println(sdf.format(c.getTime())); //2014/08/06 16:00:22
-                    Messages messages = new Messages();
-                    messages.setMessage(message.getBody());
-                    messages.setRoom(room);
-                    messages.setSender(from);
-                    messages.setTime(sdf.format(c.getTime()));
-                    String checkcase = room.split("@")[0];
-                    checkcase = checkcase.split("-")[0];
-                    Log.e("IsOfficial is flase >>>", "    " + checkcase);
-                    isOfficial = sp.getBoolean(MasterData.SHARED_IS_OFFICIAL, false);
-                    if (checkcase.matches("case") && isOfficial) {
-                        Log.e("IsOfficial is true >>>", "    JA");
-
-                    } else {
-                        Log.e("IsOfficial is flase >>>", "    JA");
-                        getUserData(messages);
-                    }
-
-
-                }
-
-
-            }
-        }, filterMulti);
-
-        PacketFilter filter2 = new MessageTypeFilter(Message.Type.normal);
-
-        mConnection.addPacketListener(new PacketListener() {
-            public void processPacket(Packet packet) {
-                Log.e("Tag, ", "////////////// notify messages //////////////////////////");
-                PubsubObject pubsubObject = new PubsubObject();
-
-                Message message = (Message) packet;
-                SimpleXmlConverter xmlphase = new SimpleXmlConverter();
-
-                EventElement event = packet.getExtension("event", PubSubNamespace.EVENT.getXmlns());
-                ItemsExtension itemsElem = (ItemsExtension) event.getEvent();
-                List<? extends PacketExtension> pubItems = itemsElem.getItems();
-                PayloadItem itemPubsub = (PayloadItem) pubItems.get(0);
-
-                DataForm dataForm = (DataForm) itemPubsub.getPayload();
-                for (FormField e : dataForm.getFields()) {
-                    if (e.getVariable().matches("ownerImage")) {
-                        pubsubObject.setImage(e.getValues().get(0));
-                    } else if (e.getVariable().matches("ownerName")) {
-                        pubsubObject.setName(e.getValues().get(0));
-                    } else if (e.getVariable().matches("title")) {
-                        pubsubObject.setTitle(e.getValues().get(0));
-                    } else if (e.getVariable().matches("displayDate")) {
-                        pubsubObject.setDisplayData(String.valueOf(System.currentTimeMillis()));
-                    } else if (e.getVariable().matches("action")) {
-                        pubsubObject.setAction(e.getValues().get(0));
-                    } else if (e.getVariable().matches("primaryKey")) {
-                        pubsubObject.setPrimarykey(Integer.parseInt(e.getValues().get(0)));
-                    } else if (e.getVariable().matches("caseId")) {
-                        pubsubObject.setCaseId(Integer.parseInt(e.getValues().get(0)));
-                    } else if (e.getVariable().matches("complainId")) {
-                        pubsubObject.setComplainId(Integer.parseInt(e.getValues().get(0)));
-                    }
-                }
-
-                NotifyCase.setNotifyChat(pubsubObject);
-
-
-            }
-        }, filter2);
-        PacketFilter filter3 = new MessageTypeFilter(Message.Type.headline);
-
-        mConnection.addPacketListener(new PacketListener() {
-            public void processPacket(Packet packet) {
-                Message message = (Message) packet;
-                Log.e("Tag, ", "////////////// Other2 //////////////////////////");
-                Log.e("From :: ", " >> " + message.getFrom());
-                Log.e("Received message :: ", " >> " + message.getBody());
-                Log.d("XML Message :: ", " >> " + message);
-
-
-            }
-        }, filter3);
-
-
-        PacketFilter filter4 = new MessageTypeFilter(Message.Type.headline);
-
-        mConnection.addPacketListener(new PacketListener() {
-            public void processPacket(Packet packet) {
-                Message message = (Message) packet;
-                Log.e("Tag, ", "////////////// Other3 //////////////////////////");
-                Log.e("From :: ", " >> " + message.getFrom());
-                Log.e("Received message :: ", " >> " + message.getBody());
-                Log.d("XML Message :: ", " >> " + message);
-
-
-            }
-        }, filter4);
-
-
-        mConnection.addPacketListener(new PacketListener() {
             @Override
-            public void processPacket(Packet packet) throws SmackException.NotConnectedException {
-                // เช็ค PackageID จากที่  ChatHistoryData.class โดยดึงจากที่เราเรียกจาก Server ผ่าน ListDateHistory.class
+            protected Boolean doInBackground(Void... params) {
+                PacketFilter filter = new MessageTypeFilter(Message.Type.chat);
+                mConnection.addPacketListener(new PacketListener() {
+                    public void processPacket(Packet packet) {
+                        Log.e("XMPPManage", "Packet Reciver >>" + packet);
+                        DelayInformation inf = null;
+                        try {
+                            inf = packet.getExtension("x", "jabber:x:delay");
+                        } catch (Exception e) {
+                            Log.e("XMPPManage Error", "" + e);
+                        }
+                        // get offline message timestamp
+                        if (inf != null) {
+                            Date date = inf.getStamp();
+                            Log.e("XMPPManage", "Time Stamp" + date);
+
+                        }
+                        final Message message = (Message) packet;
+                        String from = message.getFrom().split("/")[0];
+                        Log.e("XMPPManage", "////////////// User  Chat //////////////////////////");
+                        Log.e("XMPPManage", "From :: " + " >> " + from);
+                        Log.e("XMPPManage", "Received message :: " + " >> " + message.getBody());
+                        Log.d("XMPPManage", "XML Message  " + " >> " + message);
+
+                        if (!from.equalsIgnoreCase(mConnection.getUser().split("/")[0])
+                                && DatabaseChatHelper.init().getOneUsers(from) != null) {
+                            Calendar c = Calendar.getInstance();
+                            System.out.println(sdf.format(c.getTime())); //2014/08/06 16:00:22
+                            final Messages messages = new Messages();
+                            messages.setMessage(message.getBody());
+                            messages.setRoom(from);
+                            messages.setSender(from);
+                            messages.setTime(sdf.format(c.getTime()));
+                            //BusProvider.getInstance().post(messages);
+                            getUserData(messages);
 
 
-                String room = chatHistoryData.getMap().get(packet.getPacketID());
+                        } else if (from.equalsIgnoreCase(xmppManage.getmConnection().getUser().split("/")[0])) {
+                            String room = message.getSubject();
+                            System.out.println("XMPPManage  " + "room = [" + room + "]");
+                            if (room != null) {
+                                Calendar c = Calendar.getInstance();
+                                System.out.println(sdf.format(c.getTime())); //2014/08/06 16:00:22
+                                Messages messages = new Messages();
+                                messages.setMessage(message.getBody());
+                                messages.setRoom(room);
+                                messages.setSender(from);
+                                messages.setTime(sdf.format(c.getTime()));
+                                // DataChat mData = new DataChat(otherUser, messages);
+                                databaseChatHelper.addLogs(messages);
+                                BusProvider.getInstance().post(messages);
+                            }
 
-                if (room != null) {
-                    // Log.e("TAG -Jingle+++++++ >>>", "" + packet.getPacketID());
-                    //Log.e("TAG -Jingle+++++++ >>>", "" + room);
-                    //เช็ค packet สุดท้ายที่ถูกส่งออกไป
-                    String lastPacket = chatHistoryData.getLastMaps().get(room);
-                    // Log.e("TAG -Jingle+++++++ >>>", "" + lastPacket);
-                    if (packet.getPacketID().equalsIgnoreCase(lastPacket)) {
-                        Log.e("XMPPManage", "Get Last Room Packet" + "" + lastPacket);
-                        databaseChatHelper.UpdateChatLogs(room, chatHistoryData.getRoom().get(room));
+                        }
+
+
                     }
-                    //ลบ key value ออกจาก map เนื่องจากได้รับการตอบกลับเเล้ว
-                    chatHistoryData.getMap().remove(packet.getPacketID());
-                } else {
-                    Log.d("TAG SET >>> REsult", "" + packet);
+                }, filter);
+                PacketFilter filterMulti = new MessageTypeFilter(Message.Type.groupchat);
+                mConnection.addPacketListener(new PacketListener() {
+                    public void processPacket(Packet packet) {
+                        Message message = (Message) packet;
+                        DelayInformation inf = null;
+                        try {
+                            inf = packet.getExtension("x", "jabber:x:delay");
+                        } catch (Exception e) {
+                            Log.e("XMPPManage Error", "" + e);
+                        }
+                        //Log.e("TAG DELAY TIME", "" + inf);
+                        if (inf == null) {
+                            String[] arry = message.getFrom().split("/");
+                            String room = arry[0];
+                            String from = arry[1] + "@" + SERVICE;
+                            Log.e("XMPPManage", "////////////// MultiUser  Chat //////////////////////////");
+                            Log.e("XMPPManage", "From :: " + " >> " + from);
+                            Log.e("XMPPManage", "room :: " + " >> " + room);
+                            Log.e("XMPPManage", "Received message :: " + " >> " + message.getBody());
+                            Log.d("XMPPManage", "XML Message :: " + " >> " + message);
+                            Calendar c = Calendar.getInstance();
+                            System.out.println(sdf.format(c.getTime())); //2014/08/06 16:00:22
+                            Messages messages = new Messages();
+                            messages.setMessage(message.getBody());
+                            messages.setRoom(room);
+                            messages.setSender(from);
+                            messages.setTime(sdf.format(c.getTime()));
+                            String checkcase = room.split("@")[0];
+                            checkcase = checkcase.split("-")[0];
+                            Log.e("IsOfficial is flase >>>", "    " + checkcase);
+                            isOfficial = sp.getBoolean(MasterData.SHARED_IS_OFFICIAL, false);
+                            if (checkcase.matches("case") && isOfficial) {
+                                Log.e("IsOfficial is true >>>", "    JA");
 
-                    List<Users> arrUsers = DatabaseChatHelper.init().getUsers();
+                            } else {
+                                Log.e("IsOfficial is flase >>>", "    JA");
+                                getUserData(messages);
+                            }
+
+
+                        }
+
+
+                    }
+                }, filterMulti);
+
+                PacketFilter filter2 = new MessageTypeFilter(Message.Type.normal);
+
+                mConnection.addPacketListener(new PacketListener() {
+                    public void processPacket(Packet packet) {
+                        Log.e("Tag, ", "////////////// notify messages //////////////////////////");
+                        PubsubObject pubsubObject = new PubsubObject();
+
+                        Message message = (Message) packet;
+                        SimpleXmlConverter xmlphase = new SimpleXmlConverter();
+
+                        EventElement event = packet.getExtension("event", PubSubNamespace.EVENT.getXmlns());
+                        ItemsExtension itemsElem = (ItemsExtension) event.getEvent();
+                        List<? extends PacketExtension> pubItems = itemsElem.getItems();
+                        PayloadItem itemPubsub = (PayloadItem) pubItems.get(0);
+
+                        DataForm dataForm = (DataForm) itemPubsub.getPayload();
+                        for (FormField e : dataForm.getFields()) {
+                            if (e.getVariable().matches("ownerImage")) {
+                                pubsubObject.setImage(e.getValues().get(0));
+                            } else if (e.getVariable().matches("ownerName")) {
+                                pubsubObject.setName(e.getValues().get(0));
+                            } else if (e.getVariable().matches("title")) {
+                                pubsubObject.setTitle(e.getValues().get(0));
+                            } else if (e.getVariable().matches("displayDate")) {
+                                pubsubObject.setDisplayData(String.valueOf(System.currentTimeMillis()));
+                            } else if (e.getVariable().matches("action")) {
+                                pubsubObject.setAction(e.getValues().get(0));
+                            } else if (e.getVariable().matches("primaryKey")) {
+                                pubsubObject.setPrimarykey(Integer.parseInt(e.getValues().get(0)));
+                            } else if (e.getVariable().matches("caseId")) {
+                                pubsubObject.setCaseId(Integer.parseInt(e.getValues().get(0)));
+                            } else if (e.getVariable().matches("complainId")) {
+                                pubsubObject.setComplainId(Integer.parseInt(e.getValues().get(0)));
+                            }
+                        }
+
+                        NotifyCase.setNotifyChat(pubsubObject);
+
+
+                    }
+                }, filter2);
+                PacketFilter filter3 = new MessageTypeFilter(Message.Type.headline);
+
+                mConnection.addPacketListener(new PacketListener() {
+                    public void processPacket(Packet packet) {
+                        Message message = (Message) packet;
+                        Log.e("Tag, ", "////////////// Other2 //////////////////////////");
+                        Log.e("From :: ", " >> " + message.getFrom());
+                        Log.e("Received message :: ", " >> " + message.getBody());
+                        Log.d("XML Message :: ", " >> " + message);
+
+
+                    }
+                }, filter3);
+
+
+                PacketFilter filter4 = new MessageTypeFilter(Message.Type.headline);
+
+                mConnection.addPacketListener(new PacketListener() {
+                    public void processPacket(Packet packet) {
+                        Message message = (Message) packet;
+                        Log.e("Tag, ", "////////////// Other3 //////////////////////////");
+                        Log.e("From :: ", " >> " + message.getFrom());
+                        Log.e("Received message :: ", " >> " + message.getBody());
+                        Log.d("XML Message :: ", " >> " + message);
+
+
+                    }
+                }, filter4);
+
+
+                mConnection.addPacketListener(new PacketListener() {
+                    @Override
+                    public void processPacket(Packet packet) throws SmackException.NotConnectedException {
+                        // เช็ค PackageID จากที่  ChatHistoryData.class โดยดึงจากที่เราเรียกจาก Server ผ่าน ListDateHistory.class
+
+
+                        String room = chatHistoryData.getMap().get(packet.getPacketID());
+
+                        if (room != null) {
+                            // Log.e("TAG -Jingle+++++++ >>>", "" + packet.getPacketID());
+                            //Log.e("TAG -Jingle+++++++ >>>", "" + room);
+                            //เช็ค packet สุดท้ายที่ถูกส่งออกไป
+                            String lastPacket = chatHistoryData.getLastMaps().get(room);
+                            // Log.e("TAG -Jingle+++++++ >>>", "" + lastPacket);
+                            if (packet.getPacketID().equalsIgnoreCase(lastPacket)) {
+                                Log.e("XMPPManage", "Get Last Room Packet" + "" + lastPacket);
+                                databaseChatHelper.UpdateChatLogs(room, chatHistoryData.getRoom().get(room));
+                            }
+                            //ลบ key value ออกจาก map เนื่องจากได้รับการตอบกลับเเล้ว
+                            chatHistoryData.getMap().remove(packet.getPacketID());
+                        } else {
+                            Log.d("TAG SET >>> REsult", "" + packet);
+
+                            List<Users> arrUsers = DatabaseChatHelper.init().getUsers();
                    /* for (Users e : arrUsers) {
                         if (e.getType() == Users.TYPE_GROUP) {
                             setJoinRoom(e.getJid());
@@ -360,47 +364,51 @@ public class XMPPManage implements MessageListener {
 
                     }*/
 
-                }
+                        }
 
+                    }
+                }, new IQTypeFilter(IQ.Type.RESULT));
+
+
+                mConnection.addPacketListener(new PacketListener() {
+                    @Override
+                    public void processPacket(Packet packet) throws SmackException.NotConnectedException {
+                        Log.d("TAG Error >>>", "" + packet);
+
+
+                    }
+                }, new IQTypeFilter(IQ.Type.ERROR));
+
+
+                mConnection.addPacketListener(new PacketListener() {
+                    @Override
+                    public void processPacket(Packet packet) throws SmackException.NotConnectedException {
+
+                        new TaskGetFriend(Application.getContext()).execute();
+                        Log.d("TAG SET >>>", "" + packet);
+
+                    }
+                }, new IQTypeFilter(IQ.Type.SET));
+
+
+                mConnection.addPacketListener(new PacketListener() {
+                    @Override
+                    public void processPacket(Packet packet) throws SmackException.NotConnectedException {
+                        Log.d("TAG SET >>>", "" + packet);
+
+
+                    }
+                }, new IQTypeFilter(IQ.Type.GET));
+
+
+                //Ping();
+                ProviderManager.addIQProvider("list", "urn:xmpp:archive", new ListDateHistoryChat());
+                ProviderManager.addIQProvider("chat", "urn:xmpp:archive", new ListHistoryChat());
+                ProviderManager.addIQProvider("jingle", "urn:xmpp:jingle:1", new ListHistoryChat());
+                return null;
             }
-        }, new IQTypeFilter(IQ.Type.RESULT));
+        }.execute();
 
-
-        mConnection.addPacketListener(new PacketListener() {
-            @Override
-            public void processPacket(Packet packet) throws SmackException.NotConnectedException {
-                Log.d("TAG Error >>>", "" + packet);
-
-
-            }
-        }, new IQTypeFilter(IQ.Type.ERROR));
-
-
-        mConnection.addPacketListener(new PacketListener() {
-            @Override
-            public void processPacket(Packet packet) throws SmackException.NotConnectedException {
-
-                new TaskGetFriend(Application.getContext()).execute();
-                Log.d("TAG SET >>>", "" + packet);
-
-            }
-        }, new IQTypeFilter(IQ.Type.SET));
-
-
-        mConnection.addPacketListener(new PacketListener() {
-            @Override
-            public void processPacket(Packet packet) throws SmackException.NotConnectedException {
-                Log.d("TAG SET >>>", "" + packet);
-
-
-            }
-        }, new IQTypeFilter(IQ.Type.GET));
-
-
-        //Ping();
-        ProviderManager.addIQProvider("list", "urn:xmpp:archive", new ListDateHistoryChat());
-        ProviderManager.addIQProvider("chat", "urn:xmpp:archive", new ListHistoryChat());
-        ProviderManager.addIQProvider("jingle", "urn:xmpp:jingle:1", new ListHistoryChat());
 
 
     }
@@ -897,26 +905,35 @@ public class XMPPManage implements MessageListener {
         //chat("Hi From " + USERNAME);
     }
 
-    public void chat(String message, String room) {
-        int randomNum = 500 + (int) (Math.random() * 2000);
-        String packetId = "adpckt" + randomNum;
-        try {
-            Message messages = new Message();
-            messages.setSubject(room);
-            messages.setBody(message);
-            messages.setPacketID(packetId);
-            //messages.setTo("ffff");
-            chat.sendMessage(message);
-            mChat.sendMessage(messages);
+    public void chat(final String message, final String room) {
+
+        new AsyncTask<Void, Void, Boolean>() {
+            @Override
+            protected Boolean doInBackground(Void... params) {
+                int randomNum = 500 + (int) (Math.random() * 2000);
+                String packetId = "adpckt" + randomNum;
+                try {
+                    Message messages = new Message();
+                    messages.setSubject(room);
+                    messages.setBody(message);
+                    messages.setPacketID(packetId);
+                    //messages.setTo("ffff");
+                    chat.sendMessage(message);
+                    mChat.sendMessage(messages);
 
 
-        } catch (XMPPException e) {
-            e.printStackTrace();
-        } catch (SmackException.NotConnectedException e) {
-            e.printStackTrace();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+                } catch (XMPPException e) {
+                    e.printStackTrace();
+                } catch (SmackException.NotConnectedException e) {
+                    e.printStackTrace();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                return null;
+            }
+        }.execute();
+
+
     }
 
     public void closeChat() {
@@ -1075,7 +1092,6 @@ public class XMPPManage implements MessageListener {
         }
     }
 
-
     public class TaskJoin extends AsyncTask<Void, Void, Boolean> {
         String room;
 
@@ -1089,7 +1105,6 @@ public class XMPPManage implements MessageListener {
             if (mConnection != null && mConnection.isConnected()) {
                 MultiUserChat muc = new MultiUserChat(mConnection, room);
                 try {
-
                     // Log.e("XMPPManage", "Join ? 1: " + room + "   " + muc.isJoined());
                     String name = mConnection.getUser().split("@")[0];
                     muc.join(name);
