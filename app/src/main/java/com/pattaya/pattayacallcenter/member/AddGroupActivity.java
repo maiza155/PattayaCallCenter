@@ -1,10 +1,12 @@
 package com.pattaya.pattayacallcenter.member;
 
 import android.app.AlertDialog;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
@@ -25,6 +27,7 @@ import com.pattaya.pattayacallcenter.Data.MasterData;
 import com.pattaya.pattayacallcenter.Data.Users;
 import com.pattaya.pattayacallcenter.R;
 import com.pattaya.pattayacallcenter.chat.DatabaseChatHelper;
+import com.pattaya.pattayacallcenter.chat.XMPPManage;
 import com.pattaya.pattayacallcenter.chat.restadatper.OpenfireQueary;
 import com.pattaya.pattayacallcenter.chat.restadatper.RestAdapterOpenFire;
 import com.pattaya.pattayacallcenter.chat.xmlobject.Chatroom.ChatRoom;
@@ -43,6 +46,25 @@ import retrofit.client.Response;
 
 public class AddGroupActivity extends ActionBarActivity implements View.OnClickListener {
 
+    final String TAG = "AddGroupActivity";
+    //Openfire
+    final RestAdapter restAdapterOpenFire = RestAdapterOpenFire.getInstance();
+    final OpenfireQueary openfireQueary = restAdapterOpenFire.create(OpenfireQueary.class);
+    final RestAdapter restAdapterOpenFireJson = RestAdapterOpenFire.getInstanceJson();
+    final OpenfireQueary openfireQuearyJson = restAdapterOpenFireJson.create(OpenfireQueary.class);
+    List<String> userList = new ArrayList<>();
+    ArrayList memberlist = new ArrayList();
+    ArrayList outcastlist = new ArrayList();
+    Intent intent;
+    // widget
+    ImageButton btn;
+    TextView titleTextView;
+    Users groupdata;
+    SharedPreferences sp;
+    String jid;
+    ProgressDialog progressDialog;
+    int TAG_ADD_FRIEND_ACTIVITY = 807;
+    int TAG_ADD_EDIT_ACTIVITY = 809;
     private AdapterListViewAddGroupData adapterListViewAddGroupData; //Adapter List ที่เรากำหนดขึ้นเอง
     private ArrayList<InviteFriendObject> listDataAddGroup = new ArrayList(); //list ในการเก็บข้อมูลของ DataShow
     private ListView listViewDataAddGroup;
@@ -51,32 +73,6 @@ public class AddGroupActivity extends ActionBarActivity implements View.OnClickL
     private Button btn_invite;
     private TextView tv_empty;
     private ProgressBar progressBar;
-    List<String> userList = new ArrayList<>();
-
-
-    ArrayList memberlist = new ArrayList();
-    ArrayList outcastlist = new ArrayList();
-
-
-    Intent intent;
-    // widget
-    ImageButton btn;
-    TextView titleTextView;
-    final String TAG = "AddGroupActivity";
-    Users groupdata;
-    SharedPreferences sp;
-    String jid;
-
-
-    //Openfire
-    final RestAdapter restAdapterOpenFire = RestAdapterOpenFire.getInstance();
-    final OpenfireQueary openfireQueary = restAdapterOpenFire.create(OpenfireQueary.class);
-    final RestAdapter restAdapterOpenFireJson = RestAdapterOpenFire.getInstanceJson();
-    final OpenfireQueary openfireQuearyJson = restAdapterOpenFireJson.create(OpenfireQueary.class);
-
-
-    int TAG_ADD_FRIEND_ACTIVITY = 807;
-    int TAG_ADD_EDIT_ACTIVITY = 809;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -403,27 +399,58 @@ public class AddGroupActivity extends ActionBarActivity implements View.OnClickL
 
         if (requestCode == TAG_ADD_FRIEND_ACTIVITY) {
             if (resultCode == RESULT_OK) {
-                ArrayList<InviteFriendObject> mData = data.getParcelableArrayListExtra("data");
-                for (InviteFriendObject e : mData) {
-                    if (!userList.contains(e.getJid())) {
-                        openfireQuearyJson.updateChatRoom(groupdata.getJid().split("@")[0], "outcasts", e.getJid(), new Callback<Response>() {
-                            @Override
-                            public void success(Response response, Response response2) {
-                                System.out.println("response = [" + response + "], response2 = [" + response2 + "]");
-                                Toast.makeText(getApplication(),
-                                        "send invite success", Toast.LENGTH_SHORT)
-                                        .show();
-                            }
+                final ArrayList<InviteFriendObject> mData = data.getParcelableArrayListExtra("data");
+                final ArrayList<String> arrJid = new ArrayList<>();
+                new AsyncTask<Void, Void, Boolean>() {
+                    @Override
+                    protected void onPreExecute() {
+                        super.onPreExecute();
+                        progressDialog = ProgressDialog.show(AddGroupActivity.this, null, getResources().getString(R.string.please_wait), true);
+                        progressDialog.setCancelable(true);
 
-                            @Override
-                            public void failure(RetrofitError error) {
-                                System.out.println("error = [" + error + "]");
+                    }
+
+                    @Override
+                    protected Boolean doInBackground(Void... params) {
+                        for (InviteFriendObject e : mData) {
+                            if (!userList.contains(e.getJid())) {
+                                arrJid.add(e.getJid());
+                                openfireQuearyJson.updateChatRoom(groupdata.getJid().split("@")[0], "outcasts", e.getJid(), new Callback<Response>() {
+                                    @Override
+                                    public void success(Response response, Response response2) {
+                                        System.out.println("response = [" + response + "], response2 = [" + response2 + "]");
+                                        Toast.makeText(getApplication(),
+                                                "send invite success", Toast.LENGTH_SHORT)
+                                                .show();
+
+                                    }
+
+                                    @Override
+                                    public void failure(RetrofitError error) {
+                                        System.out.println("error = [" + error + "]");
+                                    }
+                                });
                             }
-                        });
+                        }
+
+                        XMPPManage.getInstance().sendInviteJoinRoom(
+                                groupdata.getJid()
+                                , arrJid);
+                        return null;
                     }
 
 
-                }
+                    @Override
+                    protected void onPostExecute(Boolean aBoolean) {
+                        super.onPostExecute(aBoolean);
+                        progressDialog.dismiss();
+
+
+                    }
+                }.execute();
+
+
+
 
             }
 

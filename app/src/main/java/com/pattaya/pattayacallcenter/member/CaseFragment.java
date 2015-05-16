@@ -68,6 +68,7 @@ public class CaseFragment extends Fragment implements View.OnClickListener
 
 
     static CaseFragment fragment;
+    int ACTIVITY_SEARCH = 605;
     View mSlideMenuImage;
     SlideMenuManage mSlideMenuManage;
     EditText txtSearch;
@@ -102,6 +103,7 @@ public class CaseFragment extends Fragment implements View.OnClickListener
     View btn;
     TextView titleTextView;
     private SwipeRefreshLayout mSwipeRefreshLayout;
+
 
     public CaseFragment() {
         // Required empty public constructor
@@ -286,23 +288,24 @@ public class CaseFragment extends Fragment implements View.OnClickListener
     public void onClick(View v) {
         if (v == btnClick) {
             Intent intent = new Intent(getActivity(), CaseChatMemberActivity.class);
-            getActivity().startActivity(intent);
+            startActivity(intent);
 
         } else if (v == btnCreate) {
             Intent intent = new Intent(getActivity(), CaseAddAndEditActivity.class);
-            getActivity().startActivity(intent);
+            startActivity(intent);
 
         } else if (v == btnReport) {
             Intent intent = new Intent(getActivity(), com.pattaya.pattayacallcenter.guest.CaseAddAndEditActivity.class);
-            getActivity().startActivity(intent);
+            startActivity(intent);
 
         } else if (v == btnAdvanceSearch) {
             Intent intent = new Intent(getActivity(), CaseAdvanceSearchActivity.class);
-            getActivity().startActivity(intent);
+            startActivityForResult(intent, ACTIVITY_SEARCH);
 
         } else if (v == btn) {
             displayPopupWindow(v);
         } else if (v == txtEmpty) {
+            mSwipeRefreshLayout.setRefreshing(true);
             getCaseList("");
         }
         mSlideMenuManage.stateShowMenu(mSlideMenuManage.SETTING_MENU_HIDE);
@@ -370,8 +373,103 @@ public class CaseFragment extends Fragment implements View.OnClickListener
     }
 
 
-    void getCaseList(final String s) {
+    void getCaseListAdvanceSearch(final String s, final Boolean action, final int completed) {
+        new AsyncTask<Void, Void, Boolean>() {
+            @Override
+            protected void onPreExecute() {
+                super.onPreExecute();
+                txtEmpty.setVisibility(View.GONE);
+            }
 
+            @Override
+            protected Boolean doInBackground(Void... params) {
+                GetCaseListData getCaseListData = new GetCaseListData();
+                if (isOfficial) {
+                    getCaseListData.setFilterType(3);
+                } else {
+                    getCaseListData.setFilterType(2);
+                    getCaseListData.setUserId(userId);
+                }
+
+                if (action != null) {
+                    getCaseListData.setAction(action);
+
+                }
+                if (completed != 0) {
+                    getCaseListData.setCompleted(completed);
+                }
+                getCaseListData.setAccessToken(token);
+                getCaseListData.setTextSearch(s);
+                adapterRest.getCaseList(getCaseListData, new Callback<Response>() {
+                    @Override
+                    public void success(Response result, Response response2) {
+                        DatabaseChatHelper.init().clearCaseTable();
+                        BufferedReader reader;
+                        StringBuilder sb = new StringBuilder();
+                        try {
+                            reader = new BufferedReader(new InputStreamReader(result.getBody().in()));
+                            String line;
+                            while ((line = reader.readLine()) != null) {
+                                sb.append(line);
+                            }
+
+                        } catch (IOException e) {
+                            System.out.println("result = [" + result + "], response2 = [" + response2 + "]");
+                            e.printStackTrace();
+                        }
+                        String JsonConvertData = "{data:" + sb.toString() + "}";
+                        System.out.println(JsonConvertData);
+                        CaseListMemberObject caseListObject = new Gson().fromJson(JsonConvertData, CaseListMemberObject.class);
+
+                        dataList = caseListObject.getData();
+
+                        getActivity().runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                Activity activity = getActivity();
+                                if (activity != null) {
+                                    progressBar.setVisibility(View.GONE);
+                                    txtEmpty.setVisibility(View.VISIBLE);
+
+                                    adpterListCase.resetAdpter(dataList);
+                                    mSwipeRefreshLayout.setRefreshing(false);
+                                }
+
+                            }
+                        });
+
+
+                    }
+
+                    @Override
+                    public void failure(RetrofitError error) {
+                        System.out.println("error = [" + error + "]");
+                        getActivity().runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                Activity activity = getActivity();
+                                if (activity != null) {
+                                    progressBar.setVisibility(View.GONE);
+                                    if (adpterListCase.getCount() == 0) {
+                                        txtEmpty.setVisibility(View.VISIBLE);
+                                    }
+                                    mSwipeRefreshLayout.setRefreshing(false);
+                                }
+
+
+                            }
+                        });
+
+                    }
+                });
+
+                return null;
+            }
+        }.execute();
+
+    }
+
+    void getCaseList(final String s) {
         new AsyncTask<Void, Void, Boolean>() {
             @Override
             protected void onPreExecute() {
@@ -417,12 +515,15 @@ public class CaseFragment extends Fragment implements View.OnClickListener
                         getActivity().runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
-                                progressBar.setVisibility(View.GONE);
-                                txtEmpty.setVisibility(View.VISIBLE);
+                                Activity activity = getActivity();
+                                if (activity != null) {
+                                    progressBar.setVisibility(View.GONE);
+                                    txtEmpty.setVisibility(View.VISIBLE);
 
+                                    adpterListCase.resetAdpter(dataList);
+                                    mSwipeRefreshLayout.setRefreshing(false);
+                                }
 
-                                adpterListCase.resetAdpter(dataList);
-                                mSwipeRefreshLayout.setRefreshing(false);
                             }
                         });
 
@@ -435,13 +536,15 @@ public class CaseFragment extends Fragment implements View.OnClickListener
                         getActivity().runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
-                                progressBar.setVisibility(View.GONE);
-                                if (adpterListCase.getCount() == 0) {
-                                    txtEmpty.setVisibility(View.VISIBLE);
+                                Activity activity = getActivity();
+                                if (activity != null) {
+                                    progressBar.setVisibility(View.GONE);
+                                    if (adpterListCase.getCount() == 0) {
+                                        txtEmpty.setVisibility(View.VISIBLE);
+                                    }
+                                    mSwipeRefreshLayout.setRefreshing(false);
                                 }
 
-
-                                mSwipeRefreshLayout.setRefreshing(false);
 
                             }
                         });
@@ -515,9 +618,27 @@ public class CaseFragment extends Fragment implements View.OnClickListener
 
     @Override
     public void afterTextChanged(Editable s) {
-
+        mSwipeRefreshLayout.setRefreshing(true);
         String text = s.toString();
         getCaseList(text);
 
+    }
+
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == ACTIVITY_SEARCH) {
+            if (resultCode == Activity.RESULT_OK) {
+                Boolean action = data.getBooleanExtra("action", false);
+                int completed = data.getIntExtra("completed", 0);
+                String text = data.getStringExtra("text");
+                System.out.println("action" + action + "" + completed + "  " + text);
+                mSwipeRefreshLayout.setRefreshing(true);
+                getCaseListAdvanceSearch(text, action, completed);
+
+            }
+
+        }
     }
 }

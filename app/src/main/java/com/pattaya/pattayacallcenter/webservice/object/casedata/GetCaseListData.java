@@ -12,7 +12,17 @@ public class GetCaseListData {
     int casesId;
     String accessToken;
     String clientId;
+    Boolean action;
+    int completed;
 
+
+    public void setAction(Boolean action) {
+        this.action = action;
+    }
+
+    public void setCompleted(int completed) {
+        this.completed = completed;
+    }
 
     public int getCasesId() {
         return casesId;

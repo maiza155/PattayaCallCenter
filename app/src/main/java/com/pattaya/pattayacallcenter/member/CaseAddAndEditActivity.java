@@ -497,6 +497,10 @@ public class CaseAddAndEditActivity extends ActionBarActivity implements View.On
 
                         openCaseAssignObject.setContactInfo(caseDataObject);
 
+                        Gson gson = new Gson();
+                        String json = gson.toJson(openCaseAssignObject);
+                        Log.e("opencase", "" + json);
+
                         //save data
                         adapterRest.openCases(openCaseAssignObject, new Callback<UpdateResult>() {
                             @Override

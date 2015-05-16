@@ -18,36 +18,10 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:paddingLeft="5dp"
-            android:text="@string/promptCategory" />
-
-        <Spinner
-            android:id="@+id/spn_Category"
-            style="@style/spinner_style"
-            android:entries="@array/array_Category"
-            android:prompt="@string/promptCategory" />
-
-        <TextView
-            style="@style/text_header_style"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:paddingLeft="5dp"
-            android:text="@string/promptPriority" />
-
-        <Spinner
-            android:id="@+id/spn_Priority"
-            style="@style/spinner_style"
-            android:entries="@array/array_Priority"
-            android:prompt="@string/promptPriority" />
-
-        <TextView
-            style="@style/text_header_style"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:paddingLeft="5dp"
             android:text="@string/promptAction" />
 
         <Spinner
-            android:id="@+id/spn_Action"
+            android:id="@+id/spn_action"
             style="@style/spinner_style"
             android:entries="@array/array_Action"
             android:prompt="@string/promptAction" />
@@ -60,12 +34,27 @@
             android:text="@string/promptDue" />
 
         <Spinner
-            android:id="@+id/spn_Due"
+            android:id="@+id/spn_due"
             style="@style/spinner_style"
             android:entries="@array/array_Due"
             android:prompt="@string/promptDue" />
 
+        <TextView
+            style="@style/text_header_style"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingLeft="5dp"
+            android:text="@string/search" />
+
+        <EditText
+            android:id="@+id/txt_search"
+            style="@style/edittext_style"
+            android:hint="@string/title_search_case"
+            android:inputType="text"
+            android:singleLine="true" />
+
         <Button
+            android:id="@+id/btn_search"
             style="@style/button_style"
             android:layout_marginTop="20dp"
             android:background="@color/greenDarkColor"

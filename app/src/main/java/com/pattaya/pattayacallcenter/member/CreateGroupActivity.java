@@ -22,6 +22,7 @@ import com.google.gson.Gson;
 import com.pattaya.pattayacallcenter.BusProvider;
 import com.pattaya.pattayacallcenter.Data.MasterData;
 import com.pattaya.pattayacallcenter.R;
+import com.pattaya.pattayacallcenter.chat.XMPPManage;
 import com.pattaya.pattayacallcenter.chat.jsonobject.ChatRoomObject;
 import com.pattaya.pattayacallcenter.chat.jsonobject.Members;
 import com.pattaya.pattayacallcenter.chat.jsonobject.Outcasts;
@@ -56,6 +57,8 @@ import retrofit.mime.TypedFile;
 
 public class CreateGroupActivity extends ActionBarActivity implements View.OnClickListener, View.OnCreateContextMenuListener {
 
+    private final RestAdapter restAdapterOpenFire = RestAdapterOpenFire.getInstance();
+    private final OpenfireQueary openfireQueary = restAdapterOpenFire.create(OpenfireQueary.class);
     private AdapterListCreateGroup adapterListCreateGroup; //Adapter List ที่เรากำหนดขึ้นเอง
     private ArrayList listDataCreateGroup = new ArrayList<>(); //list ในการเก็บข้อมูลของ DataShow
     private NonScrollListView listViewDataCreateGroup;
@@ -70,17 +73,10 @@ public class CreateGroupActivity extends ActionBarActivity implements View.OnCli
     private int TAG_ADD_FRIEND_ACTIVITY = 807;
     private SharedPreferences sp;
     private String jid;
-
     private RoundedImageView image;
-
     private String urlImage = null;
     private File fileImage = null;
     private CameraMange cameraMange;
-
-
-    private final RestAdapter restAdapterOpenFire = RestAdapterOpenFire.getInstance();
-    private final OpenfireQueary openfireQueary = restAdapterOpenFire.create(OpenfireQueary.class);
-
     private RestAdapter openfireConnectorJson = RestAdapterOpenFire.getInstanceJson();
     private OpenfireQueary openfireQuearyJson = openfireConnectorJson.create(OpenfireQueary.class);
 
@@ -265,13 +261,18 @@ public class CreateGroupActivity extends ActionBarActivity implements View.OnCli
 
     void createChatroom(String img) {
         final ProgressDialog ringProgressDialog = ProgressDialog.show(this, getResources().getString(R.string.update_data), getResources().getString(R.string.please_wait), true);
-        ChatRoomObject chatRoomObject = setData();
+        final ChatRoomObject chatRoomObject = setData();
         if (chatRoomObject != null) {
             chatRoomObject.setDescription(img);
             openfireQuearyJson.createChatRoom(chatRoomObject, new Callback<Response>() {
                 @Override
                 public void success(Response response, Response response2) {
                     System.out.println("response = [" + response + "], response2 = [" + response2 + "]");
+                    if (chatRoomObject.getOutcasts() != null) {
+                        XMPPManage.getInstance().sendInviteJoinRoom(
+                                chatRoomObject.getRoomName() + "@conference.pattaya-data"
+                                , (ArrayList<String>) chatRoomObject.getOutcasts().getOutcast());
+                    }
 
                     Toast.makeText(getApplication(),
                             "success", Toast.LENGTH_SHORT)

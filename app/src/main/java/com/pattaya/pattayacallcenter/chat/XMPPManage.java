@@ -273,32 +273,34 @@ public class XMPPManage implements MessageListener {
                         SimpleXmlConverter xmlphase = new SimpleXmlConverter();
 
                         EventElement event = packet.getExtension("event", PubSubNamespace.EVENT.getXmlns());
-                        ItemsExtension itemsElem = (ItemsExtension) event.getEvent();
-                        List<? extends PacketExtension> pubItems = itemsElem.getItems();
-                        PayloadItem itemPubsub = (PayloadItem) pubItems.get(0);
+                        if (event != null) {
+                            ItemsExtension itemsElem = (ItemsExtension) event.getEvent();
+                            List<? extends PacketExtension> pubItems = itemsElem.getItems();
+                            PayloadItem itemPubsub = (PayloadItem) pubItems.get(0);
 
-                        DataForm dataForm = (DataForm) itemPubsub.getPayload();
-                        for (FormField e : dataForm.getFields()) {
-                            if (e.getVariable().matches("ownerImage")) {
-                                pubsubObject.setImage(e.getValues().get(0));
-                            } else if (e.getVariable().matches("ownerName")) {
-                                pubsubObject.setName(e.getValues().get(0));
-                            } else if (e.getVariable().matches("title")) {
-                                pubsubObject.setTitle(e.getValues().get(0));
-                            } else if (e.getVariable().matches("displayDate")) {
-                                pubsubObject.setDisplayData(String.valueOf(System.currentTimeMillis()));
-                            } else if (e.getVariable().matches("action")) {
-                                pubsubObject.setAction(e.getValues().get(0));
-                            } else if (e.getVariable().matches("primaryKey")) {
-                                pubsubObject.setPrimarykey(Integer.parseInt(e.getValues().get(0)));
-                            } else if (e.getVariable().matches("caseId")) {
-                                pubsubObject.setCaseId(Integer.parseInt(e.getValues().get(0)));
-                            } else if (e.getVariable().matches("complainId")) {
-                                pubsubObject.setComplainId(Integer.parseInt(e.getValues().get(0)));
+                            DataForm dataForm = (DataForm) itemPubsub.getPayload();
+                            for (FormField e : dataForm.getFields()) {
+                                if (e.getVariable().matches("ownerImage")) {
+                                    pubsubObject.setImage(e.getValues().get(0));
+                                } else if (e.getVariable().matches("ownerName")) {
+                                    pubsubObject.setName(e.getValues().get(0));
+                                } else if (e.getVariable().matches("title")) {
+                                    pubsubObject.setTitle(e.getValues().get(0));
+                                } else if (e.getVariable().matches("displayDate")) {
+                                    pubsubObject.setDisplayData(String.valueOf(System.currentTimeMillis()));
+                                } else if (e.getVariable().matches("action")) {
+                                    pubsubObject.setAction(e.getValues().get(0));
+                                } else if (e.getVariable().matches("primaryKey")) {
+                                    pubsubObject.setPrimarykey(Integer.parseInt(e.getValues().get(0)));
+                                } else if (e.getVariable().matches("caseId")) {
+                                    pubsubObject.setCaseId(Integer.parseInt(e.getValues().get(0)));
+                                } else if (e.getVariable().matches("complainId")) {
+                                    pubsubObject.setComplainId(Integer.parseInt(e.getValues().get(0)));
+                                }
                             }
-                        }
 
-                        NotifyCase.setNotifyChat(pubsubObject);
+                            NotifyCase.setNotifyChat(pubsubObject);
+                        }
 
 
                     }
@@ -410,7 +412,6 @@ public class XMPPManage implements MessageListener {
         }.execute();
 
 
-
     }
 
     static void getUserData(final Messages messages) {
@@ -435,10 +436,10 @@ public class XMPPManage implements MessageListener {
 
                             System.out.println("indatabase " + checkCase);
 
-                            if (room[0].matches("pattaya")) {
-                                NotifyChat.setNotifyChat(users.getName(), messages.getRoom(), messages.getMessage());
-                            } else if (room[0].matches("case")) {
+                            if (room[0].matches("case")) {
                                 NotifyCase.setNotifyChatCase(users.getName(), room[1], messages.getMessage());
+                            } else {
+                                NotifyChat.setNotifyChat(users.getName(), messages.getRoom(), messages.getMessage());
                             }
 
                         }
@@ -467,10 +468,10 @@ public class XMPPManage implements MessageListener {
                                     String[] room = checkCase.split("-");
                                     System.out.println("in server " + checkCase);
 
-                                    if (room[0].matches("pattaya")) {
-                                        NotifyChat.setNotifyChat(user.getName(), messages.getRoom(), messages.getMessage());
-                                    } else if (room[0].matches("case")) {
+                                    if (room[0].matches("case")) {
                                         NotifyCase.setNotifyChatCase(user.getName(), room[1], messages.getMessage());
+                                    } else {
+                                        NotifyChat.setNotifyChat(user.getName(), messages.getRoom(), messages.getMessage());
                                     }
 
 
@@ -604,17 +605,13 @@ public class XMPPManage implements MessageListener {
                     @Override
                     public void invitationReceived(XMPPConnection xmppConnection, String room, String invite, String reason, String unknown, Message message) {
                         Log.e("XMPPManage", "Invite Room ::" + "room" + room + "  invite" + invite);
-                        setJoinRoom(room);
-
-
+                        NotifyInviteGroup.getInstant().init(room, invite);
                     }
                 });
     }
 
     public void setJoinRoom(String room) {
         new TaskJoin(room).execute();
-
-
     }
 
     public void initConnection() {
@@ -626,9 +623,9 @@ public class XMPPManage implements MessageListener {
         config.setSendPresence(true);
         // config.
         mConnection = new XMPPTCPConnection(config);
+        setChatRoomInvitationListener();
         messageReceiver();
 
-        setChatRoomInvitationListener();
 
     }
 
@@ -640,10 +637,6 @@ public class XMPPManage implements MessageListener {
         this.mConnection = mConnection;
     }
 
-    @Override
-    public void processMessage(Chat chat, Message message) {
-
-    }
 
     void getGroupRoom() {
         ArrayList joinedRooms = null;
@@ -696,6 +689,34 @@ public class XMPPManage implements MessageListener {
 
     }
 
+    public void sendInviteJoinRoom(final String room, final ArrayList<String> jid) {
+        new AsyncTask<Void, Void, Boolean>() {
+            @Override
+            protected Boolean doInBackground(Void... params) {
+                if (mConnection != null && mConnection.isConnected()) {
+                    MultiUserChat muc = new MultiUserChat(mConnection, room);
+                    try {
+                        muc.join(USERNAME);
+                        for (String e : jid) {
+                            muc.invite(e, "Please Join From Android");
+                        }
+
+                        Log.d("adnan", "gg : " + room + "  ------------- " + jid);
+                    } catch (SmackException.NotConnectedException e) {
+                        e.printStackTrace();
+                    } catch (XMPPException.XMPPErrorException e) {
+                        e.printStackTrace();
+                    } catch (SmackException.NoResponseException e) {
+                        e.printStackTrace();
+                    }
+                }
+                return null;
+            }
+        }.execute();
+
+
+    }
+
     public void disConnect() {
         new Thread(new Runnable() {
             public void run() {
@@ -725,6 +746,7 @@ public class XMPPManage implements MessageListener {
 
 
     }
+
 
     public Boolean removeRoster(String jid) {
         if (mConnection != null && mConnection.isConnected()) {
@@ -1076,6 +1098,11 @@ public class XMPPManage implements MessageListener {
 
     }
 
+    @Override
+    public void processMessage(Chat chat, Message message) {
+
+    }
+
     public class TaskSendNotify extends AsyncTask<Void, Void, Boolean> {
         PubsubObject pubsubObject;
 
@@ -1106,7 +1133,7 @@ public class XMPPManage implements MessageListener {
                 MultiUserChat muc = new MultiUserChat(mConnection, room);
                 try {
                     // Log.e("XMPPManage", "Join ? 1: " + room + "   " + muc.isJoined());
-                    String name = mConnection.getUser().split("@")[0];
+                    String name = jid.split("@")[0];
                     muc.join(name);
                     //  Log.e("XMPPManage", "mConnector  1: " + room + "   " + muc.isJoined());
                     //Log.e("XMPPManage", "Join ? 1 : " + room + "   " + muc.isJoined());

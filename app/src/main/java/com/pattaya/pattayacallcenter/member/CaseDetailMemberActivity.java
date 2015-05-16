@@ -42,6 +42,7 @@ import retrofit.client.Response;
 
 import static com.pattaya.pattayacallcenter.R.drawable.asset_icon_status_flag;
 import static com.pattaya.pattayacallcenter.R.drawable.asset_icon_status_gray;
+import static com.pattaya.pattayacallcenter.R.drawable.asset_icon_status_green;
 import static com.pattaya.pattayacallcenter.R.drawable.custom_date_bg_green;
 import static com.pattaya.pattayacallcenter.R.drawable.custom_date_bg_red;
 import static com.pattaya.pattayacallcenter.R.drawable.custom_date_bg_yellow;
@@ -232,7 +233,7 @@ public class CaseDetailMemberActivity extends ActionBarActivity {
 
                 if (caseDataMemberObject.getIsAction()) {
                     ImageView image = new ImageView(CaseDetailMemberActivity.this);
-                    Drawable drawable = getResources().getDrawable(asset_icon_status_gray);
+                    Drawable drawable = getResources().getDrawable(asset_icon_status_green);
                     image.setImageDrawable(drawable);
                     layout.addView(image);
                 } else {

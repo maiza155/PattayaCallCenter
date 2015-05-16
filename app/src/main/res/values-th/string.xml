@@ -204,8 +204,8 @@
     <string-array name="array_Due">
         <item>ทั้งหมด</item>
         <item>วันนี้</item>
+        <item>ถัดไป3วัน</item>
         <item>ถัดไป7วัน</item>
-        <item>ถัดไป15วัน</item>
         <item>เกินกำหนด</item>
     </string-array>
 
@@ -287,4 +287,6 @@
         <item>อื่นๆ</item>
     </string-array>
 
+
+    <string name="title_search_case">ชื่อเรื่อง,เลขที่คำสั่ง</string>
 </resources>

@@ -783,7 +783,7 @@ public class XMPPManageOfficial implements MessageListener {
 
                 ///////////////  displayDate ////////////////////
                 FormField formDate = new FormField("displayDate");
-                formDate.addValue(displayData);
+                formDate.addValue(String.valueOf(System.currentTimeMillis()));
 
                 dataForm.addField(formDate);
 

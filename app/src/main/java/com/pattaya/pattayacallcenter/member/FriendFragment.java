@@ -13,7 +13,6 @@ import android.support.v7.app.ActionBarActivity;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.DisplayMetrics;
-import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -129,6 +128,20 @@ public class FriendFragment extends Fragment implements SwipeRefreshLayout.OnRef
                 new queryTask().execute();
             } else if (event.matches("add_roster_complete")) {
                 new TaskGetFriend(getActivity()).execute();
+            } else if (event.matches("invited_update")) {
+                if (badge != null) {
+                    int oldBadge = (badge.getText().toString().isEmpty()) ? 0 : Integer.parseInt(badge.getText().toString());
+                    initBudge = oldBadge + 1;
+                    if (initBudge > 9) {
+                        badge.setText("N");
+                        badge.show();
+                    } else if (initBudge == 0) {
+                        badge.hide();
+                    } else {
+                        badge.setText("" + (initBudge));
+                        badge.show();
+                    }
+                }
             }
         }
 
@@ -140,7 +153,6 @@ public class FriendFragment extends Fragment implements SwipeRefreshLayout.OnRef
         Activity activity = getActivity();
         if (activity != null) {
             initBudge = busGetFriendObject.getCount();
-
             System.out.println("recive Data " + busGetFriendObject.getIsOk());
             System.out.println("recive Data " + busGetFriendObject.getCount());
             if (busGetFriendObject.getIsOk()) {
@@ -163,8 +175,8 @@ public class FriendFragment extends Fragment implements SwipeRefreshLayout.OnRef
                         .show();
             }
             mSwipeRefreshLayout.setRefreshing(false);
-        }
 
+        }
 
     }
 
@@ -183,6 +195,7 @@ public class FriendFragment extends Fragment implements SwipeRefreshLayout.OnRef
             editor.putBoolean(MasterData.SHARED_CONFIG_IS_FIRST, false);
             editor.commit();
         }
+        new TaskGetFriend(getActivity()).execute();
 
 
     }
@@ -234,10 +247,10 @@ public class FriendFragment extends Fragment implements SwipeRefreshLayout.OnRef
         expandableListAdapterFriend = new ExpandableListAdapterFriend(getActivity(), groupList, laptopCollection);
         expandableListView.setAdapter(expandableListAdapterFriend);
 
-        if (childListFriend.size() == 0) {
-            Log.e("TAG", "req friend");
+        if (isStart) {
             new queryTask().execute();
         }
+
         return view;
     }
 
@@ -292,23 +305,16 @@ public class FriendFragment extends Fragment implements SwipeRefreshLayout.OnRef
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
+            isStart = false;
             childListGroup = new ArrayList();
             childListFriend = new ArrayList<>();
             childListFavorite = new ArrayList<>();
-
-            if (isStart) {
-                System.out.println("isStart");
-
-                mSwipeRefreshLayout.post(new Runnable() {
-                    @Override
-                    public void run() {
-                        mSwipeRefreshLayout.setRefreshing(true);
-                    }
-                });
-                // progressBar.setVisibility(View.VISIBLE);
-                new TaskGetFriend(getActivity()).execute();
-                isStart = false;
-            }
+            mSwipeRefreshLayout.post(new Runnable() {
+                @Override
+                public void run() {
+                    mSwipeRefreshLayout.setRefreshing(true);
+                }
+            });
 
         }
 
@@ -341,15 +347,21 @@ public class FriendFragment extends Fragment implements SwipeRefreshLayout.OnRef
         @Override
         protected void onPostExecute(Boolean success) {
             super.onPostExecute(success);
-            expandableListAdapterFriend.resetAdapter(groupList.get(0), childListFavorite);
-            expandableListAdapterFriend.resetAdapter(groupList.get(1), childListGroup);
-            expandableListAdapterFriend.resetAdapter(groupList.get(2), childListFriend);
 
-            expandableListView.expandGroup(1);
-            expandableListView.expandGroup(2);
-            expandableListView.expandGroup(0);
+            Activity activity = getActivity();
+            if (activity != null) {
+                expandableListAdapterFriend.resetAdapter(groupList.get(0), childListFavorite);
+                expandableListAdapterFriend.resetAdapter(groupList.get(1), childListGroup);
+                expandableListAdapterFriend.resetAdapter(groupList.get(2), childListFriend);
 
-            //progressBar.setVisibility(View.GONE);
+                expandableListView.expandGroup(1);
+                expandableListView.expandGroup(2);
+                expandableListView.expandGroup(0);
+
+                mSwipeRefreshLayout.setRefreshing(false);
+
+            }
+
 
         }
 
@@ -372,6 +384,12 @@ public class FriendFragment extends Fragment implements SwipeRefreshLayout.OnRef
             arrFriend = new ArrayList<>();
             arrGroup = new ArrayList<>();
             arrFavor = new ArrayList<>();
+            mSwipeRefreshLayout.post(new Runnable() {
+                @Override
+                public void run() {
+                    mSwipeRefreshLayout.setRefreshing(true);
+                }
+            });
         }
 
         @Override
@@ -401,13 +419,16 @@ public class FriendFragment extends Fragment implements SwipeRefreshLayout.OnRef
         @Override
         protected void onPostExecute(Boolean success) {
             super.onPostExecute(success);
-            expandableListAdapterFriend.resetAdapter(groupList.get(0), arrFavor);
-            expandableListAdapterFriend.resetAdapter(groupList.get(1), arrGroup);
-            expandableListAdapterFriend.resetAdapter(groupList.get(2), arrFriend);
-            expandableListView.expandGroup(1);
-            expandableListView.expandGroup(2);
-            expandableListView.expandGroup(0);
-
+            Activity activity = getActivity();
+            if (activity != null) {
+                expandableListAdapterFriend.resetAdapter(groupList.get(0), arrFavor);
+                expandableListAdapterFriend.resetAdapter(groupList.get(1), arrGroup);
+                expandableListAdapterFriend.resetAdapter(groupList.get(2), arrFriend);
+                expandableListView.expandGroup(1);
+                expandableListView.expandGroup(2);
+                expandableListView.expandGroup(0);
+                mSwipeRefreshLayout.setRefreshing(false);
+            }
         }
     }
 

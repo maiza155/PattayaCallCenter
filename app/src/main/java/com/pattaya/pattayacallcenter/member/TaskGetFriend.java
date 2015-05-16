@@ -3,6 +3,7 @@ package com.pattaya.pattayacallcenter.member;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
+import android.util.Log;
 
 import com.pattaya.pattayacallcenter.BusProvider;
 import com.pattaya.pattayacallcenter.Data.MasterData;
@@ -13,7 +14,6 @@ import com.pattaya.pattayacallcenter.chat.restadatper.RestAdapterOpenFire;
 import com.pattaya.pattayacallcenter.chat.xmlobject.Chatroom.ChatRoom;
 import com.pattaya.pattayacallcenter.chat.xmlobject.Chatroom.ChatRooms;
 import com.pattaya.pattayacallcenter.chat.xmlobject.Chatroom.Member;
-import com.pattaya.pattayacallcenter.chat.xmlobject.Chatroom.Owners;
 import com.pattaya.pattayacallcenter.chat.xmlobject.Roster.Roster;
 import com.pattaya.pattayacallcenter.chat.xmlobject.Roster.RosterItem;
 import com.pattaya.pattayacallcenter.chat.xmlobject.User;
@@ -64,23 +64,24 @@ public class TaskGetFriend extends AsyncTask<Void, Void, Boolean> {
             @Override
             public void success(ChatRooms chatRooms, Response response) {
                 final ArrayList<Users> arrUser = new ArrayList<>();
+                countInviteGroup = 0;
                 if (chatRooms.getChatRoom() != null) {
                     for (ChatRoom e : chatRooms.getChatRoom()) {
                         final String room = e.getRoomName() + "@conference.pattaya-data";
+                        /*
                         for (Owners owners : e.getOwners()) {
-                            if (owners.getOwner().matches(jid)) {
+                            if (!owners.getOwner().matches(jid)) {
                                 final Users mUser = new Users(room, e.getNaturalName(), null, Users.TYPE_GROUP);
                                 mUser.setPic(e.getDescription());
                                 arrUser.add(mUser);
                                 DatabaseChatHelper.init().addUsers(mUser);
                             }
-                        }
+                        }*/
                         if (e.getOutcasts().getListMember() != null) {
-                            countInviteGroup = 0;
                             for (Member member : e.getOutcasts().getListMember()) {
-
                                 if (member.getText().matches(jid)) {
                                     countInviteGroup++;
+                                    Log.e("countInviteGroup", "" + countInviteGroup);
                                     childListGroup.add(new InviteFriendObject(room, e.getNaturalName(), e.getDescription()));
 
 
@@ -90,9 +91,7 @@ public class TaskGetFriend extends AsyncTask<Void, Void, Boolean> {
 
                         if (e.getMembers().getListMember() != null) {
                             for (Member member : e.getMembers().getListMember()) {
-
                                 if (member.getText().matches(jid)) {
-
                                     final Users mUser = new Users(room, e.getNaturalName(), null, Users.TYPE_GROUP);
                                     mUser.setPic(e.getDescription());
                                     arrUser.add(mUser);
