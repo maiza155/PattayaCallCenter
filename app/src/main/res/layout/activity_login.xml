@@ -15,12 +15,17 @@
 
         <ImageView
             android:id="@+id/img_pic"
-            android:layout_width="150dp"
-            android:layout_height="150dp"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
             android:layout_above="@+id/box"
             android:layout_gravity="center_horizontal"
-            android:layout_margin="20dp"
-            android:background="@drawable/appicon" />
+            android:layout_marginBottom="10dp"
+            android:layout_marginTop="10dp"
+            android:adjustViewBounds="true"
+            android:paddingLeft="70dp"
+            android:paddingRight="70dp"
+            android:scaleType="fitCenter"
+            android:src="@drawable/appiconandroid" />
 
 
         <LinearLayout
@@ -28,6 +33,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_centerInParent="true"
+            android:layout_marginBottom="10dp"
             android:layout_marginLeft="@dimen/activity_vertical_margin"
             android:layout_marginRight="@dimen/activity_vertical_margin"
             android:orientation="vertical">
@@ -56,7 +62,6 @@
             android:layout_below="@id/box"
             android:layout_marginLeft="@dimen/activity_vertical_margin"
             android:layout_marginRight="@dimen/activity_vertical_margin"
-            android:layout_marginTop="20dp"
             android:orientation="vertical">
 
             <Button

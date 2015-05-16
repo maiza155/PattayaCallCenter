@@ -1,5 +1,6 @@
 package com.pattaya.pattayacallcenter.member;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -122,41 +123,47 @@ public class FriendFragment extends Fragment implements SwipeRefreshLayout.OnRef
 
     @Subscribe
     public void onSampleEvent(String event) {
-        if (event.matches("friendfragment")) {
-            new queryTask().execute();
-        } else if (event.matches("add_roster_complete")) {
-            new TaskGetFriend(getActivity()).execute();
+        Activity activity = getActivity();
+        if (activity != null) {
+            if (event.matches("friendfragment")) {
+                new queryTask().execute();
+            } else if (event.matches("add_roster_complete")) {
+                new TaskGetFriend(getActivity()).execute();
+            }
         }
+
     }
 
 
     @Subscribe
     public void onSampleEvent(BusGetFriendObject busGetFriendObject) {
+        Activity activity = getActivity();
+        if (activity != null) {
+            initBudge = busGetFriendObject.getCount();
 
-        initBudge = busGetFriendObject.getCount();
-
-        System.out.println("recive Data " + busGetFriendObject.getIsOk());
-        System.out.println("recive Data " + busGetFriendObject.getCount());
-        if (busGetFriendObject.getIsOk()) {
-            if (badge != null) {
-                if (initBudge > 9) {
-                    badge.setText("N");
-                    badge.show();
-                } else if (initBudge == 0) {
-                    badge.hide();
-                } else {
-                    badge.setText("" + (initBudge));
-                    badge.show();
+            System.out.println("recive Data " + busGetFriendObject.getIsOk());
+            System.out.println("recive Data " + busGetFriendObject.getCount());
+            if (busGetFriendObject.getIsOk()) {
+                if (badge != null) {
+                    if (initBudge > 9) {
+                        badge.setText("N");
+                        badge.show();
+                    } else if (initBudge == 0) {
+                        badge.hide();
+                    } else {
+                        badge.setText("" + (initBudge));
+                        badge.show();
+                    }
                 }
-            }
 
-            new queryTask().execute();
-        } else {
-            Toast.makeText(Application.getContext(),
-                    getResources().getString(R.string.cant_connect_server), Toast.LENGTH_SHORT)
-                    .show();
+                new queryTask().execute();
+            } else {
+                Toast.makeText(Application.getContext(),
+                        getResources().getString(R.string.cant_connect_server), Toast.LENGTH_SHORT)
+                        .show();
+            }
+            mSwipeRefreshLayout.setRefreshing(false);
         }
-        mSwipeRefreshLayout.setRefreshing(false);
 
 
     }

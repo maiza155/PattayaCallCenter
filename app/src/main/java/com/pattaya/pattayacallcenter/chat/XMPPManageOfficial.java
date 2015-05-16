@@ -401,7 +401,7 @@ public class XMPPManageOfficial implements MessageListener {
             protected Boolean doInBackground(Void... params) {
                 ConnectionConfiguration config = new ConnectionConfiguration(HOST, PORT, SERVICE);
                 config.setSecurityMode(ConnectionConfiguration.SecurityMode.disabled);
-                config.setDebuggerEnabled(true);
+                //config.setDebuggerEnabled(true);
                 XMPPTCPConnection admin = new XMPPTCPConnection(config);
                 PubSubManager manager;
                 String username = USERNAME + "_notify";
@@ -526,7 +526,7 @@ public class XMPPManageOfficial implements MessageListener {
         Log.e("XMPPManage", "Login");
         config = new ConnectionConfiguration(HOST, PORT, SERVICE);
         config.setSecurityMode(ConnectionConfiguration.SecurityMode.disabled);
-        config.setDebuggerEnabled(true);
+        //config.setDebuggerEnabled(true);
         config.setSendPresence(true);
         // config.
         mConnection = new XMPPTCPConnection(config);

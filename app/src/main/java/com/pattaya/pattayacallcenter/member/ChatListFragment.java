@@ -39,12 +39,20 @@ import java.util.ArrayList;
 
 
 public class ChatListFragment extends Fragment {
-    private AdapterListChatFragment adapterListChatFragment; //Adapter List ที่เรากำหนดขึ้นเอง
-    private ListView listViewDataChatFragment;
     static ChatListFragment fragment = null;
     DatabaseChatHelper databaseChatHelper = DatabaseChatHelper.init();
     ArrayList<LastMessageData> dataArray = new ArrayList<>();
     int TAG_DELETE_ACTIVITY = 909;
+    // widget
+    ImageButton btn;
+    TextView titleTextView;
+    private AdapterListChatFragment adapterListChatFragment; //Adapter List ที่เรากำหนดขึ้นเอง
+    private ListView listViewDataChatFragment;
+
+
+    public ChatListFragment() {
+        // Required empty public constructor
+    }
 
     public static ChatListFragment newInstance() {
         if (fragment == null) {
@@ -55,15 +63,6 @@ public class ChatListFragment extends Fragment {
         return fragment;
     }
 
-    public ChatListFragment() {
-        // Required empty public constructor
-    }
-
-
-    // widget
-    ImageButton btn;
-    TextView titleTextView;
-
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -73,15 +72,23 @@ public class ChatListFragment extends Fragment {
 
     @Subscribe
     public void onBusReciver(Messages messages) {
-        new queryTask().execute();
+        Activity activity = getActivity();
+        if (activity != null) {
+            new queryTask().execute();
+        }
+
 
     }
 
     @Subscribe
     public void onBusReciver(String messages) {
-        if (messages.matches("update_last_message")) {
-            new queryTask().execute();
+        Activity activity = getActivity();
+        if (activity != null) {
+            if (messages.matches("update_last_message")) {
+                new queryTask().execute();
+            }
         }
+
 
     }
 
@@ -101,21 +108,12 @@ public class ChatListFragment extends Fragment {
         return view;
     }
 
-
-    public interface OnFragmentInteractionListener {
-        // TODO: Update argument type and name
-        public void onFragmentInteraction(Uri uri);
-
-
-    }
-
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         menu.clear();
         setActionBar(getActivity());
         inflater.inflate(R.menu.chat_menu, menu);
     }
-
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -160,6 +158,12 @@ public class ChatListFragment extends Fragment {
         }
     }
 
+    public interface OnFragmentInteractionListener {
+        // TODO: Update argument type and name
+        public void onFragmentInteraction(Uri uri);
+
+
+    }
 
     class queryTask extends AsyncTask<Void, Void, Boolean> {
 

@@ -198,17 +198,16 @@ public class CaseFragment extends Fragment implements View.OnClickListener
     @Subscribe
     public void updateListData(String s) {
         Activity activity = getActivity();
-        if (s.matches("update_case_list")) {
-            if (activity != null) {
+        if (activity != null) {
+            if (s.matches("update_case_list")) {
                 getCaseList("");
-            }
 
-        } else if (s.matches("case_count")) {
-            if (adpterListCase != null) {
-                adpterListCase.notifyDataSetChanged();
+            } else if (s.matches("case_count")) {
+                if (adpterListCase != null) {
+                    adpterListCase.notifyDataSetChanged();
+                }
             }
         }
-
     }
 
     void setActionBar(ActionBarActivity actionBar) {

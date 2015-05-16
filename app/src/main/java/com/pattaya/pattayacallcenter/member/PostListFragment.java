@@ -1,5 +1,6 @@
 package com.pattaya.pattayacallcenter.member;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
@@ -118,10 +119,13 @@ public class PostListFragment extends Fragment implements AbsListView.OnScrollLi
 
     @Subscribe
     public void onSampleEvent(String event) {
-
-        if (event.matches("post")) {
-            update();
+        Activity activity = getActivity();
+        if (activity != null) {
+            if (event.matches("post")) {
+                update();
+            }
         }
+
     }
 
     Boolean isPrime(int num) {

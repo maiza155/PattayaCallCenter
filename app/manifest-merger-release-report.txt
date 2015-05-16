@@ -49,6 +49,10 @@ uses-permission#com.google.android.c2dm.permission.RECEIVE
 ADDED from AndroidManifest.xml:16:5
 	android:name
 		ADDED from AndroidManifest.xml:16:22
+uses-permission#android.permission.VIBRATE
+ADDED from AndroidManifest.xml:17:5
+	android:name
+		ADDED from AndroidManifest.xml:17:22
 uses-permission#android.permission.ACCESS_COARSE_LOCATION
 ADDED from AndroidManifest.xml:22:5
 	android:name
@@ -123,309 +127,309 @@ ADDED from AndroidManifest.xml:47:9
 activity#com.pattaya.pattayacallcenter.share.LoginActivity
 ADDED from AndroidManifest.xml:51:9
 	android:windowSoftInputMode
-		ADDED from AndroidManifest.xml:55:13
-	android:screenOrientation
-		ADDED from AndroidManifest.xml:56:13
-	android:configChanges
-		ADDED from AndroidManifest.xml:53:13
-	android:hardwareAccelerated
 		ADDED from AndroidManifest.xml:54:13
+	android:screenOrientation
+		ADDED from AndroidManifest.xml:53:13
 	android:name
 		ADDED from AndroidManifest.xml:52:13
 intent-filter#android.intent.action.MAIN+android.intent.category.LAUNCHER
-ADDED from AndroidManifest.xml:57:13
+ADDED from AndroidManifest.xml:55:13
 action#android.intent.action.MAIN
+ADDED from AndroidManifest.xml:56:17
+	android:name
+		ADDED from AndroidManifest.xml:56:25
+category#android.intent.category.LAUNCHER
 ADDED from AndroidManifest.xml:58:17
 	android:name
-		ADDED from AndroidManifest.xml:58:25
-category#android.intent.category.LAUNCHER
-ADDED from AndroidManifest.xml:60:17
-	android:name
-		ADDED from AndroidManifest.xml:60:27
+		ADDED from AndroidManifest.xml:58:27
 activity#com.pattaya.pattayacallcenter.share.RegisterActivity
-ADDED from AndroidManifest.xml:63:9
-	android:windowSoftInputMode
-		ADDED from AndroidManifest.xml:66:13
+ADDED from AndroidManifest.xml:61:9
 	android:label
-		ADDED from AndroidManifest.xml:65:13
+		ADDED from AndroidManifest.xml:63:13
 	android:name
-		ADDED from AndroidManifest.xml:64:13
+		ADDED from AndroidManifest.xml:62:13
 activity#com.pattaya.pattayacallcenter.share.ForgetPasswordActivity
+ADDED from AndroidManifest.xml:64:9
+	android:label
+		ADDED from AndroidManifest.xml:66:13
+	android:name
+		ADDED from AndroidManifest.xml:65:13
+activity#com.pattaya.pattayacallcenter.guest.CaseListActivity
 ADDED from AndroidManifest.xml:67:9
 	android:label
 		ADDED from AndroidManifest.xml:69:13
 	android:name
 		ADDED from AndroidManifest.xml:68:13
-activity#com.pattaya.pattayacallcenter.guest.CaseListActivity
+activity#com.pattaya.pattayacallcenter.guest.CaseMapActivity
 ADDED from AndroidManifest.xml:70:9
 	android:label
 		ADDED from AndroidManifest.xml:72:13
 	android:name
 		ADDED from AndroidManifest.xml:71:13
-activity#com.pattaya.pattayacallcenter.guest.CaseMapActivity
+activity#com.pattaya.pattayacallcenter.share.ProfileActivity
 ADDED from AndroidManifest.xml:73:9
 	android:label
 		ADDED from AndroidManifest.xml:75:13
 	android:name
 		ADDED from AndroidManifest.xml:74:13
-activity#com.pattaya.pattayacallcenter.share.ProfileActivity
+activity#com.pattaya.pattayacallcenter.share.AlertSettingActivity
 ADDED from AndroidManifest.xml:76:9
 	android:label
 		ADDED from AndroidManifest.xml:78:13
 	android:name
 		ADDED from AndroidManifest.xml:77:13
-activity#com.pattaya.pattayacallcenter.share.AlertSettingActivity
+activity#com.pattaya.pattayacallcenter.guest.OrganizeActivity
 ADDED from AndroidManifest.xml:79:9
 	android:label
 		ADDED from AndroidManifest.xml:81:13
 	android:name
 		ADDED from AndroidManifest.xml:80:13
-activity#com.pattaya.pattayacallcenter.guest.OrganizeActivity
+activity#com.pattaya.pattayacallcenter.guest.OrganizeMemberListActivity
 ADDED from AndroidManifest.xml:82:9
 	android:label
 		ADDED from AndroidManifest.xml:84:13
 	android:name
 		ADDED from AndroidManifest.xml:83:13
-activity#com.pattaya.pattayacallcenter.guest.OrganizeMemberListActivity
+activity#com.facebook.FacebookActivity
 ADDED from AndroidManifest.xml:85:9
 	android:label
 		ADDED from AndroidManifest.xml:87:13
+	android:theme
+		ADDED from AndroidManifest.xml:88:13
 	android:name
 		ADDED from AndroidManifest.xml:86:13
-activity#com.facebook.FacebookActivity
-ADDED from AndroidManifest.xml:88:9
+activity#com.pattaya.pattayacallcenter.share.ChangePasswordActivity
+ADDED from AndroidManifest.xml:89:9
 	android:label
-		ADDED from AndroidManifest.xml:90:13
-	android:theme
 		ADDED from AndroidManifest.xml:91:13
 	android:name
-		ADDED from AndroidManifest.xml:89:13
-activity#com.pattaya.pattayacallcenter.share.ChangePasswordActivity
+		ADDED from AndroidManifest.xml:90:13
+activity#com.pattaya.pattayacallcenter.customview.CustomGalleryActivity
 ADDED from AndroidManifest.xml:92:9
 	android:label
 		ADDED from AndroidManifest.xml:94:13
 	android:name
 		ADDED from AndroidManifest.xml:93:13
-activity#com.pattaya.pattayacallcenter.customview.CustomGalleryActivity
+activity#com.pattaya.pattayacallcenter.customview.FullscreenActivity
 ADDED from AndroidManifest.xml:95:9
 	android:label
 		ADDED from AndroidManifest.xml:97:13
 	android:name
 		ADDED from AndroidManifest.xml:96:13
-activity#com.pattaya.pattayacallcenter.customview.FullscreenActivity
+activity#com.pattaya.pattayacallcenter.guest.CaseDetailActivity
 ADDED from AndroidManifest.xml:98:9
 	android:label
 		ADDED from AndroidManifest.xml:100:13
 	android:name
 		ADDED from AndroidManifest.xml:99:13
-activity#com.pattaya.pattayacallcenter.guest.CaseDetailActivity
+activity#com.pattaya.pattayacallcenter.guest.CaseResultActivity
 ADDED from AndroidManifest.xml:101:9
 	android:label
 		ADDED from AndroidManifest.xml:103:13
 	android:name
 		ADDED from AndroidManifest.xml:102:13
-activity#com.pattaya.pattayacallcenter.guest.CaseResultActivity
+activity#com.pattaya.pattayacallcenter.guest.CaseChatActivity
 ADDED from AndroidManifest.xml:104:9
+	android:windowSoftInputMode
+		ADDED from AndroidManifest.xml:109:13
+	android:screenOrientation
+		ADDED from AndroidManifest.xml:108:13
 	android:label
 		ADDED from AndroidManifest.xml:106:13
 	android:name
 		ADDED from AndroidManifest.xml:105:13
-activity#com.pattaya.pattayacallcenter.guest.CaseChatActivity
-ADDED from AndroidManifest.xml:107:9
-	android:windowSoftInputMode
-		ADDED from AndroidManifest.xml:110:13
-	android:screenOrientation
-		ADDED from AndroidManifest.xml:109:13
-	android:label
-		ADDED from AndroidManifest.xml:111:13
-	android:name
-		ADDED from AndroidManifest.xml:108:13
+	android:launchMode
+		ADDED from AndroidManifest.xml:107:13
 activity#com.pattaya.pattayacallcenter.member.OrganizeMemberActivity
-ADDED from AndroidManifest.xml:112:9
+ADDED from AndroidManifest.xml:110:9
 	android:label
-		ADDED from AndroidManifest.xml:114:13
+		ADDED from AndroidManifest.xml:112:13
 	android:name
-		ADDED from AndroidManifest.xml:113:13
+		ADDED from AndroidManifest.xml:111:13
 activity#com.pattaya.pattayacallcenter.member.DeleteChatActivity
-ADDED from AndroidManifest.xml:115:9
+ADDED from AndroidManifest.xml:113:9
 	android:label
-		ADDED from AndroidManifest.xml:118:13
-	android:name
 		ADDED from AndroidManifest.xml:116:13
-activity#com.pattaya.pattayacallcenter.share.MemberDetailActivity
-ADDED from AndroidManifest.xml:119:9
-	android:label
-		ADDED from AndroidManifest.xml:122:13
 	android:name
+		ADDED from AndroidManifest.xml:114:13
+activity#com.pattaya.pattayacallcenter.share.MemberDetailActivity
+ADDED from AndroidManifest.xml:117:9
+	android:label
 		ADDED from AndroidManifest.xml:120:13
+	android:name
+		ADDED from AndroidManifest.xml:118:13
 activity#com.pattaya.pattayacallcenter.member.MemberMainActivity
-ADDED from AndroidManifest.xml:123:9
+ADDED from AndroidManifest.xml:121:9
 	android:screenOrientation
 		ADDED from AndroidManifest.xml:125:13
 	android:label
-		ADDED from AndroidManifest.xml:127:13
+		ADDED from AndroidManifest.xml:123:13
 	android:name
-		ADDED from AndroidManifest.xml:124:13
+		ADDED from AndroidManifest.xml:122:13
 	android:launchMode
-		ADDED from AndroidManifest.xml:126:13
+		ADDED from AndroidManifest.xml:124:13
 activity#com.pattaya.pattayacallcenter.member.FriendRequestActivity
-ADDED from AndroidManifest.xml:128:9
+ADDED from AndroidManifest.xml:126:9
 	android:label
-		ADDED from AndroidManifest.xml:130:13
+		ADDED from AndroidManifest.xml:128:13
 	android:name
-		ADDED from AndroidManifest.xml:129:13
+		ADDED from AndroidManifest.xml:127:13
 activity#com.pattaya.pattayacallcenter.member.AddFriendActivity
-ADDED from AndroidManifest.xml:131:9
+ADDED from AndroidManifest.xml:129:9
 	android:windowSoftInputMode
-		ADDED from AndroidManifest.xml:133:13
-	android:label
-		ADDED from AndroidManifest.xml:134:13
-	android:name
 		ADDED from AndroidManifest.xml:132:13
-activity#com.pattaya.pattayacallcenter.member.AddGroupActivity
-ADDED from AndroidManifest.xml:135:9
 	android:label
-		ADDED from AndroidManifest.xml:137:13
+		ADDED from AndroidManifest.xml:131:13
 	android:name
-		ADDED from AndroidManifest.xml:136:13
+		ADDED from AndroidManifest.xml:130:13
+activity#com.pattaya.pattayacallcenter.member.AddGroupActivity
+ADDED from AndroidManifest.xml:133:9
+	android:label
+		ADDED from AndroidManifest.xml:135:13
+	android:name
+		ADDED from AndroidManifest.xml:134:13
 activity#com.pattaya.pattayacallcenter.member.ChatActivity
-ADDED from AndroidManifest.xml:138:9
+ADDED from AndroidManifest.xml:136:9
 	android:windowSoftInputMode
-		ADDED from AndroidManifest.xml:142:13
+		ADDED from AndroidManifest.xml:141:13
 	android:screenOrientation
 		ADDED from AndroidManifest.xml:140:13
 	android:label
-		ADDED from AndroidManifest.xml:141:13
+		ADDED from AndroidManifest.xml:138:13
 	android:name
-		ADDED from AndroidManifest.xml:139:13
+		ADDED from AndroidManifest.xml:137:13
 	android:launchMode
-		ADDED from AndroidManifest.xml:143:13
+		ADDED from AndroidManifest.xml:139:13
 activity#com.pattaya.pattayacallcenter.member.CaseAdvanceSearchActivity
-ADDED from AndroidManifest.xml:144:9
+ADDED from AndroidManifest.xml:142:9
 	android:label
-		ADDED from AndroidManifest.xml:146:13
+		ADDED from AndroidManifest.xml:144:13
 	android:name
-		ADDED from AndroidManifest.xml:145:13
+		ADDED from AndroidManifest.xml:143:13
 activity#com.pattaya.pattayacallcenter.member.CreateGroupActivity
-ADDED from AndroidManifest.xml:147:9
+ADDED from AndroidManifest.xml:145:9
 	android:windowSoftInputMode
-		ADDED from AndroidManifest.xml:150:13
-	android:label
-		ADDED from AndroidManifest.xml:149:13
-	android:name
 		ADDED from AndroidManifest.xml:148:13
+	android:label
+		ADDED from AndroidManifest.xml:147:13
+	android:name
+		ADDED from AndroidManifest.xml:146:13
 activity#com.pattaya.pattayacallcenter.member.CaseChatMemberActivity
-ADDED from AndroidManifest.xml:151:9
+ADDED from AndroidManifest.xml:149:9
 	android:windowSoftInputMode
-		ADDED from AndroidManifest.xml:155:13
+		ADDED from AndroidManifest.xml:154:13
 	android:screenOrientation
 		ADDED from AndroidManifest.xml:153:13
 	android:label
-		ADDED from AndroidManifest.xml:154:13
+		ADDED from AndroidManifest.xml:151:13
 	android:name
+		ADDED from AndroidManifest.xml:150:13
+	android:launchMode
 		ADDED from AndroidManifest.xml:152:13
 activity#com.pattaya.pattayacallcenter.member.CaseDetailMemberActivity
-ADDED from AndroidManifest.xml:156:9
+ADDED from AndroidManifest.xml:155:9
 	android:label
-		ADDED from AndroidManifest.xml:158:13
-	android:name
 		ADDED from AndroidManifest.xml:157:13
+	android:name
+		ADDED from AndroidManifest.xml:156:13
 activity#com.pattaya.pattayacallcenter.member.CaseWorkDateActivity
-ADDED from AndroidManifest.xml:159:9
+ADDED from AndroidManifest.xml:158:9
 	android:label
-		ADDED from AndroidManifest.xml:161:13
-	android:name
 		ADDED from AndroidManifest.xml:160:13
+	android:name
+		ADDED from AndroidManifest.xml:159:13
 activity#com.pattaya.pattayacallcenter.member.CaseResultMemberActivity
-ADDED from AndroidManifest.xml:162:9
+ADDED from AndroidManifest.xml:161:9
 	android:label
-		ADDED from AndroidManifest.xml:164:13
-	android:name
 		ADDED from AndroidManifest.xml:163:13
+	android:name
+		ADDED from AndroidManifest.xml:162:13
 activity#com.pattaya.pattayacallcenter.member.CaseForwardToUser
-ADDED from AndroidManifest.xml:165:9
+ADDED from AndroidManifest.xml:164:9
 	android:label
-		ADDED from AndroidManifest.xml:167:13
-	android:name
 		ADDED from AndroidManifest.xml:166:13
+	android:name
+		ADDED from AndroidManifest.xml:165:13
 activity#com.pattaya.pattayacallcenter.member.CaseForwardToOrganize
-ADDED from AndroidManifest.xml:168:9
+ADDED from AndroidManifest.xml:167:9
 	android:label
-		ADDED from AndroidManifest.xml:170:13
-	android:name
 		ADDED from AndroidManifest.xml:169:13
+	android:name
+		ADDED from AndroidManifest.xml:168:13
 activity#com.pattaya.pattayacallcenter.guest.CaseAddAndEditActivity
-ADDED from AndroidManifest.xml:171:9
+ADDED from AndroidManifest.xml:170:9
 	android:label
-		ADDED from AndroidManifest.xml:173:13
-	android:name
 		ADDED from AndroidManifest.xml:172:13
+	android:name
+		ADDED from AndroidManifest.xml:171:13
 activity#com.pattaya.pattayacallcenter.guest.PlaceActivity
-ADDED from AndroidManifest.xml:174:9
+ADDED from AndroidManifest.xml:173:9
 	android:windowSoftInputMode
-		ADDED from AndroidManifest.xml:177:13
-	android:label
 		ADDED from AndroidManifest.xml:176:13
-	android:name
+	android:label
 		ADDED from AndroidManifest.xml:175:13
+	android:name
+		ADDED from AndroidManifest.xml:174:13
 activity#com.pattaya.pattayacallcenter.member.CaseAddAndEditActivity
-ADDED from AndroidManifest.xml:178:9
+ADDED from AndroidManifest.xml:177:9
 	android:label
-		ADDED from AndroidManifest.xml:180:13
-	android:name
 		ADDED from AndroidManifest.xml:179:13
+	android:name
+		ADDED from AndroidManifest.xml:178:13
 activity#com.pattaya.pattayacallcenter.member.CaseForwardToActivity
-ADDED from AndroidManifest.xml:181:9
+ADDED from AndroidManifest.xml:180:9
 	android:label
-		ADDED from AndroidManifest.xml:183:13
-	android:name
 		ADDED from AndroidManifest.xml:182:13
+	android:name
+		ADDED from AndroidManifest.xml:181:13
 activity#com.pattaya.pattayacallcenter.member.CaseForwardActivity
-ADDED from AndroidManifest.xml:184:9
+ADDED from AndroidManifest.xml:183:9
 	android:label
-		ADDED from AndroidManifest.xml:186:13
-	android:name
 		ADDED from AndroidManifest.xml:185:13
+	android:name
+		ADDED from AndroidManifest.xml:184:13
 activity#com.pattaya.pattayacallcenter.member.CloseCaseActivity
-ADDED from AndroidManifest.xml:187:9
-	android:windowSoftInputMode
-		ADDED from AndroidManifest.xml:190:13
+ADDED from AndroidManifest.xml:186:9
 	android:label
-		ADDED from AndroidManifest.xml:189:13
-	android:name
 		ADDED from AndroidManifest.xml:188:13
+	android:name
+		ADDED from AndroidManifest.xml:187:13
 activity#com.pattaya.pattayacallcenter.member.PostActivity
-ADDED from AndroidManifest.xml:191:9
+ADDED from AndroidManifest.xml:189:9
 	android:label
-		ADDED from AndroidManifest.xml:193:13
+		ADDED from AndroidManifest.xml:191:13
 	android:name
-		ADDED from AndroidManifest.xml:192:13
+		ADDED from AndroidManifest.xml:190:13
 activity#com.pattaya.pattayacallcenter.member.InviteOrgActivity
-ADDED from AndroidManifest.xml:194:9
+ADDED from AndroidManifest.xml:192:9
 	android:windowSoftInputMode
-		ADDED from AndroidManifest.xml:197:13
-	android:label
-		ADDED from AndroidManifest.xml:196:13
-	android:name
 		ADDED from AndroidManifest.xml:195:13
-activity#com.pattaya.pattayacallcenter.member.ShowPostData
-ADDED from AndroidManifest.xml:198:9
 	android:label
-		ADDED from AndroidManifest.xml:200:13
+		ADDED from AndroidManifest.xml:194:13
 	android:name
-		ADDED from AndroidManifest.xml:199:13
+		ADDED from AndroidManifest.xml:193:13
+activity#com.pattaya.pattayacallcenter.member.ShowPostData
+ADDED from AndroidManifest.xml:196:9
+	android:label
+		ADDED from AndroidManifest.xml:198:13
+	android:name
+		ADDED from AndroidManifest.xml:197:13
 service#com.pattaya.pattayacallcenter.chat.XMPPService
-ADDED from AndroidManifest.xml:202:9
+ADDED from AndroidManifest.xml:200:9
 	android:name
-		ADDED from AndroidManifest.xml:202:18
+		ADDED from AndroidManifest.xml:200:18
+service#com.pattaya.pattayacallcenter.chat.XMPPServiceOfficial
+ADDED from AndroidManifest.xml:201:9
+	android:name
+		ADDED from AndroidManifest.xml:201:18
 service#com.pattaya.pattayacallcenter.chat.StrickLoaderService
-ADDED from AndroidManifest.xml:203:9
+ADDED from AndroidManifest.xml:202:9
 	android:exported
-		ADDED from AndroidManifest.xml:206:13
-	android:enabled
 		ADDED from AndroidManifest.xml:205:13
-	android:name
+	android:enabled
 		ADDED from AndroidManifest.xml:204:13
+	android:name
+		ADDED from AndroidManifest.xml:203:13
 uses-sdk
 INJECTED from AndroidManifest.xml:0:0 reason: use-sdk injection requested
 MERGED from com.android.support:appcompat-v7:21.0.3:15:5
