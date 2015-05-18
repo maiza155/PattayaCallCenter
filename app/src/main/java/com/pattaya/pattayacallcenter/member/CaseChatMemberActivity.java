@@ -130,6 +130,14 @@ public class CaseChatMemberActivity extends ActionBarActivity implements View.On
     private int userId;
 
     @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        finish();
+        startActivity(intent);
+
+    }
+
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_case_chat_member);
@@ -299,7 +307,6 @@ public class CaseChatMemberActivity extends ActionBarActivity implements View.On
                     getTypeList();
                 }
             }
-
 
 
         }
@@ -741,26 +748,29 @@ public class CaseChatMemberActivity extends ActionBarActivity implements View.On
                         System.out.println(userId);
                         System.out.println(JsonConvertData);
                         CaseListMemberObject caseListObject = new Gson().fromJson(JsonConvertData, CaseListMemberObject.class);
-                        String type = caseListObject.getData().get(0).getCasesType();
-                        String[] dataType = type.split(",");
-                        menu = new ArrayList<>();
-                        for (String e : dataType) {
-                            switch (e) {
-                                case "IsOper":
-                                    menu.add(1);
-                                    break;
-                                case "IsOwner":
-                                    menu.add(2);
-                                    break;
-                                case "IsNoti":
-                                    menu.add(3);
-                                    break;
-                                case "IsClose":
-                                    menu.add(4);
-                                    break;
-                            }
+                        if (!caseListObject.getData().isEmpty()) {
+                            String type = caseListObject.getData().get(0).getCasesType();
+                            String[] dataType = type.split(",");
+                            menu = new ArrayList<>();
+                            for (String e : dataType) {
+                                switch (e) {
+                                    case "IsOper":
+                                        menu.add(1);
+                                        break;
+                                    case "IsOwner":
+                                        menu.add(2);
+                                        break;
+                                    case "IsNoti":
+                                        menu.add(3);
+                                        break;
+                                    case "IsClose":
+                                        menu.add(4);
+                                        break;
+                                }
 
+                            }
                         }
+
                         runOnUiThread(new Runnable() {
                             @Override
                             public void run() {

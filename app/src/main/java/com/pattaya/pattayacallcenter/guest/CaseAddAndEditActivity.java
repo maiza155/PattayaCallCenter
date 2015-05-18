@@ -307,7 +307,7 @@ public class CaseAddAndEditActivity extends ActionBarActivity implements View.On
                                                             pub.setDisplayData(c.getTime().toString());
                                                             // pub.setPrimarykey(complainId);
                                                             if (complainId == 0) {
-                                                                pub.setAction("เปิดเคส");
+                                                                pub.setAction("ส่งเรื่องร้องเรียน");
                                                             } else {
                                                                 pub.setAction("อัพเดทเคส");
                                                             }

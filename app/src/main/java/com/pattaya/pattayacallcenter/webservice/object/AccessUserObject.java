@@ -20,6 +20,7 @@ public class AccessUserObject {
     String clientId;
     String orgName;
     String displayName;
+    String username;
 
 
     @Override
@@ -46,89 +47,84 @@ public class AccessUserObject {
         return firstname;
     }
 
-    public String getLastname() {
-        return lastname;
-    }
-
-    public String getMobile() {
-        return mobile;
-    }
-
-    public String getIdCard() {
-        return idCard;
-    }
-
-    public String getAddress() {
-        return address;
-    }
-
-    public String getProvince() {
-        return province;
-    }
-
-    public String getAmphur() {
-        return amphur;
-    }
-
-    public String getDistrict() {
-        return district;
-    }
-
-    public String getPostCode() {
-        return postCode;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-
-    public void setUserId(String userId) {
-        this.userId = userId;
-    }
-
     public void setFirstname(String firstname) {
         this.firstname = firstname;
+    }
+
+    public String getLastname() {
+        return lastname;
     }
 
     public void setLastname(String lastname) {
         this.lastname = lastname;
     }
 
+    public String getMobile() {
+        return mobile;
+    }
+
     public void setMobile(String mobile) {
         this.mobile = mobile;
+    }
+
+    public String getIdCard() {
+        return idCard;
     }
 
     public void setIdCard(String idCard) {
         this.idCard = idCard;
     }
 
+    public String getAddress() {
+        return address;
+    }
+
     public void setAddress(String address) {
         this.address = address;
+    }
+
+    public String getProvince() {
+        return province;
     }
 
     public void setProvince(String province) {
         this.province = province;
     }
 
+    public String getAmphur() {
+        return amphur;
+    }
+
     public void setAmphur(String amphur) {
         this.amphur = amphur;
+    }
+
+    public String getDistrict() {
+        return district;
     }
 
     public void setDistrict(String district) {
         this.district = district;
     }
 
+    public String getPostCode() {
+        return postCode;
+    }
+
     public void setPostCode(String postCode) {
         this.postCode = postCode;
+    }
+
+    public String getEmail() {
+        return email;
     }
 
     public void setEmail(String email) {
         this.email = email;
     }
 
-    public void setUserImage(String userImage) {
-        this.userImage = userImage;
+    public void setUserId(String userId) {
+        this.userId = userId;
     }
 
     public void setAccessToken(String accessToken) {
@@ -141,6 +137,10 @@ public class AccessUserObject {
 
     public String getUserImage() {
         return userImage;
+    }
+
+    public void setUserImage(String userImage) {
+        this.userImage = userImage;
     }
 
     public String getOrgName() {
@@ -157,5 +157,13 @@ public class AccessUserObject {
 
     public void setDisplayName(String displayName) {
         this.displayName = displayName;
+    }
+
+    public String getUserName() {
+        return username;
+    }
+
+    public void setUserName(String userName) {
+        this.username = userName;
     }
 }

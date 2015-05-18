@@ -81,6 +81,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
+import java.util.UUID;
 import java.util.concurrent.ExecutionException;
 
 import retrofit.Callback;
@@ -255,6 +256,7 @@ public class CaseAddAndEditActivity extends ActionBarActivity implements View.On
         startActivity(intent);
 
     }
+
     void init() {
         Intent intent = getIntent();
         caseId = intent.getIntExtra("id", 0);
@@ -321,77 +323,88 @@ public class CaseAddAndEditActivity extends ActionBarActivity implements View.On
 
     }
 
-    void setTypeMain(int id, final Spinner view) {
-        adapterRest.getTypeCaseList(id, new Callback<Response>() {
-            @Override
-            public void success(Response result, Response response2) {
-                list = new ArrayList();
-                list2 = new ArrayList();
-
-                BufferedReader reader = null;
-                StringBuilder sb = new StringBuilder();
-                try {
-
-                    reader = new BufferedReader(new InputStreamReader(result.getBody().in()));
-
-                    String line;
-
-                    try {
-                        while ((line = reader.readLine()) != null) {
-                            sb.append(line);
-                        }
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-                String JsonConvertData = "{data:" + sb.toString() + "}";
-                System.out.println(JsonConvertData);
-                ListTypeDataObject caseTypeObject = new Gson().fromJson(JsonConvertData, ListTypeDataObject.class);
-                if (view == spinner1) {
-                    listData = new ArrayList();
-                    for (CaseTypeObject e : caseTypeObject.getData()) {
-                        if (!e.getName().matches("สอบถามข้อมูล")) {
-                            list.add(e.getName());
-                            listData.add(e);
-                            System.out.println(e.getName());
-                            System.out.println(e.getId());
-                        }
-                    }
-                    setTypeMain(2, spinner2);
-                } else if (view == spinner2) {
-                    listSubData = new ArrayList<>();
-                    for (CaseTypeObject e : caseTypeObject.getData()) {
-                        list2.add(e.getName());
-                        listSubData.add(e);
-                        System.out.println(e.getName());
-                    }
-                }
-                if (view == spinner1) {
-                    adapter.clear();
-                    // listData.addAll(list);
-                    adapter.addAll(list);
-                } else if (view == spinner2) {
-
-                    //adapter2.clear();
-                    //listSubData
-                    adapter2.addAll(list2);
-                    spinner2.setSelection(0);
-
-                }
-
-
-                //adapter.notifyDataSetChanged();
-
-            }
+    void setTypeMain(final int id, final Spinner view) {
+        new AsyncTask<Void, Void, Boolean>() {
 
             @Override
-            public void failure(RetrofitError error) {
-                System.out.println("error = [" + error + "]");
+            protected Boolean doInBackground(Void... params) {
+                adapterRest.getTypeCaseList(id, new Callback<Response>() {
+                    @Override
+                    public void success(Response result, Response response2) {
+                        list = new ArrayList();
+                        list2 = new ArrayList();
 
+                        BufferedReader reader = null;
+                        StringBuilder sb = new StringBuilder();
+                        try {
+
+                            reader = new BufferedReader(new InputStreamReader(result.getBody().in()));
+
+                            String line;
+
+                            try {
+                                while ((line = reader.readLine()) != null) {
+                                    sb.append(line);
+                                }
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                        String JsonConvertData = "{data:" + sb.toString() + "}";
+                        System.out.println(JsonConvertData);
+                        final ListTypeDataObject caseTypeObject = new Gson().fromJson(JsonConvertData, ListTypeDataObject.class);
+
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                if (view == spinner1) {
+                                    listData = new ArrayList();
+                                    for (CaseTypeObject e : caseTypeObject.getData()) {
+                                        if (!e.getName().matches("สอบถามข้อมูล")) {
+                                            list.add(e.getName());
+                                            listData.add(e);
+                                            System.out.println(e.getName());
+                                            System.out.println(e.getId());
+                                        }
+                                    }
+                                    setTypeMain(2, spinner2);
+                                } else if (view == spinner2) {
+                                    listSubData = new ArrayList<>();
+                                    for (CaseTypeObject e : caseTypeObject.getData()) {
+                                        list2.add(e.getName());
+                                        listSubData.add(e);
+                                        System.out.println(e.getName());
+                                    }
+                                }
+                                if (view == spinner1) {
+                                    adapter.clear();
+                                    // listData.addAll(list);
+                                    adapter.addAll(list);
+                                } else if (view == spinner2) {
+
+                                    //adapter2.clear();
+                                    //listSubData
+                                    adapter2.addAll(list2);
+                                    spinner2.setSelection(0);
+
+                                }
+
+                            }
+                        });
+                    }
+
+                    @Override
+                    public void failure(RetrofitError error) {
+                        System.out.println("error = [" + error + "]");
+
+                    }
+                });
+
+                return null;
             }
-        });
+        }.execute();
 
 
     }
@@ -434,371 +447,511 @@ public class CaseAddAndEditActivity extends ActionBarActivity implements View.On
     }
 
     void saveData() {
-        runOnUiThread(new Runnable() {
-            public void run() {
-                ringProgressDialog = ProgressDialog.show(CaseAddAndEditActivity.this, getResources().getString(R.string.update_data), getResources().getString(R.string.please_wait), true);
-                ringProgressDialog.setCancelable(true);
-            }
-        });
-
 
         final OpenCaseAssignObject openCaseAssignObject = setCaseData();
-        if (openCaseAssignObject != null) {
-            GetUserObject getUserObject = new GetUserObject(userId, token, clientId);
+        new AsyncTask<Void, Void, Boolean>() {
+            @Override
+            protected void onPreExecute() {
+                super.onPreExecute();
 
-            // query user data from webservice
-            adapterRestUser.getUser(getUserObject, new Callback<AccessUserObject>() {
-                @Override
-                public void success(AccessUserObject accessUserObject, Response response) {
-                    Log.d("Profile User Access", " " + accessUserObject.toString());
-                    if (accessUserObject != null) {
-                        CaseDataObject caseDataObject = openCaseAssignObject.getContactInfo();
-                        caseDataObject.setAddress(accessUserObject.getAddress());
-                        caseDataObject.setDistrict(accessUserObject.getDistrict());
-                        caseDataObject.setAmphur(accessUserObject.getAmphur());
-                        caseDataObject.setProvince(accessUserObject.getProvince());
-                        caseDataObject.setPostCode(accessUserObject.getPostCode());
-                        caseDataObject.setEmail(accessUserObject.getEmail());
-                        if (caseDataObject.getTelephone() == null || caseDataObject.getTelephone().isEmpty()) {
-                            caseDataObject.setTelephone(accessUserObject.getMobile());
-                        }
-                        if (caseDataObject.getNameContact() == null || caseDataObject.getNameContact().isEmpty()) {
-                            caseDataObject.setNameContact(accessUserObject.getDisplayName());
-                        }
+                ringProgressDialog = ProgressDialog.show(CaseAddAndEditActivity.this, null, getResources().getString(R.string.please_wait), true);
+                ringProgressDialog.setCancelable(true);
+            }
 
+            @Override
+            protected Boolean doInBackground(Void... params) {
+                if (openCaseAssignObject != null) {
+                    GetUserObject getUserObject = new GetUserObject(userId, token, clientId);
 
-                        PersonalObject personalObject = new PersonalObject();
-                        personalObject.setAddress(accessUserObject.getAddress());
-                        personalObject.setAmphur(accessUserObject.getAmphur());
-                        personalObject.setDistrict(accessUserObject.getDistrict());
-                        personalObject.setEmail(accessUserObject.getEmail());
-                        personalObject.setFirstname(accessUserObject.getFirstname());
-                        personalObject.setLastname(accessUserObject.getLastname());
-                        personalObject.setIdCard(accessUserObject.getIdCard());
-                        personalObject.setProvince(accessUserObject.getProvince());
-                        personalObject.setPostCode(accessUserObject.getPostCode());
-                        personalObject.setPersonalImage(accessUserObject.getUserImage());
-                        personalObject.setMobile(accessUserObject.getMobile());
-
-
-                        adapterRestPersonal.savePersonalAndChkMobile(personalObject, new Callback<UpdateResult>() {
-                            @Override
-                            public void success(UpdateResult updateResult, Response response) {
-                                System.out.println("updateResult adapterRestPersonal  = [" + updateResult.getResult() + "], response = [" + response + "]");
-                            }
-
-                            @Override
-                            public void failure(RetrofitError error) {
-                                System.out.println("error = [" + error + "]");
-
-                            }
-                        });
-
-
-                        openCaseAssignObject.setContactInfo(caseDataObject);
-
-                        Gson gson = new Gson();
-                        String json = gson.toJson(openCaseAssignObject);
-                        Log.e("opencase", "" + json);
-
-                        //save data
-                        adapterRest.openCases(openCaseAssignObject, new Callback<UpdateResult>() {
-                            @Override
-                            public void success(UpdateResult updateResult, Response response) {
-                                System.out.println(userId);
-                                System.out.println("updateResult = [" + updateResult.getCasesId() + "], response = [" + response + "]");
-                                if (updateResult.getResult()) {
-                                    String roomName = "case-" + updateResult.getPrimaryKeyId();
-                                    final ChatRoomObject chatRoomObject = new ChatRoomObject();
-                                    chatRoomObject.setRoomName(roomName);
-                                    chatRoomObject.setNaturalName(openCaseAssignObject.getCasesName());
-                                    chatRoomObject.setDescription(roomName);
-                                    List<String> listJid = new ArrayList<String>();
-                                    final List<PubsubObject> listNotify = new ArrayList<PubsubObject>();
-                                    Calendar c = Calendar.getInstance();
-                                    if (STATE_FORWARD == 2) {
-                                        Members members = new Members();
-                                        for (ForwardObject e : arrayList) {
-                                            if (e.getJid() != null) {
-                                                listJid.add(e.getJid());
-                                                PubsubObject pub = new PubsubObject();
-                                                pub.setUsername(e.getJid().split("@")[0]);
-                                                pub.setImage(displayImage);
-                                                pub.setAction("เปิดเคส");
-                                                pub.setDisplayData(c.getTime().toString());
-                                                pub.setCaseId(updateResult.getCasesId());
-                                                pub.setComplainId(updateResult.getPrimaryKeyId());
-                                                pub.setName(displayName);
-                                                pub.setTitle(openCaseAssignObject.getCasesName());
-                                                if (!e.getJid().matches(jid)) {
-                                                    listNotify.add(pub);
-                                                }
-
-                                            }
-
-                                        }
-                                        members.setMember(listJid);
-                                        chatRoomObject.setMembers(members);
-                                    }
-
-                                    openfireQuearyJson.createChatRoom(chatRoomObject, new Callback<Response>() {
-                                        @Override
-                                        public void success(Response response, Response response2) {
-                                            //System.out.println("response = [" + response + "], response2 = [" + response2 + "]");
-                                            for (PubsubObject e : listNotify) {
-                                                Log.e("TAG", ">>>>" + e.getUsername());
-                                                XMPPManage.getInstance().new TaskSendNotify(e).execute();
-                                            }
-                                            ringProgressDialog.dismiss();
-                                            BusProvider.getInstance().post("update_case_list");
-                                            Toast.makeText(getApplication(), "success", Toast.LENGTH_SHORT).show();
-                                            finish();
-
-
-                                        }
-
-                                        @Override
-                                        public void failure(RetrofitError error) {
-                                            System.out.println("error = [" + error + "]");
-                                            ringProgressDialog.dismiss();
-                                            Toast.makeText(getApplication(), "Unable connect server. Please try again", Toast.LENGTH_SHORT).show();
-                                        }
-                                    });
-
-
-                                } else {
-
-                                    ringProgressDialog.dismiss();
-                                    Toast.makeText(getApplication(), "Data is  not correct. Please try again.", Toast.LENGTH_SHORT).show();
+                    // query user data from webservice
+                    adapterRestUser.getUser(getUserObject, new Callback<AccessUserObject>() {
+                        @Override
+                        public void success(AccessUserObject accessUserObject, Response response) {
+                            Log.d("Profile User Access", " " + accessUserObject.toString());
+                            if (accessUserObject != null) {
+                                CaseDataObject caseDataObject = openCaseAssignObject.getContactInfo();
+                                caseDataObject.setAddress(accessUserObject.getAddress());
+                                caseDataObject.setDistrict(accessUserObject.getDistrict());
+                                caseDataObject.setAmphur(accessUserObject.getAmphur());
+                                caseDataObject.setProvince(accessUserObject.getProvince());
+                                caseDataObject.setPostCode(accessUserObject.getPostCode());
+                                caseDataObject.setEmail(accessUserObject.getEmail());
+                                if (caseDataObject.getTelephone() == null || caseDataObject.getTelephone().isEmpty()) {
+                                    caseDataObject.setTelephone(accessUserObject.getMobile());
+                                }
+                                if (caseDataObject.getNameContact() == null || caseDataObject.getNameContact().isEmpty()) {
+                                    caseDataObject.setNameContact(accessUserObject.getDisplayName());
                                 }
 
 
+                                PersonalObject personalObject = new PersonalObject();
+                                personalObject.setAddress(accessUserObject.getAddress());
+                                personalObject.setAmphur(accessUserObject.getAmphur());
+                                personalObject.setDistrict(accessUserObject.getDistrict());
+                                personalObject.setEmail(accessUserObject.getEmail());
+                                personalObject.setFirstname(accessUserObject.getFirstname());
+                                personalObject.setLastname(accessUserObject.getLastname());
+                                personalObject.setIdCard(accessUserObject.getIdCard());
+                                personalObject.setProvince(accessUserObject.getProvince());
+                                personalObject.setPostCode(accessUserObject.getPostCode());
+                                personalObject.setPersonalImage(accessUserObject.getUserImage());
+                                personalObject.setMobile(accessUserObject.getMobile());
+
+
+                                adapterRestPersonal.savePersonalAndChkMobile(personalObject, new Callback<UpdateResult>() {
+                                    @Override
+                                    public void success(UpdateResult updateResult, Response response) {
+                                        System.out.println("updateResult adapterRestPersonal  = [" + updateResult.getResult() + "], response = [" + response + "]");
+                                    }
+
+                                    @Override
+                                    public void failure(RetrofitError error) {
+                                        System.out.println("error = [" + error + "]");
+
+                                    }
+                                });
+
+
+                                openCaseAssignObject.setContactInfo(caseDataObject);
+
+                                Gson gson = new Gson();
+                                String json = gson.toJson(openCaseAssignObject);
+                                Log.e("opencase", "" + json);
+
+                                //save data
+                                adapterRest.openCases(openCaseAssignObject, new Callback<UpdateResult>() {
+                                    @Override
+                                    public void success(UpdateResult updateResult, Response response) {
+                                        System.out.println(userId);
+                                        System.out.println("updateResult = [" + updateResult.getCasesId() + "], response = [" + response + "]");
+                                        if (updateResult.getResult()) {
+                                            String roomName = "case-" + updateResult.getPrimaryKeyId();
+                                            final ChatRoomObject chatRoomObject = new ChatRoomObject();
+                                            chatRoomObject.setRoomName(roomName);
+                                            chatRoomObject.setNaturalName(openCaseAssignObject.getCasesName());
+                                            chatRoomObject.setDescription(roomName);
+                                            List<String> listJid = new ArrayList<String>();
+                                            final List<PubsubObject> listNotify = new ArrayList<PubsubObject>();
+                                            Calendar c = Calendar.getInstance();
+                                            if (STATE_FORWARD == 2) {
+                                                Members members = new Members();
+                                                for (ForwardObject e : arrayList) {
+                                                    if (e.getJid() != null) {
+                                                        listJid.add(e.getJid());
+                                                        PubsubObject pub = new PubsubObject();
+                                                        pub.setUsername(e.getJid().split("@")[0]);
+                                                        pub.setImage(displayImage);
+                                                        pub.setAction("เปิดเคส");
+                                                        pub.setDisplayData(c.getTime().toString());
+                                                        pub.setCaseId(updateResult.getCasesId());
+                                                        pub.setComplainId(updateResult.getPrimaryKeyId());
+                                                        pub.setName(displayName);
+                                                        pub.setTitle(openCaseAssignObject.getCasesName());
+                                                        if (!e.getJid().matches(jid)) {
+                                                            listNotify.add(pub);
+                                                        }
+
+                                                    }
+
+                                                }
+                                                members.setMember(listJid);
+                                                chatRoomObject.setMembers(members);
+                                            }
+
+                                            openfireQuearyJson.createChatRoom(chatRoomObject, new Callback<Response>() {
+                                                @Override
+                                                public void success(Response response, Response response2) {
+                                                    //System.out.println("response = [" + response + "], response2 = [" + response2 + "]");
+                                                    for (PubsubObject e : listNotify) {
+                                                        Log.e("TAG", ">>>>" + e.getUsername());
+                                                        XMPPManage.getInstance().new TaskSendNotify(e).execute();
+                                                    }
+                                                    runOnUiThread(new Runnable() {
+                                                        @Override
+                                                        public void run() {
+                                                            Activity activity = CaseAddAndEditActivity.this;
+                                                            if (activity != null) {
+                                                                ringProgressDialog.dismiss();
+                                                            }
+
+                                                        }
+                                                    });
+                                                    BusProvider.getInstance().post("update_case_list");
+                                                    Toast.makeText(getApplication(), "success", Toast.LENGTH_SHORT).show();
+                                                    finish();
+
+
+                                                }
+
+                                                @Override
+                                                public void failure(RetrofitError error) {
+                                                    System.out.println("error = [" + error + "]");
+                                                    runOnUiThread(new Runnable() {
+                                                        @Override
+                                                        public void run() {
+                                                            Activity activity = CaseAddAndEditActivity.this;
+                                                            if (activity != null) {
+                                                                ringProgressDialog.dismiss();
+                                                            }
+
+                                                        }
+                                                    });
+                                                    Toast.makeText(getApplication(), "Unable connect server. Please try again", Toast.LENGTH_SHORT).show();
+                                                }
+                                            });
+
+
+                                        } else {
+
+                                            runOnUiThread(new Runnable() {
+                                                @Override
+                                                public void run() {
+                                                    Activity activity = CaseAddAndEditActivity.this;
+                                                    if (activity != null) {
+                                                        ringProgressDialog.dismiss();
+                                                    }
+
+                                                }
+                                            });
+                                            Toast.makeText(getApplication(), "Data is  not correct. Please try again.", Toast.LENGTH_SHORT).show();
+                                        }
+
+
+                                    }
+
+                                    @Override
+                                    public void failure(RetrofitError error) {
+                                        runOnUiThread(new Runnable() {
+                                            @Override
+                                            public void run() {
+                                                Activity activity = CaseAddAndEditActivity.this;
+                                                if (activity != null) {
+                                                    ringProgressDialog.dismiss();
+                                                }
+
+                                            }
+                                        });
+                                        System.out.println("error = [" + error.getResponse() + "]");
+                                        Toast.makeText(getApplication(), "Unable connect server. Please try again", Toast.LENGTH_SHORT).show();
+                                    }
+                                });
+
                             }
 
-                            @Override
-                            public void failure(RetrofitError error) {
+                        }
+
+                        @Override
+                        public void failure(RetrofitError error) {
+                            runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    Activity activity = CaseAddAndEditActivity.this;
+                                    if (activity != null) {
+                                        ringProgressDialog.dismiss();
+                                    }
+
+                                }
+                            });
+
+                            System.out.println("error get user data = [" + error + "]");
+                            Toast.makeText(getApplication(), "Unable connect server. Please try again", Toast.LENGTH_SHORT).show();
+
+                        }
+                    });
+
+
+                } else {
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            Activity activity = CaseAddAndEditActivity.this;
+                            if (activity != null) {
                                 ringProgressDialog.dismiss();
-                                System.out.println("error = [" + error.getResponse() + "]");
-                                Toast.makeText(getApplication(), "Unable connect server. Please try again", Toast.LENGTH_SHORT).show();
                             }
-                        });
 
-                    }
-
+                        }
+                    });
                 }
-
-                @Override
-                public void failure(RetrofitError error) {
-                    ringProgressDialog.dismiss();
-                    System.out.println("error get user data = [" + error + "]");
-                    Toast.makeText(getApplication(), "Unable connect server. Please try again", Toast.LENGTH_SHORT).show();
-
-                }
-            });
+                return null;
+            }
+        }.execute();
 
 
-        } else {
-            ringProgressDialog.dismiss();
-        }
     }
 
     void getData() {
         final ProgressDialog ringProgressDialog = ProgressDialog.show(this, getResources().getString(R.string.load_data), getResources().getString(R.string.please_wait), true);
         ringProgressDialog.setCancelable(true);
-        GetComplainObject getComplainObject = new GetComplainObject();
+        final GetComplainObject getComplainObject = new GetComplainObject();
         getComplainObject.setAccessToken(token);
         getComplainObject.setClientId(clientId);
         getComplainObject.setPrimaryKeyId(caseId);
-
-        adapterRest.getCaseData(getComplainObject, new Callback<CaseDataMemberObject>() {
-            @Override
-            public void success(CaseDataMemberObject caseDataMemberObject, Response response) {
-                System.out.println("caseDataMemberObject = [" + caseDataMemberObject + "], response = [" + response + "]");
-                STATE_FORWARD = caseDataMemberObject.getTypeCaseAssign();
-                txtDetail.setText(caseDataMemberObject.getCasesName());
-                ////////////////////////////////////////////////////////////////////////////////////
-                if (caseDataMemberObject.getCaseAssignList() != null) {
-                    for (CaseAssignObject e : caseDataMemberObject.getCaseAssignList()) {
-                        ForwardObject object = new ForwardObject();
-                        if (STATE_FORWARD == 1) {
-                            object.setId(e.getOrganizeId());
-                            object.setImage(e.getUserImage());
-                            object.setName(e.getOrganizeName());
-                            arrayList.add(object);
-
-                        } else if (STATE_FORWARD == 2) {
-                            object.setId(e.getUserId());
-                            object.setImage(e.getUserImage());
-                            object.setName(e.getUserName());
-                            arrayList.add(object);
-                        }
-
-                    }
-
-                    //set text in AssignText
-                    setTextTO();
-                }
-                ////////////////////////////////////////////////////////////////////////////////////
-
-
-                ////////////////////////////////////////////////////////////////////////////////////
-                if (caseDataMemberObject.getContactInfo() != null) {
-                    dataPlace = caseDataMemberObject.getContactInfo();
-
-                    checkAnonymous.setChecked(dataPlace.getIsAnonymousString());
-
-                    //////////// Set Address /////////////
-                    String houseNumber = dataPlace.getHouseNumber();
-                    houseNumber = (houseNumber == null || houseNumber.isEmpty()) ? "" : houseNumber + " ";
-
-                    String village = dataPlace.getVillage();
-                    village = (village == null || village.isEmpty()) ? "" : village + " ";
-
-                    String soi = dataPlace.getSoi();
-                    soi = (soi == null || soi.isEmpty()) ? "" : soi + " ";
-
-                    String road = dataPlace.getRoad();
-                    road = (road == null || road.isEmpty()) ? "" : road + "\n";
-
-                    String more = dataPlace.getMoreInformation();
-                    more = (more == null || more.matches("")) ? "" : "(" + more + ")";
-
-
-                    String address = houseNumber + village + soi + road + more;
-                    if (address.matches("")) {
-                        address = "ไม่มีข้อมูล";
-                    }
-
-
-                    txtPlace.setText(address);
-                    txtName.setText(dataPlace.getTelephone());
-                    txtPhone.setText(dataPlace.getNameContact());
-
-
-                    ////////////////////////Image View///////////////////////////
-                    listOldImageUrl = new ArrayList();
-                    if (dataPlace.getInfoImageList().size() > 0) {
-                        System.out.println("Have  data");
-                        //mGridAdapter.resetAdapter(caseMainObject.getContactInfo().getInfoImageList());
-                        listOldImageUrl = dataPlace.getInfoImageList();
-                        for (ImageObject e : listOldImageUrl) {
-                            System.out.println("Have  data" + e.getInfoImage());
-                            mGridAdapter.addItemUpdate(e.getInfoImage());
-                        }
-                    } else {
-                        System.out.println("no data");
-                    }
-                }
-                ringProgressDialog.dismiss();
-            }
+        new AsyncTask<Void, Void, Boolean>() {
 
             @Override
-            public void failure(RetrofitError error) {
-                System.out.println("error = [" + error + "]");
-                ringProgressDialog.dismiss();
-                Toast.makeText(getApplication(),
-                        "Please check your internet connection.", Toast.LENGTH_SHORT)
-                        .show();
-                finish();
+            protected Boolean doInBackground(Void... params) {
+                adapterRest.getCaseData(getComplainObject, new Callback<CaseDataMemberObject>() {
+                    @Override
+                    public void success(final CaseDataMemberObject caseDataMemberObject, Response response) {
+                        System.out.println("caseDataMemberObject = [" + caseDataMemberObject + "], response = [" + response + "]");
+                        STATE_FORWARD = caseDataMemberObject.getTypeCaseAssign();
+
+                        ////////////////////////////////////////////////////////////////////////////////////
+                        if (caseDataMemberObject.getCaseAssignList() != null) {
+                            for (CaseAssignObject e : caseDataMemberObject.getCaseAssignList()) {
+                                ForwardObject object = new ForwardObject();
+                                if (STATE_FORWARD == 1) {
+                                    object.setId(e.getOrganizeId());
+                                    object.setImage(e.getUserImage());
+                                    object.setName(e.getOrganizeName());
+                                    arrayList.add(object);
+
+                                } else if (STATE_FORWARD == 2) {
+                                    object.setId(e.getUserId());
+                                    object.setImage(e.getUserImage());
+                                    object.setName(e.getUserName());
+                                    arrayList.add(object);
+                                }
+
+                            }
+
+                            //set text in AssignText
+                            setTextTO();
+                        }
+                        ////////////////////////////////////////////////////////////////////////////////////
+
+
+                        ////////////////////////////////////////////////////////////////////////////////////
+                        if (caseDataMemberObject.getContactInfo() != null) {
+                            dataPlace = caseDataMemberObject.getContactInfo();
+
+                            checkAnonymous.setChecked(dataPlace.getIsAnonymousString());
+
+                            //////////// Set Address /////////////
+                            String houseNumber = dataPlace.getHouseNumber();
+                            houseNumber = (houseNumber == null || houseNumber.isEmpty()) ? "" : houseNumber + " ";
+
+                            String village = dataPlace.getVillage();
+                            village = (village == null || village.isEmpty()) ? "" : village + " ";
+
+                            String soi = dataPlace.getSoi();
+                            soi = (soi == null || soi.isEmpty()) ? "" : soi + " ";
+
+                            String road = dataPlace.getRoad();
+                            road = (road == null || road.isEmpty()) ? "" : road + "\n";
+
+                            String more = dataPlace.getMoreInformation();
+                            more = (more == null || more.matches("")) ? "" : "(" + more + ")";
+
+
+                            String address = houseNumber + village + soi + road + more;
+                            if (address.matches("")) {
+                                address = "ไม่มีข้อมูล";
+                            }
+
+                            final String finalAddress = address;
+                            runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    Activity activity = CaseAddAndEditActivity.this;
+                                    if (activity != null) {
+                                        txtDetail.setText(caseDataMemberObject.getCasesName());
+                                        txtPlace.setText(finalAddress);
+                                        txtName.setText(dataPlace.getTelephone());
+                                        txtPhone.setText(dataPlace.getNameContact());
+                                    }
+
+                                }
+                            });
+
+
+                            ////////////////////////Image View///////////////////////////
+                            listOldImageUrl = new ArrayList();
+                            if (dataPlace.getInfoImageList().size() > 0) {
+                                System.out.println("Have  data");
+                                //mGridAdapter.resetAdapter(caseMainObject.getContactInfo().getInfoImageList());
+                                listOldImageUrl = dataPlace.getInfoImageList();
+                                for (final ImageObject e : listOldImageUrl) {
+                                    System.out.println("Have  data" + e.getInfoImage());
+                                    runOnUiThread(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            Activity activity = CaseAddAndEditActivity.this;
+                                            if (activity != null) {
+                                                mGridAdapter.addItemUpdate(e.getInfoImage());
+                                            }
+
+                                        }
+                                    });
+
+                                }
+                            } else {
+                                System.out.println("no data");
+                            }
+                        }
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                Activity activity = CaseAddAndEditActivity.this;
+                                if (activity != null) {
+
+                                }
+                                ringProgressDialog.dismiss();
+                            }
+                        });
+
+                    }
+
+                    @Override
+                    public void failure(RetrofitError error) {
+                        System.out.println("error = [" + error + "]");
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                Activity activity = CaseAddAndEditActivity.this;
+                                if (activity != null) {
+                                    ringProgressDialog.dismiss();
+                                }
+
+                            }
+                        });
+                        Toast.makeText(getApplication(),
+                                "Please check your internet connection.", Toast.LENGTH_SHORT)
+                                .show();
+                        finish();
+                    }
+                });
+
+                return null;
             }
-        });
+        }.execute();
+
+
     }
 
     void updateCase() {
-        runOnUiThread(new Runnable() {
-            public void run() {
-                ringProgressDialog = ProgressDialog.show(CaseAddAndEditActivity.this, null, getResources().getString(R.string.please_wait), true);
-                ringProgressDialog.setCancelable(true);
-            }
-        });
-
         final OpenCaseAssignObject openCaseAssignObject = setCaseData();
-
         openCaseAssignObject.setCasesNo(caseId);
         Gson gson = new Gson();
         String json = gson.toJson(openCaseAssignObject);
         System.out.println(json);
 
-        if (openCaseAssignObject != null) {
+        new AsyncTask<Void, Void, Boolean>() {
+            ProgressDialog ringProgressDialog;
 
-            //saveCase
-            adapterRest.saveCases(openCaseAssignObject, new Callback<UpdateResult>() {
-                @Override
-                public void success(UpdateResult updateResult, Response response) {
-                    //adapterRest.getUserListJid();
-                    ringProgressDialog.dismiss();
-                    if (updateResult.getResult()) {
-                        String roomName = "case-" + complainId;
-                        final ChatRoomObject chatRoomObject = new ChatRoomObject();
-                        chatRoomObject.setRoomName(roomName);
-                        chatRoomObject.setNaturalName(openCaseAssignObject.getCasesName());
-                        chatRoomObject.setDescription(roomName);
+            @Override
+            protected void onPreExecute() {
+                super.onPreExecute();
+                ringProgressDialog = ProgressDialog.show(CaseAddAndEditActivity.this, null, getResources().getString(R.string.please_wait), true);
+                ringProgressDialog.setCancelable(true);
+            }
 
-                        //get JidList for notify and Recreate chat room
-                        adapterRest.getUserListJid(complainId, new Callback<Response>() {
-                            @Override
-                            public void success(Response result, Response response2) {
-                                DatabaseChatHelper.init().clearCaseTable();
-                                BufferedReader reader;
-                                StringBuilder sb = new StringBuilder();
-                                try {
-                                    reader = new BufferedReader(new InputStreamReader(result.getBody().in()));
-                                    String line;
+            @Override
+            protected Boolean doInBackground(Void... params) {
+                if (openCaseAssignObject != null) {
 
-                                    try {
-                                        while ((line = reader.readLine()) != null) {
-                                            sb.append(line);
-                                        }
-                                    } catch (IOException e) {
-                                        e.printStackTrace();
-                                    }
-                                } catch (IOException e) {
-                                    e.printStackTrace();
-                                }
-                                String JsonConvertData = "{data:" + sb.toString() + "}";
-                                System.out.println(JsonConvertData);
-                                CaseListJidObject listObject = new Gson().fromJson(JsonConvertData, CaseListJidObject.class);
-                                Members members = new Members();
-                                List<String> listJid = new ArrayList();
-                                final List<PubsubObject> listNotify = new ArrayList<PubsubObject>();
-                                Calendar c = Calendar.getInstance();
-                                for (JidData e : listObject.getData()) {
-                                    if (!e.getJid().isEmpty() && e.getJid() != null) {
-                                        listJid.add(e.getJid());
-                                        PubsubObject pub = new PubsubObject();
-                                        pub.setUsername(e.getJid().split("@")[0]);
-                                        pub.setImage(displayImage);
-                                        pub.setAction("อัพเดทเคส");
-                                        pub.setDisplayData(c.getTime().toString());
-                                        //pub.setPrimarykey(complainId);
-                                        pub.setComplainId(complainId);
-                                        pub.setCaseId(caseId);
-                                        pub.setName(displayName);
-                                        pub.setTitle(openCaseAssignObject.getCasesName());
+                    //saveCase
+                    adapterRest.saveCases(openCaseAssignObject, new Callback<UpdateResult>() {
+                        @Override
+                        public void success(UpdateResult updateResult, Response response) {
+                            //adapterRest.getUserListJid();
 
-                                        if (!e.getJid().matches(jid)) {
-                                            listNotify.add(pub);
-                                        }
-                                    }
+                            if (updateResult.getResult()) {
+                                String roomName = "case-" + complainId;
+                                final ChatRoomObject chatRoomObject = new ChatRoomObject();
+                                chatRoomObject.setRoomName(roomName);
+                                chatRoomObject.setNaturalName(openCaseAssignObject.getCasesName());
+                                chatRoomObject.setDescription(roomName);
 
-                                }
-                                members.setMember(listJid);
-                                chatRoomObject.setMembers(members);
-
-                                //Recreate chat room
-                                openfireQuearyJson.createChatRoom(chatRoomObject, new Callback<Response>() {
+                                //get JidList for notify and Recreate chat room
+                                adapterRest.getUserListJid(complainId, new Callback<Response>() {
                                     @Override
-                                    public void success(Response response, Response response2) {
-                                        //System.out.println("response = [" + response + "], response2 = [" + response2 + "]");
-                                        for (PubsubObject e : listNotify) {
+                                    public void success(Response result, Response response2) {
+                                        DatabaseChatHelper.init().clearCaseTable();
+                                        BufferedReader reader;
+                                        StringBuilder sb = new StringBuilder();
+                                        try {
+                                            reader = new BufferedReader(new InputStreamReader(result.getBody().in()));
+                                            String line;
 
-                                            Log.e("TAG", ">>>>" + e.getUsername());
-                                            XMPPManage.getInstance().new TaskSendNotify(e).execute();
+                                            try {
+                                                while ((line = reader.readLine()) != null) {
+                                                    sb.append(line);
+                                                }
+                                            } catch (IOException e) {
+                                                e.printStackTrace();
+                                            }
+                                        } catch (IOException e) {
+                                            e.printStackTrace();
                                         }
-                                        ringProgressDialog.dismiss();
-                                        Toast.makeText(getApplication(), "success", Toast.LENGTH_SHORT).show();
-                                        BusProvider.getInstance().post("update_case_list");
-                                        finish();
+                                        String JsonConvertData = "{data:" + sb.toString() + "}";
+                                        System.out.println(JsonConvertData);
+                                        CaseListJidObject listObject = new Gson().fromJson(JsonConvertData, CaseListJidObject.class);
+                                        Members members = new Members();
+                                        List<String> listJid = new ArrayList();
+                                        final List<PubsubObject> listNotify = new ArrayList<PubsubObject>();
+                                        Calendar c = Calendar.getInstance();
+                                        for (JidData e : listObject.getData()) {
+                                            if (!e.getJid().isEmpty() && e.getJid() != null) {
+                                                listJid.add(e.getJid());
+                                                PubsubObject pub = new PubsubObject();
+                                                pub.setUsername(e.getJid().split("@")[0]);
+                                                pub.setImage(displayImage);
+                                                pub.setAction("อัพเดทเคส");
+                                                pub.setDisplayData(c.getTime().toString());
+                                                //pub.setPrimarykey(complainId);
+                                                pub.setComplainId(complainId);
+                                                pub.setCaseId(caseId);
+                                                pub.setName(displayName);
+                                                pub.setTitle(openCaseAssignObject.getCasesName());
+
+                                                if (!e.getJid().matches(jid)) {
+                                                    listNotify.add(pub);
+                                                }
+                                            }
+
+                                        }
+                                        members.setMember(listJid);
+                                        chatRoomObject.setMembers(members);
+
+                                        //Recreate chat room
+                                        openfireQuearyJson.createChatRoom(chatRoomObject, new Callback<Response>() {
+                                            @Override
+                                            public void success(Response response, Response response2) {
+                                                //System.out.println("response = [" + response + "], response2 = [" + response2 + "]");
+                                                for (PubsubObject e : listNotify) {
+
+                                                    Log.e("TAG", ">>>>" + e.getUsername());
+                                                    XMPPManage.getInstance().new TaskSendNotify(e).execute();
+                                                }
+                                                runOnUiThread(new Runnable() {
+                                                    @Override
+                                                    public void run() {
+                                                        ringProgressDialog.dismiss();
+                                                    }
+                                                });
+
+
+                                                Toast.makeText(getApplication(), "success", Toast.LENGTH_SHORT).show();
+                                                BusProvider.getInstance().post("update_case_list");
+                                                finish();
+
+
+                                            }
+
+                                            @Override
+                                            public void failure(RetrofitError error) {
+                                                System.out.println("error = [" + error + "]");
+                                                runOnUiThread(new Runnable() {
+                                                    @Override
+                                                    public void run() {
+                                                        ringProgressDialog.dismiss();
+                                                    }
+                                                });
+
+                                                Toast.makeText(getApplication(), "Unable connect server. Please try again", Toast.LENGTH_SHORT).show();
+                                            }
+                                        });
 
 
                                     }
@@ -806,40 +959,55 @@ public class CaseAddAndEditActivity extends ActionBarActivity implements View.On
                                     @Override
                                     public void failure(RetrofitError error) {
                                         System.out.println("error = [" + error + "]");
-                                        ringProgressDialog.dismiss();
-                                        Toast.makeText(getApplication(), "Unable connect server. Please try again", Toast.LENGTH_SHORT).show();
+                                        runOnUiThread(new Runnable() {
+                                            @Override
+                                            public void run() {
+                                                ringProgressDialog.dismiss();
+                                            }
+                                        });
+                                        Toast.makeText(getApplication(), "Unable connect server \n Please try again", Toast.LENGTH_SHORT).show();
                                     }
                                 });
 
-
+                            } else {
+                                runOnUiThread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        ringProgressDialog.dismiss();
+                                    }
+                                });
+                                Toast.makeText(getApplication(), "Data is  not correct \n Please try again.", Toast.LENGTH_SHORT).show();
                             }
+                            System.out.println(userId);
+                            System.out.println("updateResult = [" + updateResult.getResult() + "], response = [" + response + "]");
 
-                            @Override
-                            public void failure(RetrofitError error) {
-                                System.out.println("error = [" + error + "]");
-                                ringProgressDialog.dismiss();
-                                Toast.makeText(getApplication(), "Unable connect server \n Please try again", Toast.LENGTH_SHORT).show();
-                            }
-                        });
+                        }
 
-                    } else {
-                        Toast.makeText(getApplication(), "Data is  not correct \n Please try again.", Toast.LENGTH_SHORT).show();
-                    }
-                    System.out.println(userId);
-                    System.out.println("updateResult = [" + updateResult.getResult() + "], response = [" + response + "]");
-
+                        @Override
+                        public void failure(RetrofitError error) {
+                            runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    ringProgressDialog.dismiss();
+                                }
+                            });
+                            System.out.println("error = [" + error.getResponse() + "]");
+                            Toast.makeText(getApplication(), "Unable connect server \n Please try again", Toast.LENGTH_SHORT).show();
+                        }
+                    });
+                } else {
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            ringProgressDialog.dismiss();
+                        }
+                    });
                 }
+                return null;
+            }
+        }.execute();
 
-                @Override
-                public void failure(RetrofitError error) {
-                    ringProgressDialog.dismiss();
-                    System.out.println("error = [" + error.getResponse() + "]");
-                    Toast.makeText(getApplication(), "Unable connect server \n Please try again", Toast.LENGTH_SHORT).show();
-                }
-            });
-        } else {
-            ringProgressDialog.dismiss();
-        }
+
     }
 
 
@@ -1010,7 +1178,7 @@ public class CaseAddAndEditActivity extends ActionBarActivity implements View.On
         protected void onPreExecute() {
 
             super.onPreExecute();
-            ringProgressDialog = ProgressDialog.show(CaseAddAndEditActivity.this, getResources().getString(R.string.uploading), getResources().getString(R.string.please_wait), true);
+            ringProgressDialog = ProgressDialog.show(CaseAddAndEditActivity.this, null, getResources().getString(R.string.please_wait), true);
             ringProgressDialog.setCancelable(true);
         }
 
@@ -1021,9 +1189,11 @@ public class CaseAddAndEditActivity extends ActionBarActivity implements View.On
                 int imageCount = 0;
                 for (ImageData e : mGridAdapter.getData()) {
                     if (e.getTag() == 1) {
+                        String uuid = UUID.randomUUID().toString();
+                        System.out.println("uuid = " + uuid);
                         imageCount++;
                         int randomNum = 500 + (int) ((Math.random() * 1204006080) / Math.random());
-                        File file = new File(getCacheDir(), "pattaya-case" + randomNum);
+                        File file = new File(getCacheDir(), "pattaya-case" + randomNum + uuid);
                         try {
                             file.createNewFile();
                         } catch (IOException error) {
@@ -1061,15 +1231,10 @@ public class CaseAddAndEditActivity extends ActionBarActivity implements View.On
                         } catch (IOException error) {
                             error.printStackTrace();
                         }
-                        Log.e("File upload", "" + file.length());
-                        Log.e("File upload", "" + file.getAbsolutePath());
                         final long totalSize = file.length();
-                        System.out.println("FILE LENGTH" + ">>>>>>>>" + totalSize);
-
-
                         final int finalImageCount = imageCount;
                         ProgressListener listener = new ProgressListener() {
-                            String fileID = "Please wait... \nimage" + finalImageCount + " upload complete";
+                            String fileID = "Please wait... \nimage" + finalImageCount + " uploading";
 
                             @Override
                             public void transferred(long num) {
@@ -1120,23 +1285,33 @@ public class CaseAddAndEditActivity extends ActionBarActivity implements View.On
                                 listImageURL.add(imageObject);
                                 if (listImageURL.size() == mGridAdapter.getData().size()) {
                                     dataPlace.setInfoImageList(listImageURL);
-                                    if (caseId > 0) {
-                                        updateCase();
-                                    } else {
-                                        saveData();
-                                    }
+                                    runOnUiThread(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            if (caseId > 0) {
+                                                updateCase();
+                                            } else {
+                                                saveData();
+                                            }
+                                            ringProgressDialog.dismiss();
+                                        }
+                                    });
 
-                                    System.out.println("UPload Complete!!!");
-                                    ringProgressDialog.dismiss();
+
                                 }
                             }
 
                             @Override
                             public void failure(RetrofitError error) {
                                 System.out.println("error = [" + error + "]");
-
                                 Toast.makeText(getApplication(), "Cannot upload file please try again", Toast.LENGTH_SHORT).show();
-                                ringProgressDialog.dismiss();
+                                runOnUiThread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        ringProgressDialog.dismiss();
+                                    }
+                                });
+
 
                             }
                         });
@@ -1145,26 +1320,40 @@ public class CaseAddAndEditActivity extends ActionBarActivity implements View.On
                         imageObject.setInfoImage(e.getPath());
                         listImageURL.add(imageObject);
                         if (listImageURL.size() == mGridAdapter.getData().size()) {
-                            ringProgressDialog.dismiss();
-                            dataPlace.setInfoImageList(listImageURL);
-                            if (caseId > 0) {
-                                updateCase();
-                            } else {
-                                saveData();
-                            }
+                            runOnUiThread(new Runnable() {
+
+                                @Override
+                                public void run() {
+                                    ringProgressDialog.dismiss();
+                                    dataPlace.setInfoImageList(listImageURL);
+                                    if (caseId > 0) {
+                                        updateCase();
+                                    } else {
+                                        saveData();
+                                    }
+                                }
+                            });
+
+
                             System.out.println("UPload Complete!!!");
                         }
                     }
                 }
 
             } else {
-                ringProgressDialog.dismiss();
-                dataPlace.setInfoImageList(listImageURL);
-                if (caseId > 0) {
-                    updateCase();
-                } else {
-                    saveData();
-                }
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        ringProgressDialog.dismiss();
+                        dataPlace.setInfoImageList(listImageURL);
+                        if (caseId > 0) {
+                            updateCase();
+                        } else {
+                            saveData();
+                        }
+                    }
+                });
+
 
             }
             return null;

@@ -50,6 +50,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 import java.util.concurrent.ExecutionException;
 
 import retrofit.Callback;
@@ -163,32 +164,63 @@ public class PostActivity extends ActionBarActivity implements View.OnClickListe
 
 
     void savePost() {
-        runOnUiThread(new Runnable() {
-            public void run() {
+        new AsyncTask<Void, Void, Boolean>() {
+            ProgressDialog ringProgressDialog;
+
+            @Override
+            protected void onPreExecute() {
+                super.onPreExecute();
                 ringProgressDialog = ProgressDialog.show(PostActivity.this, null, getResources().getString(R.string.please_wait), true);
                 ringProgressDialog.setCancelable(true);
             }
-        });
-
-        restFulQuearyPost.savePost(savePostObject, new Callback<UpdateResult>() {
-            @Override
-            public void success(UpdateResult updateResult, Response response) {
-                Toast.makeText(getApplication(),
-                        "success", Toast.LENGTH_SHORT)
-                        .show();
-                BusProvider.getInstance().post("post");
-                ringProgressDialog.dismiss();
-                finish();
-
-            }
 
             @Override
-            public void failure(RetrofitError error) {
-                alertDialogFailtoServer();
-                ringProgressDialog.dismiss();
+            protected Boolean doInBackground(Void... params) {
+                restFulQuearyPost.savePost(savePostObject, new Callback<UpdateResult>() {
+                    @Override
+                    public void success(UpdateResult updateResult, Response response) {
+                        Toast.makeText(getApplication(),
+                                "success", Toast.LENGTH_SHORT)
+                                .show();
+                        BusProvider.getInstance().post("post");
+                        Activity activity = PostActivity.this;
+                        if (activity != null) {
+                            runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    ringProgressDialog.dismiss();
+                                    finish();
+                                }
+                            });
 
+
+                        }
+
+
+                    }
+
+                    @Override
+                    public void failure(RetrofitError error) {
+                        Activity activity = PostActivity.this;
+                        if (activity != null) {
+                            runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    alertDialogFailtoServer();
+                                    ringProgressDialog.dismiss();
+                                }
+                            });
+
+                        }
+
+
+                    }
+                });
+                return null;
             }
-        });
+        }.execute();
+
+
     }
 
     @Override
@@ -308,9 +340,11 @@ public class PostActivity extends ActionBarActivity implements View.OnClickListe
                 final boolean[] fail = {false};
                 for (String e : imageData) {
                     imageCount++;
+                    String uuid = UUID.randomUUID().toString();
+                    System.out.println("uuid = " + uuid);
                     System.out.println(e);
                     int randomNum = 500 + (int) ((Math.random() * 1204006080) / Math.random());
-                    File file = new File(getCacheDir(), "pattaya-post" + randomNum);
+                    File file = new File(getCacheDir(), "pattaya-post" + randomNum + uuid);
                     try {
                         file.createNewFile();
                     } catch (IOException error) {
@@ -354,7 +388,7 @@ public class PostActivity extends ActionBarActivity implements View.OnClickListe
                     final long totalSize = file.length();
                     final int finalImageCount = imageCount;
                     listener = new ProgressListener() {
-                        String fileID = "Please wait... \nimage" + finalImageCount + " upload complete";
+                        String fileID = "Please wait... \nimage" + finalImageCount + " uploading";
 
                         @Override
                         public void transferred(long num) {
@@ -401,11 +435,19 @@ public class PostActivity extends ActionBarActivity implements View.OnClickListe
 
                             imageUploadURL.add(fileListObject.getData().get(0).getUrl());
                             if (imageUploadURL.size() == imageData.size()) {
-                                savePostObject.setPostImageList(imageUploadURL);
+                                Activity activity = PostActivity.this;
+                                if (activity != null) {
+                                    runOnUiThread(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            savePostObject.setPostImageList(imageUploadURL);
+                                            ringProgressDialog.dismiss();
+                                            savePost();
+                                        }
+                                    });
 
-                                ringProgressDialog.dismiss();
+                                }
 
-                                savePost();
                             }
 
                         }
@@ -414,10 +456,18 @@ public class PostActivity extends ActionBarActivity implements View.OnClickListe
                         public void failure(RetrofitError error) {
                             System.out.println("error = [" + error + "]");
                             fail[0] = true;
+                            Activity activity = PostActivity.this;
+                            if (activity != null) {
+                                runOnUiThread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        alertDialogFailtoServer();
+                                        ringProgressDialog.dismiss();
+                                    }
+                                });
 
-                            alertDialogFailtoServer();
+                            }
 
-                            ringProgressDialog.dismiss();
 
                         }
                     });
@@ -427,8 +477,18 @@ public class PostActivity extends ActionBarActivity implements View.OnClickListe
 
                 }
             } else {
-                ringProgressDialog.dismiss();
-                savePost();
+                Activity activity = PostActivity.this;
+                if (activity != null) {
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            ringProgressDialog.dismiss();
+                            savePost();
+                        }
+                    });
+
+                }
+
             }
 
             return null;

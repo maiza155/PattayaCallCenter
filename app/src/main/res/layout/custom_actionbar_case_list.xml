@@ -7,14 +7,27 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
-        <ImageButton
-            android:id="@+id/add_left_menu"
-            android:layout_width="35dp"
-            android:layout_height="wrap_content"
-            android:background="@null"
-            android:gravity="left"
-            android:scaleType="centerInside"
-            android:src="@drawable/asset_icon_menu_setting" />
+        <RelativeLayout
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content">
+
+            <ImageButton
+                android:id="@+id/add_left_menu"
+                android:layout_width="35dp"
+                android:layout_height="wrap_content"
+                android:background="@null"
+                android:gravity="left"
+                android:scaleType="centerInside"
+                android:src="@drawable/asset_icon_menu_setting" />
+
+            <View
+                android:id="@+id/badge"
+                android:layout_width="25dp"
+                android:layout_height="25dp"
+                android:layout_alignParentTop="true"
+                android:layout_alignRight="@id/add_left_menu" />
+        </RelativeLayout>
+
 
         <TextView
             android:id="@+id/actionbar_textview"

@@ -12,6 +12,7 @@ import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.widget.LinearLayoutManager;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -40,6 +41,8 @@ import com.pattaya.pattayacallcenter.webservice.WebserviceConnector;
 import com.pattaya.pattayacallcenter.webservice.object.casedata.CaseListDataObject;
 import com.pattaya.pattayacallcenter.webservice.object.casedata.CaseListObject;
 import com.pattaya.pattayacallcenter.webservice.object.casedata.GetCaseListData;
+import com.pattaya.pattayacallcenter.webservice.object.organize.GetInviteOrgObject;
+import com.readystatesoftware.viewbadger.BadgeView;
 import com.squareup.otto.Subscribe;
 
 import java.io.BufferedReader;
@@ -70,11 +73,15 @@ public class CaseListActivity extends ActionBarActivity implements View.OnClickL
     SharedPreferences.Editor editor;
     RestAdapter webserviceConnector = WebserviceConnector.getInstanceCase();
     RestFulQueary adapterRest = null;
+
+    RestAdapter webserviceConnector2 = WebserviceConnector.getInstance();
+    final RestFulQueary queary = webserviceConnector2.create(RestFulQueary.class);
     int userId;
     String token;
     String clientId;
     ProgressDialog ringProgressDialog;
     int TAG_ORGANIZE = 808;
+    BadgeView badge, badgeInSlide;
     private SwipeRefreshLayout mSwipeRefreshLayout;
 
     @Override
@@ -137,6 +144,11 @@ public class CaseListActivity extends ActionBarActivity implements View.OnClickL
         getListData();
 
 
+        badgeInSlide = new BadgeView(this, btnOranize);
+        badgeInSlide.setText("N");
+        badgeInSlide.setTextSize(12);
+        getOrg();
+
     }
 
 
@@ -159,6 +171,12 @@ public class CaseListActivity extends ActionBarActivity implements View.OnClickL
         getSupportActionBar().setCustomView(v);
         getSupportActionBar().setDisplayHomeAsUpEnabled(false);
         getSupportActionBar().setDisplayShowHomeEnabled(false);
+        badge = new BadgeView(this, v.findViewById(R.id.badge));
+        badge.setBackgroundResource(R.drawable.custom_budget);
+        badge.setGravity(Gravity.CENTER);
+        badge.setText("N");
+        badge.setBadgePosition(BadgeView.POSITION_BOTTOM_RIGHT);
+        badge.setTextSize(12);
     }
 
     @Subscribe
@@ -169,6 +187,9 @@ public class CaseListActivity extends ActionBarActivity implements View.OnClickL
             if (mAdapter != null) {
                 mAdapter.notifyDataSetChanged();
             }
+        } else if (s.matches("org_update")) {
+            badge.show();
+            badgeInSlide.show();
         }
 
     }
@@ -312,6 +333,32 @@ public class CaseListActivity extends ActionBarActivity implements View.OnClickL
 
     }
 
+
+    void getOrg() {
+        new AsyncTask<Void, Void, Boolean>() {
+
+            @Override
+            protected Boolean doInBackground(Void... params) {
+                return null;
+            }
+        }.execute();
+        queary.getInviteOrg(userId, new Callback<GetInviteOrgObject>() {
+            @Override
+            public void success(GetInviteOrgObject getInviteOrgObject, Response response) {
+                ringProgressDialog.dismiss();
+                System.out.println("getInviteOrgObject = [" + getInviteOrgObject.getOrgId() + "], response = [" + response + "]");
+                if (getInviteOrgObject.getOrgId() > 0) {
+                    badge.show();
+                    badgeInSlide.show();
+                }
+            }
+
+            @Override
+            public void failure(RetrofitError error) {
+
+            }
+        });
+    }
 
     class TaskQueary extends AsyncTask<Void, Void, List<CaseListDataObject>> {
 

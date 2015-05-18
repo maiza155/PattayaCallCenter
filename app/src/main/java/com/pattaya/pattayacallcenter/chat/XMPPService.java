@@ -14,11 +14,21 @@ import android.util.Log;
 import com.pattaya.pattayacallcenter.Application;
 import com.pattaya.pattayacallcenter.Data.MasterData;
 import com.pattaya.pattayacallcenter.Data.Users;
+import com.pattaya.pattayacallcenter.chat.restadatper.OpenfireQueary;
+import com.pattaya.pattayacallcenter.chat.restadatper.RestAdapterOpenFire;
+import com.pattaya.pattayacallcenter.chat.xmlobject.Chatroom.ChatRoom;
+import com.pattaya.pattayacallcenter.chat.xmlobject.Chatroom.ChatRooms;
+import com.pattaya.pattayacallcenter.chat.xmlobject.Chatroom.Member;
 
 import org.jivesoftware.smack.SmackException;
 import org.jivesoftware.smack.packet.Presence;
 
-import java.util.List;
+import java.util.ArrayList;
+
+import retrofit.Callback;
+import retrofit.RestAdapter;
+import retrofit.RetrofitError;
+import retrofit.client.Response;
 
 /**
  * Created by SWF on 2/24/2015.
@@ -27,7 +37,11 @@ public class XMPPService extends Service {
 
     static XMPPManage xmppManage = XMPPManage.getInstance();
     private static XMPPService instance = null;
+    final RestAdapter restAdapterOpenFire = RestAdapterOpenFire.getInstance();
+    final OpenfireQueary openfireQueary = restAdapterOpenFire.create(OpenfireQueary.class);
     ThreadXMPP td = new ThreadXMPP();
+    SharedPreferences sp = Application.getContext().getSharedPreferences(MasterData.SHARED_NAME_USER_FILE, Context.MODE_PRIVATE);
+    String jid = sp.getString(MasterData.SHARED_USER_JID, null);
     private Handler handler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
@@ -109,6 +123,7 @@ public class XMPPService extends Service {
                         } else {
                             Log.e("XMPPSerVICE", "Break .. .. ... .. ." + xmppManage.getmConnection().isConnected());
                             xmppManage.createPubSub();
+                            /*
                             List<Users> arrUsers = DatabaseChatHelper.init().getUsers();
                             for (Users e : arrUsers) {
                                 if (e.getType() == Users.TYPE_GROUP) {
@@ -116,7 +131,41 @@ public class XMPPService extends Service {
                                     xmppManage.setJoinRoom(e.getJid());
                                 }
 
-                            }
+                            }*/
+
+                            openfireQueary.getChatRoom(new Callback<ChatRooms>() {
+                                @Override
+                                public void success(ChatRooms chatRooms, Response response) {
+                                    final ArrayList<Users> arrUser = new ArrayList<>();
+                                    if (chatRooms.getChatRoom() != null) {
+                                        for (ChatRoom e : chatRooms.getChatRoom()) {
+                                            final String room = e.getRoomName() + "@conference.pattaya-data";
+
+                                            if (e.getMembers().getListMember() != null) {
+
+                                                for (Member member : e.getMembers().getListMember()) {
+                                                    if (member.getText().matches(jid)) {
+                                                        System.out.println("join room >> " + jid);
+                                                        xmppManage.setJoinRoom(room);
+                                                    }
+
+                                                }
+
+                                            }
+
+
+                                        }
+
+
+                                    }
+
+                                }
+
+                                @Override
+                                public void failure(RetrofitError error) {
+
+                                }
+                            });
 
                             stopSelf();
                             break;

@@ -1,6 +1,7 @@
 package com.pattaya.pattayacallcenter.chat;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
@@ -21,6 +22,7 @@ import com.pattaya.pattayacallcenter.member.TaskGetFriend;
 import org.jivesoftware.smack.Chat;
 import org.jivesoftware.smack.ChatManager;
 import org.jivesoftware.smack.ConnectionConfiguration;
+import org.jivesoftware.smack.ConnectionListener;
 import org.jivesoftware.smack.MessageListener;
 import org.jivesoftware.smack.PacketListener;
 import org.jivesoftware.smack.SmackException;
@@ -142,6 +144,47 @@ public class XMPPManageOfficial implements MessageListener {
     }
 
     static void messageReceiver() {
+
+        mConnection.addConnectionListener(new ConnectionListener() {
+            @Override
+            public void reconnectionSuccessful() {
+                Log.e("xmppadapter", "Successfully reconnected to the XMPP server. >>" + mConnection.isConnected());
+                Application.getContext().startService(new Intent(Application.getContext(), XMPPServiceOfficial.class));
+                //new TaskGetFriend(Application.getContext()).execute();
+            }
+
+            @Override
+            public void reconnectionFailed(Exception arg0) {
+                Log.e("xmppadapter", "Failed to reconnect to the XMPP server.>>" + mConnection.isConnected());
+            }
+
+            @Override
+            public void reconnectingIn(int seconds) {
+                Log.i("xmppadapter", "Reconnecting in " + seconds + " seconds.>>" + mConnection.isConnected());
+            }
+
+            @Override
+            public void connectionClosedOnError(Exception arg0) {
+                Log.i("xmppadapter", "Connection to XMPP server was lost.>>" + mConnection.isConnected());
+            }
+
+            @Override
+            public void connected(XMPPConnection xmppConnection) {
+                Log.i("xmppadapter", "XMPP connection was connected.>>" + mConnection.isConnected());
+            }
+
+            @Override
+            public void authenticated(XMPPConnection xmppConnection) {
+                Log.i("xmppadapter", "XMPP connection was authenticated.>>" + mConnection.isConnected());
+            }
+
+            @Override
+            public void connectionClosed() {
+                Log.i("xmppadapter", "XMPP connection was closed.>>" + mConnection.isConnected());
+
+            }
+        });
+
 
         PacketFilter filterMulti = new MessageTypeFilter(Message.Type.groupchat);
         mConnection.addPacketListener(new PacketListener() {
@@ -356,7 +399,7 @@ public class XMPPManageOfficial implements MessageListener {
 
 
                 } else {
-                    new TaskGetFriend(Application.getContext()).execute();
+                    // new TaskGetFriend(Application.getContext()).execute();
                     openfireQueary.getUser(messages.getSender().split("@")[0], new Callback<User>() {
                         @Override
                         public void success(User user, Response response) {

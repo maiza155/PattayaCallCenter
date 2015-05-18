@@ -1,6 +1,7 @@
 package com.pattaya.pattayacallcenter.chat;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
@@ -21,8 +22,10 @@ import com.pattaya.pattayacallcenter.member.TaskGetFriend;
 import org.jivesoftware.smack.Chat;
 import org.jivesoftware.smack.ChatManager;
 import org.jivesoftware.smack.ConnectionConfiguration;
+import org.jivesoftware.smack.ConnectionListener;
 import org.jivesoftware.smack.MessageListener;
 import org.jivesoftware.smack.PacketListener;
+import org.jivesoftware.smack.ReconnectionManager;
 import org.jivesoftware.smack.Roster;
 import org.jivesoftware.smack.RosterEntry;
 import org.jivesoftware.smack.RosterGroup;
@@ -100,6 +103,8 @@ public class XMPPManage implements MessageListener {
     final String GROUP_FRIEND = "Friends";
     final String GROUP_FAVORITE = "Favorite";
 
+    ReconnectionManager reconnectionManager;
+
     public static XMPPManage getInstance() {
         if (xmppManage == null) {
             Log.e("XMPPManage", "CreatE nEW oBJECT");
@@ -159,6 +164,47 @@ public class XMPPManage implements MessageListener {
 
             @Override
             protected Boolean doInBackground(Void... params) {
+                mConnection.addConnectionListener(new ConnectionListener() {
+                    @Override
+                    public void reconnectionSuccessful() {
+                        Log.e("xmppadapter", "Successfully reconnected to the XMPP server. >>" + mConnection.isConnected());
+                        Application.getContext().startService(new Intent(Application.getContext(), XMPPService.class));
+                        new TaskGetFriend(Application.getContext()).execute();
+                    }
+
+                    @Override
+                    public void reconnectionFailed(Exception arg0) {
+                        Log.e("xmppadapter", "Failed to reconnect to the XMPP server.>>" + mConnection.isConnected());
+                    }
+
+                    @Override
+                    public void reconnectingIn(int seconds) {
+                        Log.i("xmppadapter", "Reconnecting in " + seconds + " seconds.>>" + mConnection.isConnected());
+                    }
+
+                    @Override
+                    public void connectionClosedOnError(Exception arg0) {
+                        Log.i("xmppadapter", "Connection to XMPP server was lost.>>" + mConnection.isConnected());
+                    }
+
+                    @Override
+                    public void connected(XMPPConnection xmppConnection) {
+                        Log.i("xmppadapter", "XMPP connection was connected.>>" + mConnection.isConnected());
+                    }
+
+                    @Override
+                    public void authenticated(XMPPConnection xmppConnection) {
+                        Log.i("xmppadapter", "XMPP connection was authenticated.>>" + mConnection.isConnected());
+                    }
+
+                    @Override
+                    public void connectionClosed() {
+                        Log.i("xmppadapter", "XMPP connection was closed.>>" + mConnection.isConnected());
+
+                    }
+                });
+
+
                 PacketFilter filter = new MessageTypeFilter(Message.Type.chat);
                 mConnection.addPacketListener(new PacketListener() {
                     public void processPacket(Packet packet) {
@@ -298,8 +344,15 @@ public class XMPPManage implements MessageListener {
                                     pubsubObject.setComplainId(Integer.parseInt(e.getValues().get(0)));
                                 }
                             }
+                            if (pubsubObject.getAction().matches("org")) {
+                                Log.e("TAg", "INVITE TO oRG");
+                                BusProvider.getInstance().post("org_update");
 
-                            NotifyCase.setNotifyChat(pubsubObject);
+                            } else {
+                                NotifyCase.setNotifyChat(pubsubObject);
+                            }
+
+
                         }
 
 
@@ -447,7 +500,7 @@ public class XMPPManage implements MessageListener {
 
 
                 } else {
-                    new TaskGetFriend(Application.getContext()).execute();
+                    // new TaskGetFriend(Application.getContext()).execute();
                     openfireQueary.getUser(messages.getSender().split("@")[0], new Callback<User>() {
                         @Override
                         public void success(User user, Response response) {
@@ -500,6 +553,7 @@ public class XMPPManage implements MessageListener {
                 ConnectionConfiguration config = new ConnectionConfiguration(HOST, PORT, SERVICE);
                 config.setSecurityMode(ConnectionConfiguration.SecurityMode.disabled);
                 config.setDebuggerEnabled(true);
+                config.setReconnectionAllowed(true);
                 XMPPTCPConnection admin = new XMPPTCPConnection(config);
                 PubSubManager manager;
                 String username = USERNAME + "_notify";
@@ -619,7 +673,7 @@ public class XMPPManage implements MessageListener {
         Log.e("XMPPManage", "Login");
         config = new ConnectionConfiguration(HOST, PORT, SERVICE);
         config.setSecurityMode(ConnectionConfiguration.SecurityMode.disabled);
-        config.setDebuggerEnabled(true);
+        //config.setDebuggerEnabled(true);
         config.setSendPresence(true);
         // config.
         mConnection = new XMPPTCPConnection(config);
@@ -1135,7 +1189,7 @@ public class XMPPManage implements MessageListener {
                     // Log.e("XMPPManage", "Join ? 1: " + room + "   " + muc.isJoined());
                     String name = jid.split("@")[0];
                     muc.join(name);
-                    //  Log.e("XMPPManage", "mConnector  1: " + room + "   " + muc.isJoined());
+                    Log.e("XMPPManage", "mConnector  1: " + room + "   " + muc.isJoined());
                     //Log.e("XMPPManage", "Join ? 1 : " + room + "   " + muc.isJoined());
 
                 } catch (SmackException.NoResponseException e) {

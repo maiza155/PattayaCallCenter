@@ -3,6 +3,7 @@ package com.pattaya.pattayacallcenter.member;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.ActionBar;
@@ -21,6 +22,8 @@ import android.widget.Toast;
 import com.google.gson.Gson;
 import com.pattaya.pattayacallcenter.Data.MasterData;
 import com.pattaya.pattayacallcenter.R;
+import com.pattaya.pattayacallcenter.chat.PubsubObject;
+import com.pattaya.pattayacallcenter.chat.XMPPManage;
 import com.pattaya.pattayacallcenter.member.Adapter.AdapterListViewInviteOrg;
 import com.pattaya.pattayacallcenter.webservice.RestFulQueary;
 import com.pattaya.pattayacallcenter.webservice.WebserviceConnector;
@@ -41,6 +44,7 @@ import retrofit.RetrofitError;
 import retrofit.client.Response;
 
 public class InviteOrgActivity extends ActionBarActivity implements View.OnClickListener, SwipeRefreshLayout.OnRefreshListener {
+    private final Gson gson = new Gson();
     private AdapterListViewInviteOrg adapterListViewInviteOrg; //Adapter List ที่เรากำหนดขึ้นเอง
     private List listDataAddFriend = new ArrayList(); //list ในการเก็บข้อมูลของ DataShow
     private ListView listViewDataAddFriend;
@@ -54,8 +58,6 @@ public class InviteOrgActivity extends ActionBarActivity implements View.OnClick
     private SharedPreferences sp;
     private int userId;
     private String orgId;
-    private final Gson gson = new Gson();
-
     private SwipeRefreshLayout mSwipeRefreshLayout;
 
     @Override
@@ -132,83 +134,136 @@ public class InviteOrgActivity extends ActionBarActivity implements View.OnClick
                 mSwipeRefreshLayout.setRefreshing(true);
             }
         });
-        restqueary.getInviteUser(getInviteUserObject, new Callback<Response>() {
+        new AsyncTask<Void, Void, Boolean>() {
+
             @Override
-            public void success(Response result, Response response2) {
+            protected Boolean doInBackground(Void... params) {
 
-                BufferedReader reader = null;
-                StringBuilder sb = new StringBuilder();
-                try {
+                restqueary.getInviteUser(getInviteUserObject, new Callback<Response>() {
+                    @Override
+                    public void success(Response result, Response response2) {
 
-                    reader = new BufferedReader(new InputStreamReader(result.getBody().in()));
+                        BufferedReader reader = null;
+                        StringBuilder sb = new StringBuilder();
+                        try {
 
-                    String line;
+                            reader = new BufferedReader(new InputStreamReader(result.getBody().in()));
 
-                    try {
-                        while ((line = reader.readLine()) != null) {
-                            sb.append(line);
+                            String line;
+
+                            try {
+                                while ((line = reader.readLine()) != null) {
+                                    sb.append(line);
+                                }
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }
+                        } catch (IOException e) {
+                            e.printStackTrace();
                         }
-                    } catch (IOException e) {
-                        e.printStackTrace();
+
+
+                        String JsonConvertData = "{data:" + sb.toString() + "}";
+                        final OrgListData orgobject = new Gson().fromJson(JsonConvertData, OrgListData.class);
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                adapterListViewInviteOrg.resetAdapter(orgobject.getData());
+                                mSwipeRefreshLayout.setRefreshing(false);
+
+                            }
+                        });
+
                     }
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
 
+                    @Override
+                    public void failure(RetrofitError error) {
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                mSwipeRefreshLayout.setRefreshing(false);
+                            }
+                        });
 
-                String JsonConvertData = "{data:" + sb.toString() + "}";
-                OrgListData orgobject = new Gson().fromJson(JsonConvertData, OrgListData.class);
-                adapterListViewInviteOrg.resetAdapter(orgobject.getData());
-                mSwipeRefreshLayout.setRefreshing(false);
+                        Toast.makeText(getApplicationContext(),
+                                getResources().getString(R.string.cant_connect_server), Toast.LENGTH_SHORT)
+                                .show();
 
+                    }
+                });
+                return null;
             }
+        }.execute();
 
-            @Override
-            public void failure(RetrofitError error) {
-                mSwipeRefreshLayout.setRefreshing(false);
-                Toast.makeText(getApplicationContext(),
-                        getResources().getString(R.string.cant_connect_server), Toast.LENGTH_SHORT)
-                        .show();
-
-            }
-        });
 
     }
 
     void sendInvite() {
         final ProgressDialog ringProgressDialog = ProgressDialog.show(this, getResources().getString(R.string.load_data), getResources().getString(R.string.please_wait), true);
-        SendInviteObject sendInviteObject = new SendInviteObject();
+        final SendInviteObject sendInviteObject = new SendInviteObject();
         sendInviteObject.setUserList(adapterListViewInviteOrg.getListSelect());
         sendInviteObject.setOrgId(orgId);
         sendInviteObject.setInviteByUserId(userId);
         String json2 = gson.toJson(sendInviteObject);
         System.out.println(json2);
-        restqueary.sendInvite(sendInviteObject, new Callback<UpdateResult>() {
-            @Override
-            public void success(UpdateResult updateResult, Response response) {
-                System.out.println("updateResult = [" + updateResult.getResult() + "], response = [" + response + "]");
-                ringProgressDialog.dismiss();
-                if (updateResult.getResult()) {
-                    Toast.makeText(getApplicationContext(),
-                            getResources().getString(R.string.update_data_success), Toast.LENGTH_SHORT)
-                            .show();
-                    finish();
-                } else {
-                    Toast.makeText(getApplicationContext(),
-                            "Please try again", Toast.LENGTH_SHORT)
-                            .show();
-                }
-            }
+
+        new AsyncTask<Void, Void, Boolean>() {
 
             @Override
-            public void failure(RetrofitError error) {
-                System.out.println("error = [" + error + "]");
-                ringProgressDialog.dismiss();
-                Toast.makeText(getApplicationContext(),
-                        getResources().getString(R.string.cant_connect_server), Toast.LENGTH_SHORT)
-                        .show();
+            protected Boolean doInBackground(Void... params) {
+                restqueary.sendInvite(sendInviteObject, new Callback<UpdateResult>() {
+                    @Override
+                    public void success(UpdateResult updateResult, Response response) {
+                        System.out.println("updateResult = [" + updateResult.getResult() + "], response = [" + response + "]");
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                ringProgressDialog.dismiss();
+                            }
+                        });
+                        if (updateResult.getResult()) {
+                            for (String e : adapterListViewInviteOrg.getListSelectJid()) {
+                                if (!e.isEmpty()) {
+                                    PubsubObject pub = new PubsubObject();
+                                    pub.setUsername(e.split("@")[0]);
+                                    pub.setAction("org");
+                                    pub.setTitle("คำเชิญเข้ากลุ่ม");
+                                    XMPPManage.getInstance().new TaskSendNotify(pub).execute();
+                                }
+
+                            }
+
+
+                            Toast.makeText(getApplicationContext(),
+                                    getResources().getString(R.string.update_data_success), Toast.LENGTH_SHORT)
+                                    .show();
+                            finish();
+                        } else {
+                            Toast.makeText(getApplicationContext(),
+                                    "Please try again", Toast.LENGTH_SHORT)
+                                    .show();
+                        }
+                    }
+
+                    @Override
+                    public void failure(RetrofitError error) {
+                        System.out.println("error = [" + error + "]");
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                ringProgressDialog.dismiss();
+                            }
+                        });
+
+                        Toast.makeText(getApplicationContext(),
+                                getResources().getString(R.string.cant_connect_server), Toast.LENGTH_SHORT)
+                                .show();
+                    }
+                });
+
+                return null;
             }
-        });
+        }.execute();
 
     }
 
@@ -223,8 +278,6 @@ public class InviteOrgActivity extends ActionBarActivity implements View.OnClick
             } else {
                 sendInvite();
             }
-
-
         }
 
     }

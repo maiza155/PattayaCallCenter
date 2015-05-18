@@ -246,6 +246,8 @@ public class ProfileActivity extends ActionBarActivity implements View.OnClickLi
             accessUserObject.setAccessToken(token);
             accessUserObject.setClientId(clientId);
             accessUserObject.setEmail(txtEmail.getText().toString());
+            accessUserObject.setUserName(txtEmail.getText().toString());
+
             if (urlImage != null) {
                 //update file successfull
                 ringProgressDialog.dismiss();

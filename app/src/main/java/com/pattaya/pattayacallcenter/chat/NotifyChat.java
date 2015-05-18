@@ -29,11 +29,23 @@ public class NotifyChat {
     public static void setNotifyChat(String str, String jid, String msg) {
         SharedPreferences spConfig = Application.getContext().getSharedPreferences(MasterData.SHARED_NAME_CONFIG_FILE, Context.MODE_PRIVATE);
         Boolean alertSound = spConfig.getBoolean(MasterData.SHARED_CONFIG_ALERT_SOUND, true);
+        String[] sticker = msg.split("<s>");
+        String[] image = msg.split("<img>");
+        String messages;
+        if (sticker.length > 1) {
+            messages = "?????????????";
+        } else if (image.length > 1) {
+            messages = "Image file";
+        } else {
+            messages = msg;
+        }
+
+
         NotificationCompat.Builder mBuilder =
                 new NotificationCompat.Builder(Application.getContext())
                         .setSmallIcon(R.drawable.ic_launcher)
                         .setContentTitle(str)
-                        .setContentText(msg)
+                        .setContentText(messages)
                         .setAutoCancel(true);
         mBuilder.setLights(Color.BLUE, 500, 500);
         long[] pattern = {500, 500};

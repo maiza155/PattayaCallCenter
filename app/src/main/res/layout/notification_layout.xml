@@ -6,12 +6,12 @@
 
     <TextView
         android:id="@+id/header"
-        android:textColor="@color/whiteColor"
-        android:textSize="15dp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="center"
-        android:text="MyHero" />
+        android:text="MyHero"
+        android:textColor="@color/whiteColor"
+        android:textSize="15dp" />
 
     <ImageView
         android:id="@+id/imagenotileft"
@@ -35,29 +35,30 @@
 
         <TextView
             android:id="@+id/name"
-            android:textSize="12dp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:text="ชื่อผู้เเจ้ง :"
 
-            android:text="ชื่อผู้เเจ้ง :" />
+            android:textSize="12dp" />
 
         <TextView
             android:id="@+id/title"
-            android:lines="1"
-            android:textSize="12dp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-
-            android:text="ชื่อเรื่อง : " />
+            android:ellipsize="end"
+            android:lines="1"
+            android:singleLine="true"
+            android:text="ชื่อเรื่อง : "
+            android:textSize="12dp" />
 
         <TextView
             android:id="@+id/date"
-            android:lines="1"
-            android:textSize="12dp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:lines="1"
+            android:text="วันที่ : "
 
-            android:text="วันที่ : " />
+            android:textSize="12dp" />
     </LinearLayout>
 
 </RelativeLayout>

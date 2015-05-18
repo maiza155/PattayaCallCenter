@@ -4,8 +4,6 @@ package com.pattaya.pattayacallcenter.member;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.view.ViewPager;
@@ -20,10 +18,13 @@ import com.astuetz.PagerSlidingTabStrip;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.gcm.GoogleCloudMessaging;
+import com.pattaya.pattayacallcenter.BusProvider;
 import com.pattaya.pattayacallcenter.Data.MasterData;
+import com.pattaya.pattayacallcenter.Data.NetworkObject;
 import com.pattaya.pattayacallcenter.R;
 import com.pattaya.pattayacallcenter.chat.XMPPServiceOfficial;
 import com.pattaya.pattayacallcenter.member.Adapter.AdapterPager;
+import com.squareup.otto.Subscribe;
 
 import java.io.IOException;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -56,7 +57,7 @@ public class MemberMainActivity extends ActionBarActivity implements View.OnClic
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_member_main);
-
+        BusProvider.getInstance().register(this);
         sp = getSharedPreferences(MasterData.SHARED_NAME_USER_FILE, Context.MODE_PRIVATE);
         isOfficial = sp.getBoolean(MasterData.SHARED_IS_OFFICIAL, false);
         tabs = (PagerSlidingTabStrip) findViewById(R.id.titles);
@@ -67,10 +68,6 @@ public class MemberMainActivity extends ActionBarActivity implements View.OnClic
         if (isOfficial) {
             startService(new Intent(this, XMPPServiceOfficial.class));
         }
-
-
-
-
         if (checkPlayServices()) {
 
             gcm = GoogleCloudMessaging.getInstance(this);
@@ -83,27 +80,15 @@ public class MemberMainActivity extends ActionBarActivity implements View.OnClic
             Log.i(TAG, "No valid Google Play Services APK found.");
         }
 
-
-        isNetworkAvailable();
-
     }
 
-    public boolean isNetworkAvailable() {
-        ConnectivityManager cm = (ConnectivityManager) this.getSystemService(Context.CONNECTIVITY_SERVICE);
-        if (cm.getActiveNetworkInfo() != null && cm.getActiveNetworkInfo().isAvailable()
-                && cm.getActiveNetworkInfo().isConnected()) {
-            return true;
-        } else {
-            return false;
+
+    @Subscribe
+    public void BusNetwork(NetworkObject networkObject) {
+        Log.i(TAG, "Network is " + networkObject.getText());
+        if (networkObject.isConect()) {
+
         }
-    }
-
-    public boolean isOnline(Context context) {
-
-        ConnectivityManager cm = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
-        NetworkInfo netInfo = cm.getActiveNetworkInfo();
-        //should check null because in air plan mode it will be null
-        return (netInfo != null && netInfo.isConnected());
 
     }
 

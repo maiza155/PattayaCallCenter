@@ -51,6 +51,9 @@ public class NotifyCase {
         SharedPreferences spConfig = Application.getContext().getSharedPreferences(MasterData.SHARED_NAME_CONFIG_FILE, Context.MODE_PRIVATE);
         Boolean alertSound = spConfig.getBoolean(MasterData.SHARED_CONFIG_ALERT_SOUND, true);
         Boolean alert = spConfig.getBoolean(MasterData.SHARED_CONFIG_ALERT, true);
+
+        SharedPreferences sp = Application.getContext().getSharedPreferences(MasterData.SHARED_NAME_USER_FILE, Context.MODE_PRIVATE);
+        Boolean isOfficial = sp.getBoolean(MasterData.SHARED_IS_OFFICIAL,false);
         System.out.println(object.getDisplayData());
 
         Long millis = Long.parseLong(object.getDisplayData(), 10);
@@ -66,6 +69,8 @@ public class NotifyCase {
 
         String content = "ชื่อเรื่อง :" + object.getTitle() + "\n" + "ชื่อผู้เเจ้ง :" + object.getName() + "\n";
 
+
+        Log.e("Title",">>>>"+object.getName());
 
         NotificationCompat.Builder mBuilder =
                 new NotificationCompat.Builder(Application.getContext())
@@ -106,7 +111,23 @@ public class NotifyCase {
             mBuilder.setContentIntent(intent);
         }
 
+        SharedPreferences settings = Application.getContext().getSharedPreferences(MasterData.SHARED_CASE_COUNT, Context.MODE_PRIVATE);
+        String caseStr = "id_" + object.getComplainId();
+        int count = settings.getInt(caseStr, 0);
+        Log.e("count ", "" + count);
+        count = count + 1;
+        settings.edit().putInt(caseStr, count).commit();
+        BusProvider.getInstance().post("update_case_list");
 
+        String jidRoom = "case-"+object.getComplainId()+"@conference.pattaya-data";
+        Log.e("Notify - case",""+jidRoom);
+
+        if(isOfficial){
+            XMPPManageOfficial.getInstance().setJoinRoom(jidRoom);
+
+        }else{
+            XMPPManage.getInstance().setJoinRoom(jidRoom);
+        }
         NotificationCompat.BigPictureStyle notiStyle = new
                 NotificationCompat.BigPictureStyle();
 
@@ -180,10 +201,22 @@ public class NotifyCase {
                     RemoteViews contentView = new RemoteViews(Application.getContext().getPackageName(),
                             R.layout.notification_layout);
                     Log.e("TAG Notification CaseID", "" + caseMainObject.getRefCasesId());
+                    String[] sticker = msg.split("<s>");
+                    String[] image = msg.split("<img>");
+                    String messages ;
+                    if (sticker.length > 1) {
+                        messages = "ส่งสติ๊กเกอร์";
+                    } else if (image.length > 1) {
+                        messages = "Image file";
+                    } else {
+                        messages = msg;
+                    }
+
+
                     contentView.setTextViewText(R.id.header, "สนทนาเคส");
                     contentView.setTextViewText(R.id.title, "ชื่อเรื่อง:" + Application.getContext().getResources().getString(R.string.tab) + caseMainObject.getComplaintName());
                     contentView.setTextViewText(R.id.name, "ชื่อผู้เเจ้ง:" + Application.getContext().getResources().getString(R.string.tab) + name);
-                    contentView.setTextViewText(R.id.date, "ข้อความ:" + Application.getContext().getResources().getString(R.string.tab) + msg);
+                    contentView.setTextViewText(R.id.date, "ข้อความ:" + Application.getContext().getResources().getString(R.string.tab) + messages);
 
                     String content = "ชื่อเรื่อง :" + caseMainObject.getComplaintName() + "\n" + "ชื่อผู้เเจ้ง :" + name + "\n";
 

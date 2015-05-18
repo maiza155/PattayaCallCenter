@@ -7,6 +7,16 @@ public class OrgDetail {
     String userImage;
     String displayName;
     String userId;
+    String jId;
+
+
+    public String getjId() {
+        return jId;
+    }
+
+    public void setjId(String jId) {
+        this.jId = jId;
+    }
 
     public String getUserImage() {
         return userImage;

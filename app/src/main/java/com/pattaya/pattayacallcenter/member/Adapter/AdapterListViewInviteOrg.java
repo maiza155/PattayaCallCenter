@@ -23,11 +23,12 @@ import java.util.List;
  */
 public class AdapterListViewInviteOrg extends BaseAdapter {
 
+    View convertView;
+    List<String> listselectdata = new ArrayList<>();
+    List<String> listselectdataJid = new ArrayList<>();
     private LayoutInflater mInflater;
     private Context context; //รับ Context จาก CustomListViewActivity
     private List<OrgDetail> listData; //list ในการเก็บข้อมูลของ DataShow
-    View convertView;
-    List<String> listselectdata = new ArrayList<>();
 
     public AdapterListViewInviteOrg(Context context, List listData) {
         // TODO Auto-generated constructor stub
@@ -49,6 +50,11 @@ public class AdapterListViewInviteOrg extends BaseAdapter {
             userIdObjects.add(new UserIdObject(e));
         }
         return userIdObjects;
+    }
+
+    public List<String> getListSelectJid() {
+
+        return listselectdataJid;
     }
 
     @Override
@@ -98,10 +104,15 @@ public class AdapterListViewInviteOrg extends BaseAdapter {
         convertView.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 if (listselectdata.contains(listData.get(position).getUserId())) {
+                    int index = listselectdata.indexOf(listData.get(position).getUserId());
                     listselectdata.remove(listData.get(position).getUserId());
+
+                    listselectdataJid.remove(index);
                     holder.btnSelect.setVisibility(View.GONE);
                 } else {
+                    int index = listselectdata.indexOf(listData.get(position).getUserId());
                     listselectdata.add(listData.get(position).getUserId());
+                    listselectdataJid.add(listData.get(position).getjId());
                     holder.btnSelect.setVisibility(View.VISIBLE);
                 }
             }
