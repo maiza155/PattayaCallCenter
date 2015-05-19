@@ -20,6 +20,7 @@ import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.Toast;
 
+import com.google.gson.Gson;
 import com.pattaya.pattayacallcenter.Application;
 import com.pattaya.pattayacallcenter.Data.MasterData;
 import com.pattaya.pattayacallcenter.R;
@@ -27,8 +28,7 @@ import com.pattaya.pattayacallcenter.webservice.RestFulQueary;
 import com.pattaya.pattayacallcenter.webservice.WebserviceConnector;
 import com.pattaya.pattayacallcenter.webservice.object.UpdateResult;
 import com.pattaya.pattayacallcenter.webservice.object.UpdateTaskObject;
-import com.pattaya.pattayacallcenter.webservice.object.casedata.CaseDataMemberObject;
-import com.pattaya.pattayacallcenter.webservice.object.casedata.GetComplainObject;
+import com.pattaya.pattayacallcenter.webservice.object.casedata.GetCaseDate;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -227,40 +227,40 @@ public class CaseWorkDateActivity extends ActionBarActivity implements View.OnCl
     void getCaseData() {
         final ProgressDialog ringProgressDialog = ProgressDialog.show(this, null, getResources().getString(R.string.please_wait), true);
         ringProgressDialog.setCancelable(true);
-        GetComplainObject getComplainObject = new GetComplainObject();
-        getComplainObject.setAccessToken(token);
-        getComplainObject.setClientId(clientId);
-        getComplainObject.setPrimaryKeyId(caseId);
 
-        adapterRest.getCaseData(getComplainObject, new Callback<CaseDataMemberObject>() {
+        GetCaseDate getCaseDate = new GetCaseDate();
+        getCaseDate.setClientId(clientId);
+        getCaseDate.setAccessToken(token);
+        getCaseDate.setForeignKeyId(userId);
+        getCaseDate.setPrimaryKeyId(caseId);
 
+        Gson gson = new Gson();
+        String json = gson.toJson(getCaseDate);
+        System.out.println(json);
+
+        adapterRest.getTaskData(getCaseDate, new Callback<UpdateResult>() {
             @Override
-            public void success(CaseDataMemberObject caseDataMemberObject, Response response) {
-                System.out.println(caseDataMemberObject.getDateForOperationIn());
-                System.out.println(caseDataMemberObject.getDateForOperationOut());
-                if (caseDataMemberObject.getDateForOperationIn() != null
-                        && caseDataMemberObject.getDateForOperationOut() != null) {
-                    try {
-                        Date datestart = sdf.parse(caseDataMemberObject.getDateForOperationIn());
-                        startDate.setText(dateFormatter.format(datestart));
-                        startTime.setText(dateFormatterTime.format(datestart));
+            public void success(UpdateResult updateResult, Response response) {
 
-
-                        Date dateend = sdf.parse(caseDataMemberObject.getDateForOperationOut());
-                        endDate.setText(dateFormatter.format(dateend));
-                        endTime.setText(dateFormatterTime.format(dateend));
-
-
-                    } catch (ParseException e) {
-                        e.printStackTrace();
-                    }
-
-
-                }
+                System.out.println("updateResult = [" + updateResult.getResult() + "], response = [" + response + "]");
 
                 ringProgressDialog.dismiss();
 
+                /*
+                try {
+                    Date datestart = sdf.parse(caseDataMemberObject.getDateForOperationIn());
+                    startDate.setText(dateFormatter.format(datestart));
+                    startTime.setText(dateFormatterTime.format(datestart));
 
+
+                    Date dateend = sdf.parse(caseDataMemberObject.getDateForOperationOut());
+                    endDate.setText(dateFormatter.format(dateend));
+                    endTime.setText(dateFormatterTime.format(dateend));
+
+
+                } catch (ParseException e) {
+                    e.printStackTrace();
+                }*/
             }
 
             @Override
@@ -272,6 +272,8 @@ public class CaseWorkDateActivity extends ActionBarActivity implements View.OnCl
                         .show();
             }
         });
+
+
     }
 
 

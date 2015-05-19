@@ -67,6 +67,7 @@ public class AdapterListCaseActionBar extends BaseAdapter {
         Glide.with(context)
                 .load(data.get(position).getImage())
                 .override(200, 200)
+                .error(R.drawable.com_facebook_profile_picture_blank_portrait)
                 .fitCenter()
                 .into(holder.imageView);
         return convertView;

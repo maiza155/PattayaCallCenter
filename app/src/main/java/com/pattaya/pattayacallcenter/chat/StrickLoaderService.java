@@ -41,13 +41,27 @@ public class StrickLoaderService extends Service {
 
     }
 
+    public static Bitmap getBitmapFromURL(String src) {
+        try {
+            URL url = new URL(src);
+            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+            connection.setDoInput(true);
+            connection.connect();
+            InputStream input = connection.getInputStream();
+            Bitmap myBitmap = BitmapFactory.decodeStream(input);
+            return myBitmap;
+        } catch (IOException e) {
+            // Log exception
+            return null;
+        }
+    }
+
     @Override
     public void onCreate() {
         super.onCreate();
         System.out.println("Create Service Sticker");
         //android.os.Debug.waitForDebugger();
     }
-
 
     @Override
     public void onDestroy() {
@@ -68,7 +82,6 @@ public class StrickLoaderService extends Service {
         // TODO: Return the communication channel to the service.
         return null;
     }
-
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
@@ -115,35 +128,26 @@ public class StrickLoaderService extends Service {
     }
 
     public Bitmap getResizedBitmap(Bitmap bm, int newWidth, int newHeight) {
-        int width = bm.getWidth();
-        int height = bm.getHeight();
-        float scaleWidth = ((float) newWidth) / width;
-        float scaleHeight = ((float) newHeight) / height;
-        // CREATE A MATRIX FOR THE MANIPULATION
-        Matrix matrix = new Matrix();
-        // RESIZE THE BIT MAP
-        matrix.postScale(scaleWidth, scaleHeight);
+        int width = 0;
+        int height = 0;
+        float scaleWidth;
+        float scaleHeight;
+        Bitmap resizedBitmap = null;
+        if (bm != null) {
+            width = bm.getWidth();
+            height = bm.getHeight();
+            scaleWidth = ((float) newWidth) / width;
+            scaleHeight = ((float) newHeight) / height;
+            // CREATE A MATRIX FOR THE MANIPULATION
+            Matrix matrix = new Matrix();
+            // RESIZE THE BIT MAP
+            matrix.postScale(scaleWidth, scaleHeight);
 
+            resizedBitmap = Bitmap.createBitmap(bm, 0, 0, width, height, matrix, false);
+        }
         // "RECREATE" THE NEW BITMAP
-        Bitmap resizedBitmap = Bitmap.createBitmap(bm, 0, 0, width, height, matrix, false);
         return resizedBitmap;
     }
-
-    public static Bitmap getBitmapFromURL(String src) {
-        try {
-            URL url = new URL(src);
-            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-            connection.setDoInput(true);
-            connection.connect();
-            InputStream input = connection.getInputStream();
-            Bitmap myBitmap = BitmapFactory.decodeStream(input);
-            return myBitmap;
-        } catch (IOException e) {
-            // Log exception
-            return null;
-        }
-    }
-
 
     class TaskLoadBitmap extends AsyncTask<Void, Void, Bitmap> {
         String url;
@@ -157,15 +161,20 @@ public class StrickLoaderService extends Service {
         @Override
         protected Bitmap doInBackground(Void... params) {
             Bitmap bitmap = getBitmapFromURL(url);
-            byte[] image = BitmapEncodeByte(getResizedBitmap(bitmap, 300, 300));
-            databaseChatHelper.addStricker(String.valueOf(id), image);
-            BusProvider.getInstance().post("sticker_update");
-            targetList.add("" + id);
-            if (targetList.size() == duo) {
-
-                stopSelf();
+            Bitmap bitmapTemp = getResizedBitmap(bitmap, 300, 300);
+            if (bitmapTemp != null) {
+                byte[] image = BitmapEncodeByte(bitmapTemp);
+                databaseChatHelper.addStricker(String.valueOf(id), image);
+                BusProvider.getInstance().post("sticker_update");
+                targetList.add("" + id);
+                if (targetList.size() == duo) {
+                    stopSelf();
+                    BusProvider.getInstance().post("sticker_fin");
+                }
+            } else {
                 BusProvider.getInstance().post("sticker_fin");
             }
+
 
             return null;
         }

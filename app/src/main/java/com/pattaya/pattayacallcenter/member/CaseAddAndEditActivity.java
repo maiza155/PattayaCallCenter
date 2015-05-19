@@ -530,11 +530,11 @@ public class CaseAddAndEditActivity extends ActionBarActivity implements View.On
                                             chatRoomObject.setRoomName(roomName);
                                             chatRoomObject.setNaturalName(openCaseAssignObject.getCasesName());
                                             chatRoomObject.setDescription(roomName);
-                                            List<String> listJid = new ArrayList<String>();
+                                            final List<String> listJid = new ArrayList<String>();
+                                            final Members members = new Members();
                                             final List<PubsubObject> listNotify = new ArrayList<PubsubObject>();
                                             Calendar c = Calendar.getInstance();
                                             if (STATE_FORWARD == 2) {
-                                                Members members = new Members();
                                                 for (ForwardObject e : arrayList) {
                                                     if (e.getJid() != null) {
                                                         listJid.add(e.getJid());
@@ -554,31 +554,103 @@ public class CaseAddAndEditActivity extends ActionBarActivity implements View.On
                                                     }
 
                                                 }
-                                                members.setMember(listJid);
-                                                chatRoomObject.setMembers(members);
-                                            }
 
-                                            openfireQuearyJson.createChatRoom(chatRoomObject, new Callback<Response>() {
+                                            }
+                                            //get JidList for notify and Recreate chat room
+                                            adapterRest.getUserListJid(complainId, new Callback<Response>() {
                                                 @Override
-                                                public void success(Response response, Response response2) {
-                                                    //System.out.println("response = [" + response + "], response2 = [" + response2 + "]");
-                                                    for (PubsubObject e : listNotify) {
-                                                        Log.e("TAG", ">>>>" + e.getUsername());
-                                                        XMPPManage.getInstance().new TaskSendNotify(e).execute();
-                                                    }
-                                                    runOnUiThread(new Runnable() {
-                                                        @Override
-                                                        public void run() {
-                                                            Activity activity = CaseAddAndEditActivity.this;
-                                                            if (activity != null) {
-                                                                ringProgressDialog.dismiss();
+                                                public void success(Response result, Response response2) {
+                                                    DatabaseChatHelper.init().clearCaseTable();
+                                                    BufferedReader reader;
+                                                    StringBuilder sb = new StringBuilder();
+                                                    try {
+                                                        reader = new BufferedReader(new InputStreamReader(result.getBody().in()));
+                                                        String line;
+
+                                                        try {
+                                                            while ((line = reader.readLine()) != null) {
+                                                                sb.append(line);
                                                             }
+                                                        } catch (IOException e) {
+                                                            e.printStackTrace();
+                                                        }
+                                                    } catch (IOException e) {
+                                                        e.printStackTrace();
+                                                    }
+                                                    String JsonConvertData = "{data:" + sb.toString() + "}";
+                                                    System.out.println(JsonConvertData);
+                                                    CaseListJidObject listObject = new Gson().fromJson(JsonConvertData, CaseListJidObject.class);
+
+
+                                                    Calendar c = Calendar.getInstance();
+                                                    for (JidData e : listObject.getData()) {
+                                                        if (!e.getJid().isEmpty() && e.getJid() != null) {
+                                                            listJid.add(e.getJid());
+                                                            PubsubObject pub = new PubsubObject();
+                                                            pub.setUsername(e.getJid().split("@")[0]);
+                                                            pub.setImage(displayImage);
+                                                            pub.setAction("อัพเดทเคส");
+                                                            pub.setDisplayData(c.getTime().toString());
+                                                            //pub.setPrimarykey(complainId);
+                                                            pub.setComplainId(complainId);
+                                                            pub.setCaseId(caseId);
+                                                            pub.setName(displayName);
+                                                            pub.setTitle(openCaseAssignObject.getCasesName());
+
+                                                            if (!e.getJid().matches(jid)) {
+                                                                listNotify.add(pub);
+                                                            }
+                                                        }
+
+                                                    }
+                                                    members.setMember(listJid);
+                                                    chatRoomObject.setMembers(members);
+
+                                                    //Recreate chat room
+
+                                                    openfireQuearyJson.createChatRoom(chatRoomObject, new Callback<Response>() {
+                                                        @Override
+                                                        public void success(Response response, Response response2) {
+                                                            //System.out.println("response = [" + response + "], response2 = [" + response2 + "]");
+
+                                                            XMPPManage.getInstance().setJoinRoom(chatRoomObject.getRoomName() + "@conference.pattaya-data");
+                                                            for (PubsubObject e : listNotify) {
+                                                                Log.e("TAG", ">>>>" + e.getUsername());
+                                                                XMPPManage.getInstance().new TaskSendNotify(e).execute();
+                                                            }
+                                                            runOnUiThread(new Runnable() {
+                                                                @Override
+                                                                public void run() {
+                                                                    Activity activity = CaseAddAndEditActivity.this;
+                                                                    if (activity != null) {
+                                                                        ringProgressDialog.dismiss();
+                                                                    }
+
+                                                                }
+                                                            });
+                                                            BusProvider.getInstance().post("update_case_list");
+                                                            Toast.makeText(getApplication(), "success", Toast.LENGTH_SHORT).show();
+                                                            finish();
+
 
                                                         }
+
+                                                        @Override
+                                                        public void failure(RetrofitError error) {
+                                                            System.out.println("error = [" + error + "]");
+                                                            runOnUiThread(new Runnable() {
+                                                                @Override
+                                                                public void run() {
+                                                                    Activity activity = CaseAddAndEditActivity.this;
+                                                                    if (activity != null) {
+                                                                        ringProgressDialog.dismiss();
+                                                                    }
+
+                                                                }
+                                                            });
+                                                            Toast.makeText(getApplication(), "Unable connect server. Please try again", Toast.LENGTH_SHORT).show();
+                                                        }
                                                     });
-                                                    BusProvider.getInstance().post("update_case_list");
-                                                    Toast.makeText(getApplication(), "success", Toast.LENGTH_SHORT).show();
-                                                    finish();
 
 
                                                 }
@@ -589,17 +661,12 @@ public class CaseAddAndEditActivity extends ActionBarActivity implements View.On
                                                     runOnUiThread(new Runnable() {
                                                         @Override
                                                         public void run() {
-                                                            Activity activity = CaseAddAndEditActivity.this;
-                                                            if (activity != null) {
-                                                                ringProgressDialog.dismiss();
-                                                            }
-
+                                                            ringProgressDialog.dismiss();
                                                         }
                                                     });
-                                                    Toast.makeText(getApplication(), "Unable connect server. Please try again", Toast.LENGTH_SHORT).show();
+                                                    Toast.makeText(getApplication(), "Unable connect server \n Please try again", Toast.LENGTH_SHORT).show();
                                                 }
                                             });
-
 
                                         } else {
 
@@ -757,8 +824,8 @@ public class CaseAddAndEditActivity extends ActionBarActivity implements View.On
                                     if (activity != null) {
                                         txtDetail.setText(caseDataMemberObject.getCasesName());
                                         txtPlace.setText(finalAddress);
-                                        txtName.setText(dataPlace.getTelephone());
-                                        txtPhone.setText(dataPlace.getNameContact());
+                                        txtName.setText(dataPlace.getNameContact());
+                                        txtPhone.setText(dataPlace.getTelephone());
                                     }
 
                                 }

@@ -52,6 +52,7 @@ import java.io.InputStreamReader;
 import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 import java.util.concurrent.ExecutionException;
 
 import retrofit.Callback;
@@ -305,19 +306,15 @@ public class ProfileActivity extends ActionBarActivity implements View.OnClickLi
                     editor.putString(MasterData.SHARED_USER_LAST_NAME, txtSurName.getText().toString());
                     editor.commit();
                 }
+                progressDialog.dismiss();
+                finish();
 
-                boolUpdate[0] = true;
-                if (boolUpdate[0] && boolUpdate[1]) {
-                    progressDialog.dismiss();
-                    finish();
-                }
             }
 
             @Override
             public void failure(RetrofitError error) {
                 Toast.makeText(getApplication(), "Unable connect server \n Please try again", Toast.LENGTH_SHORT).show();
                 System.out.println("error update = [" + error + "]");
-                boolUpdate[0] = false;
                 progressDialog.dismiss();
                 // alertDialogFailtoServer();
             }
@@ -342,21 +339,14 @@ public class ProfileActivity extends ActionBarActivity implements View.OnClickLi
                 @Override
                 public void success(String s, Response response) {
                     System.out.println("s = [" + s + "], response = [" + response + "]");
-                    boolUpdate[1] = true;
-                    if (boolUpdate[0] && boolUpdate[1]) {
-                        progressDialog.dismiss();
-                        finish();
-                    }
-
 
                 }
 
                 @Override
                 public void failure(RetrofitError error) {
                     System.out.println("error = [" + error + "]");
-                    boolUpdate[1] = false;
-                    progressDialog.dismiss();
-                    Toast.makeText(getApplication(), "Unable connect server \n Please try again", Toast.LENGTH_SHORT).show();
+
+                    // Toast.makeText(getApplication(), "Unable connect server \n Please try again", Toast.LENGTH_SHORT).show();
                 }
             });
         }
@@ -488,7 +478,7 @@ public class ProfileActivity extends ActionBarActivity implements View.OnClickLi
 
     void setImageUrl(String url) {
         String mUrl = (url == null || url.isEmpty()) ? "No Image" : url;
-        System.out.println("File : "+url);
+        System.out.println("File : " + url);
         Glide.with(context).load(mUrl)
                 .error(R.drawable.com_facebook_profile_picture_blank_square)
                 .placeholder(R.drawable.com_facebook_profile_picture_blank_square)
@@ -499,19 +489,22 @@ public class ProfileActivity extends ActionBarActivity implements View.OnClickLi
     }
 
 
-    class TaskResizeUpload extends AsyncTask<Void,Void,Boolean>{
+    class TaskResizeUpload extends AsyncTask<Void, Void, Boolean> {
         ProgressDialog ringProgressDialog;
+
         @Override
         protected void onPreExecute() {
-
             super.onPreExecute();
             ringProgressDialog = ProgressDialog.show(ProfileActivity.this, null, getResources().getString(R.string.please_wait), true);
             ringProgressDialog.setCancelable(true);
         }
+
         @Override
         protected Boolean doInBackground(Void... params) {
+            String uuid = UUID.randomUUID().toString();
+            System.out.println("uuid = " + uuid);
             int randomNum = 500 + (int) (Math.random() * 2000000000);
-            File file = new File(getCacheDir(), "pattaya" + randomNum);
+            File file = new File(getCacheDir(), "pattaya" + randomNum + uuid);
             try {
                 file.createNewFile();
             } catch (IOException error) {
@@ -533,72 +526,79 @@ public class ProfileActivity extends ActionBarActivity implements View.OnClickLi
             }
 
             System.out.println(bitmap);
-            ByteArrayOutputStream bos = new ByteArrayOutputStream();
-            bitmap.compress(Bitmap.CompressFormat.JPEG, MasterData.PERCEN_OF_IMAGE_FILE, bos);
-            byte[] bitmapdata = bos.toByteArray();
-            FileOutputStream fos = null;
-            try {
-                fos = new FileOutputStream(file);
-            } catch (FileNotFoundException error) {
-                error.printStackTrace();
-            }
-            try {
-                fos.write(bitmapdata);
-                fos.flush();
-                fos.close();
-            } catch (IOException error) {
-                error.printStackTrace();
-            }
-            Log.e("File upload", "" + file.length());
-            Log.e("File upload", "" + file.getAbsolutePath());
-            final long totalSize = file.length();
-            System.out.println("FILE LENGTH" + ">>>>>>>>" + totalSize);
+
+            if (bitmap != null) {
+                ByteArrayOutputStream bos = new ByteArrayOutputStream();
+                bitmap.compress(Bitmap.CompressFormat.JPEG, MasterData.PERCEN_OF_IMAGE_FILE, bos);
+                byte[] bitmapdata = bos.toByteArray();
+                FileOutputStream fos = null;
+                try {
+                    fos = new FileOutputStream(file);
+                } catch (FileNotFoundException error) {
+                    error.printStackTrace();
+                }
+                try {
+                    fos.write(bitmapdata);
+                    fos.flush();
+                    fos.close();
+                } catch (IOException error) {
+                    error.printStackTrace();
+                }
+                Log.e("File upload", "" + file.length());
+                Log.e("File upload", "" + file.getAbsolutePath());
+                final long totalSize = file.length();
+                System.out.println("FILE LENGTH" + ">>>>>>>>" + totalSize);
 
 
-
-            adapterRestUpload.uploadImage(new TypedFile("image/jpeg", fileImage), new Callback<Response>() {
-                @Override
-                public void success(Response result, Response response) {
-                    //Try to get response body
-                    BufferedReader reader = null;
-                    StringBuilder sb = new StringBuilder();
-                    try {
-
-                        reader = new BufferedReader(new InputStreamReader(result.getBody().in()));
-
-                        String line;
-
+                adapterRestUpload.uploadImage(new TypedFile("image/jpeg", fileImage), new Callback<Response>() {
+                    @Override
+                    public void success(Response result, Response response) {
+                        //Try to get response body
+                        BufferedReader reader = null;
+                        StringBuilder sb = new StringBuilder();
                         try {
-                            while ((line = reader.readLine()) != null) {
-                                sb.append(line);
+
+                            reader = new BufferedReader(new InputStreamReader(result.getBody().in()));
+
+                            String line;
+
+                            try {
+                                while ((line = reader.readLine()) != null) {
+                                    sb.append(line);
+                                }
+                            } catch (IOException e) {
+                                e.printStackTrace();
                             }
                         } catch (IOException e) {
                             e.printStackTrace();
                         }
-                    } catch (IOException e) {
-                        e.printStackTrace();
+
+
+                        String JsonConvertData = "{data:" + sb.toString() + "}";
+                        FileListObject fileListObject = new Gson().fromJson(JsonConvertData, FileListObject.class);
+                        System.out.println(fileListObject.getData().get(0).getUrl());
+                        urlImage = fileListObject.getData().get(0).getUrl();
+                        //setImageUrl(urlImage);
+                        accessUserObject.setUserImage(urlImage);
+                        ringProgressDialog.dismiss();
+                        updateDataAll();
+
                     }
 
+                    @Override
+                    public void failure(RetrofitError error) {
+                        ringProgressDialog.dismiss();
+                        System.out.println("error upload = [" + error + "]");
+                        Toast.makeText(getApplication(), "Unable connect server \n Please try again", Toast.LENGTH_SHORT).show();
 
-                    String JsonConvertData = "{data:" + sb.toString() + "}";
-                    FileListObject fileListObject = new Gson().fromJson(JsonConvertData, FileListObject.class);
-                    System.out.println(fileListObject.getData().get(0).getUrl());
-                    urlImage = fileListObject.getData().get(0).getUrl();
-                    //setImageUrl(urlImage);
-                    accessUserObject.setUserImage(urlImage);
-                    updateDataAll();
 
-                }
+                    }
+                });
+            } else {
+                ringProgressDialog.dismiss();
+                Toast.makeText(getApplication(), "This image cannot upload.", Toast.LENGTH_SHORT).show();
+            }
 
-                @Override
-                public void failure(RetrofitError error) {
-                    ringProgressDialog.dismiss();
-                    System.out.println("error upload = [" + error + "]");
-                    Toast.makeText(getApplication(), "Unable connect server \n Please try again", Toast.LENGTH_SHORT).show();
-                    // alertDialogFailtoServer();
-
-                }
-            });
 
             return null;
         }

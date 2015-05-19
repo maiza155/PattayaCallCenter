@@ -18,8 +18,9 @@
             style="@style/text_header_list_style"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
+            android:ellipsize="end"
             android:gravity="left"
-            android:maxLines="4"
+            android:maxLines="2"
             android:text="Sample Text" />
 
         <TextView

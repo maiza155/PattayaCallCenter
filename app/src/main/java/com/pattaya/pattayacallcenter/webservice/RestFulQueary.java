@@ -18,6 +18,7 @@ import com.pattaya.pattayacallcenter.webservice.object.UserDataObject;
 import com.pattaya.pattayacallcenter.webservice.object.casedata.CaseDataMemberObject;
 import com.pattaya.pattayacallcenter.webservice.object.casedata.CaseMainObject;
 import com.pattaya.pattayacallcenter.webservice.object.casedata.CloseCaseObject;
+import com.pattaya.pattayacallcenter.webservice.object.casedata.GetCaseDate;
 import com.pattaya.pattayacallcenter.webservice.object.casedata.GetCaseListData;
 import com.pattaya.pattayacallcenter.webservice.object.casedata.GetComplainObject;
 import com.pattaya.pattayacallcenter.webservice.object.casedata.OpenCaseAssignObject;
@@ -243,6 +244,11 @@ public interface RestFulQueary {
     @Headers("Content-Type:application/json;charset=UTF-8")
     @GET("/cases2/getUserRelateByComplaintId/{id}")
     void getUserListJid(@Path("id") int id, Callback<Response> json);
+
+
+    @Headers("Content-Type:application/json;charset=UTF-8")
+    @POST("/cases/getTaskData")
+    void getTaskData(@Body GetCaseDate object, Callback<UpdateResult> json);
 
 
     /**

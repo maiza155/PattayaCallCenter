@@ -232,6 +232,8 @@ public class CaseFragment extends Fragment implements View.OnClickListener
             if (listUsers.size() == 2) {
                 Glide.with(this)
                         .load(listUsers.get(1).getImage())
+                        .error(R.drawable.com_facebook_profile_picture_blank_portrait)
+                        .placeholder(R.drawable.com_facebook_profile_picture_blank_portrait)
                         .override(300, 300)
                         .fitCenter()
                         .into(rootView);
@@ -243,6 +245,8 @@ public class CaseFragment extends Fragment implements View.OnClickListener
 
             Glide.with(this)
                     .load(listUsers.get(0).getImage())
+                    .error(R.drawable.com_facebook_profile_picture_blank_portrait)
+                    .placeholder(R.drawable.com_facebook_profile_picture_blank_portrait)
                     .override(300, 300)
                     .fitCenter()
                     .into(rootView);
@@ -330,7 +334,6 @@ public class CaseFragment extends Fragment implements View.OnClickListener
                     editor.putBoolean(MasterData.SHARED_IS_OFFICIAL, false);
                     editor.commit();
                     isOfficial = false;
-
                     System.out.println(dataPopUp.getImage());
                     XMPPManageOfficial.getInstance().disConnect();
 
@@ -349,6 +352,8 @@ public class CaseFragment extends Fragment implements View.OnClickListener
                 Glide.with(v.getContext())
                         .load(dataPopUp.getImage())
                         .override(300, 300)
+                        .error(R.drawable.com_facebook_profile_picture_blank_portrait)
+                        .placeholder(R.drawable.com_facebook_profile_picture_blank_portrait)
                         .fitCenter()
                         .into(rootView);
                 mSwipeRefreshLayout.setRefreshing(true);
@@ -565,7 +570,7 @@ public class CaseFragment extends Fragment implements View.OnClickListener
                 adapterRestUser.getUserOfficialData(userId, new Callback<OfficialObject>() {
                     @Override
                     public void success(OfficialObject officialObject, Response response) {
-                        if (listUsers.size() == 1) {
+                        if (officialObject.getId() > 0 && listUsers.size() == 1) {
                             listUsers.add(new DataPopUp(officialObject.getUserImage(), officialObject.getDisplayname()));
                             System.out.println("officialObject = [" + officialObject + "], response = [" + response + "]");
 
@@ -576,6 +581,7 @@ public class CaseFragment extends Fragment implements View.OnClickListener
                                     if (rootView != null && isOfficial) {
                                         Glide.with(getActivity())
                                                 .load(listUsers.get(1).getImage())
+                                                .error(R.drawable.com_facebook_profile_picture_blank_portrait)
                                                 .override(300, 300)
                                                 .fitCenter()
                                                 .into(rootView);

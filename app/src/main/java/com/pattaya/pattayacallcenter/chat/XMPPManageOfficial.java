@@ -451,13 +451,14 @@ public class XMPPManageOfficial implements MessageListener {
                 Log.e("subscribePubSub", username);
                 try {
                     admin.connect();
-                    admin.login("admin", "admin", "Android");
+                    admin.login("admin", "p@ssw0rd", "Android");
                     Log.e("XMPPManage", "Admin Connection is : " + admin.isConnected());
                     ConfigureForm form = new ConfigureForm(FormType.submit);
                     form.setAccessModel(AccessModel.open);
                     form.setDeliverPayloads(true);
                     form.setNotifyRetract(true);
                     form.setNotifyDelete(true);
+                    form.setMaxPayloadSize(1024000);
                     form.setPublishModel(PublishModel.open);
                     manager = new PubSubManager(admin);
                     try {
@@ -764,7 +765,7 @@ public class XMPPManageOfficial implements MessageListener {
         try {
             if (isNetworkConnected()) {
                 admin.connect();
-                admin.login("admin", "admin", "Android");
+                admin.login("admin", "p@ssw0rd", "Android");
 
                 Log.e("XMPPManage", "Admin Connection is SendMessage : " + admin.isConnected());
                 ConfigureForm form = new ConfigureForm(FormType.submit);

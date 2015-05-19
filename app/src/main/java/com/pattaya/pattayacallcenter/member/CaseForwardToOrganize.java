@@ -6,14 +6,17 @@ import android.os.Bundle;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ListView;
-import android.widget.TextView;
 import android.widget.ProgressBar;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.gson.Gson;
@@ -36,13 +39,15 @@ import retrofit.RestAdapter;
 import retrofit.RetrofitError;
 import retrofit.client.Response;
 
-public class CaseForwardToOrganize extends ActionBarActivity implements View.OnClickListener, SwipeRefreshLayout.OnRefreshListener {
+public class CaseForwardToOrganize extends ActionBarActivity implements View.OnClickListener
+        , SwipeRefreshLayout.OnRefreshListener, TextWatcher {
 
     private AdapterListToOrg adapterList;//Adapter List ที่เรากำหนดขึ้นเอง
     private ArrayList<OrganizeObject> listData;  //list ในการเก็บข้อมูลของ DataShow
     private ArrayList<OrganizeObject> selectedData;
     private ListView listView;
     private TextView emptyView;
+    private EditText search;
 
     private ProgressBar progressBar;
     // widget
@@ -78,6 +83,7 @@ public class CaseForwardToOrganize extends ActionBarActivity implements View.OnC
         /** /////////////////////////////////////////////////////////////////// */
 
         // init widget
+        search = (EditText) findViewById(R.id.search);
         progressBar = (ProgressBar) findViewById(R.id.progressBar);
         emptyView = (TextView) findViewById(R.id.empty);
         listView = (ListView) findViewById(R.id.list);
@@ -98,6 +104,11 @@ public class CaseForwardToOrganize extends ActionBarActivity implements View.OnC
 
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        search.addTextChangedListener(this);
+    }
 
     void setActionBar() {
         /** Set Title Center Actionbar*/
@@ -134,6 +145,55 @@ public class CaseForwardToOrganize extends ActionBarActivity implements View.OnC
         progressBar.setVisibility(View.VISIBLE);
         emptyView.setVisibility(View.GONE);
         adapterRest.getOrganizeList(new GetOrgObject(), new Callback<Response>() {
+            @Override
+            public void success(Response result, Response response2) {
+                BufferedReader reader;
+                StringBuilder sb = new StringBuilder();
+                try {
+                    reader = new BufferedReader(new InputStreamReader(result.getBody().in()));
+                    String line;
+                    while ((line = reader.readLine()) != null) {
+                        sb.append(line);
+                    }
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                String JsonConvertData = "{data:" + sb.toString() + "}";
+                ListOrgData listOrgData = new Gson().fromJson(JsonConvertData, ListOrgData.class);
+
+                listData = new ArrayList();
+                for (OrganizeObject e : listOrgData.getData()) {
+                    listData.add(e);
+                }
+                progressBar.setVisibility(View.GONE);
+                emptyView.setVisibility(View.VISIBLE);
+                adapterList.resetAdapter(listData);
+                mSwipeRefreshLayout.setRefreshing(false);
+            }
+
+            @Override
+            public void failure(RetrofitError error) {
+                progressBar.setVisibility(View.GONE);
+                if (listData.size() == 0) {
+                    emptyView.setVisibility(View.VISIBLE);
+                }
+                mSwipeRefreshLayout.setRefreshing(false);
+
+            }
+        });
+
+    }
+
+    public void getListOrgSearch(String s) {
+        mSwipeRefreshLayout.post(new Runnable() {
+            @Override
+            public void run() {
+                mSwipeRefreshLayout.setRefreshing(true);
+            }
+        });
+        progressBar.setVisibility(View.VISIBLE);
+        emptyView.setVisibility(View.GONE);
+        adapterRest.getOrganizeList(new GetOrgObject(s), new Callback<Response>() {
             @Override
             public void success(Response result, Response response2) {
                 BufferedReader reader;
@@ -214,5 +274,20 @@ public class CaseForwardToOrganize extends ActionBarActivity implements View.OnC
     @Override
     public void onRefresh() {
         getListOrg();
+    }
+
+    @Override
+    public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+    }
+
+    @Override
+    public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+    }
+
+    @Override
+    public void afterTextChanged(Editable s) {
+        getListOrgSearch(s.toString());
     }
 }

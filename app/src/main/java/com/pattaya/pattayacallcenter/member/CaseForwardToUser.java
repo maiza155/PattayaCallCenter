@@ -6,10 +6,13 @@ import android.os.Bundle;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.ProgressBar;
@@ -36,7 +39,7 @@ import retrofit.RestAdapter;
 import retrofit.RetrofitError;
 import retrofit.client.Response;
 
-public class CaseForwardToUser extends ActionBarActivity implements SwipeRefreshLayout.OnRefreshListener {
+public class CaseForwardToUser extends ActionBarActivity implements SwipeRefreshLayout.OnRefreshListener, TextWatcher {
 
 
     private ListView listView;
@@ -44,6 +47,7 @@ public class CaseForwardToUser extends ActionBarActivity implements SwipeRefresh
 
     private ArrayList<UserDataObject> selectedData;
     private AdapterListToUser adapterListToUser;
+    private EditText txtSearch;
     private TextView emptyView;
 
     private ProgressBar progressBar;
@@ -73,7 +77,7 @@ public class CaseForwardToUser extends ActionBarActivity implements SwipeRefresh
                 android.R.color.holo_orange_light,
                 android.R.color.holo_red_light);
 
-
+        txtSearch = (EditText) findViewById(R.id.search);
         progressBar = (ProgressBar) findViewById(R.id.progressBar);
         emptyView = (TextView) findViewById(R.id.empty);
         listView = (ListView) findViewById(R.id.list);
@@ -94,8 +98,15 @@ public class CaseForwardToUser extends ActionBarActivity implements SwipeRefresh
                 getUserList();
             }
         });
+
+
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        txtSearch.addTextChangedListener(this);
+    }
 
     void init() {
         selectedData = new ArrayList<>();
@@ -175,6 +186,53 @@ public class CaseForwardToUser extends ActionBarActivity implements SwipeRefresh
         });
     }
 
+    void getUserListSearch(String s) {
+        mSwipeRefreshLayout.post(new Runnable() {
+            @Override
+            public void run() {
+                mSwipeRefreshLayout.setRefreshing(true);
+            }
+        });
+        progressBar.setVisibility(View.VISIBLE);
+        emptyView.setVisibility(View.GONE);
+        adapterRest.getUserList(new GetUserObject(s, s), new Callback<Response>() {
+            @Override
+            public void success(Response result, Response response2) {
+                BufferedReader reader;
+                StringBuilder sb = new StringBuilder();
+                try {
+                    reader = new BufferedReader(new InputStreamReader(result.getBody().in()));
+                    String line;
+                    while ((line = reader.readLine()) != null) {
+                        sb.append(line);
+                    }
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                String JsonConvertData = "{data:" + sb.toString() + "}";
+                ListUserData listUserData = new Gson().fromJson(JsonConvertData, ListUserData.class);
+
+
+                progressBar.setVisibility(View.GONE);
+                emptyView.setVisibility(View.VISIBLE);
+                adapterListToUser.resetAdapter(listUserData.getData());
+                mSwipeRefreshLayout.setRefreshing(false);
+
+            }
+
+            @Override
+            public void failure(RetrofitError error) {
+                progressBar.setVisibility(View.GONE);
+                if (adapterListToUser.getCount() == 0) {
+                    emptyView.setVisibility(View.VISIBLE);
+                }
+
+                mSwipeRefreshLayout.setRefreshing(false);
+
+            }
+        });
+    }
+
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -209,5 +267,20 @@ public class CaseForwardToUser extends ActionBarActivity implements SwipeRefresh
     public void onRefresh() {
 
         getUserList();
+    }
+
+    @Override
+    public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+    }
+
+    @Override
+    public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+    }
+
+    @Override
+    public void afterTextChanged(Editable s) {
+        getUserListSearch(s.toString());
     }
 }

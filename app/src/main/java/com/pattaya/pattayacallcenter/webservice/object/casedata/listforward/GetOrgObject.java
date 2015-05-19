@@ -5,4 +5,16 @@ package com.pattaya.pattayacallcenter.webservice.object.casedata.listforward;
  */
 public class GetOrgObject {
     Boolean isActive = true;
+    String orgName;
+
+    public GetOrgObject(String orgName) {
+        this.orgName = orgName;
+    }
+
+    public GetOrgObject() {
+    }
+
+    public void setOrgName(String orgName) {
+        this.orgName = orgName;
+    }
 }

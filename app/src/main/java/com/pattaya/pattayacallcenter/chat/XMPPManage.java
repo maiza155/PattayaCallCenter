@@ -78,7 +78,7 @@ import retrofit.client.Response;
  */
 public class XMPPManage implements MessageListener {
     public static final String HOST = "58.181.163.115";
-    //    public static final String HOST = "172.16.1.128";
+    // public static final String HOST = "172.16.1.128";
     public static final int PORT = 5222;
     public static final String PASSWORD = "1234";
     static final RestAdapter restAdapterOpenFire = RestAdapterOpenFire.getInstance();
@@ -347,7 +347,6 @@ public class XMPPManage implements MessageListener {
                             if (pubsubObject.getAction().matches("org")) {
                                 Log.e("TAg", "INVITE TO oRG");
                                 BusProvider.getInstance().post("org_update");
-
                             } else {
                                 NotifyCase.setNotifyChat(pubsubObject);
                             }
@@ -559,18 +558,21 @@ public class XMPPManage implements MessageListener {
                 String username = USERNAME + "_notify";
                 try {
                     admin.connect();
-                    admin.login("admin", "admin", "Android");
+                    admin.login("admin", "p@ssw0rd", "Android");
                     Log.e("XMPPManage", "Admin Connection is : " + admin.isConnected());
                     ConfigureForm form = new ConfigureForm(FormType.submit);
                     form.setAccessModel(AccessModel.open);
                     form.setDeliverPayloads(true);
                     form.setNotifyRetract(true);
                     form.setNotifyDelete(true);
+                    form.setMaxPayloadSize(1024000);
                     form.setPublishModel(PublishModel.open);
                     manager = new PubSubManager(admin);
+
                     try {
                         System.out.println("///////////////////////////////////////////////////////");
                         LeafNode myNode = (LeafNode) manager.createNode(username, form);
+
                         subscribePubSub();
                         String itemData =
                                 "<x xmlns='jabber:x:data' type='result'>" +
@@ -726,7 +728,7 @@ public class XMPPManage implements MessageListener {
             try {
                 Log.e("XMPPManage", "Join ? : " + muc.isJoined());
                 Log.e("XMPPManage", "Nick Name >>" + mConnection.getUser());
-                String name = mConnection.getUser().split("@")[0];
+                String name = jid.split("@")[0];
                 muc.join(name);
                 Log.e("XMPPManage", "mConnector  : " + mConnection.isConnected());
                 Log.e("XMPPManage", "Join ? : " + muc.isJoined());
@@ -1049,7 +1051,7 @@ public class XMPPManage implements MessageListener {
                 try {
                     if (isNetworkConnected()) {
                         admin.connect();
-                        admin.login("admin", "admin", "Android");
+                        admin.login("admin", "p@ssw0rd", "Android");
 
                         Log.e("XMPPManage", "Admin Connection is SendMessage : " + admin.isConnected());
                         ConfigureForm form = new ConfigureForm(FormType.submit);

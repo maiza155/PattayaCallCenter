@@ -13,7 +13,7 @@ public class WebserviceConnector {
     static RestAdapter restAdapterCase = null;
     static RestAdapter restAdapterPersonal = null;
     static String URL = "http://58.181.163.115:8080/";
-    //static String URL = "http://172.16.1.127:8080/";
+    // static String URL = "http://172.16.1.127:8080/";
 
     public static RestAdapter getInstance() {
         if (restAdapter == null) {
@@ -28,6 +28,7 @@ public class WebserviceConnector {
         if (restAdapterUpload == null) {
             restAdapterUpload = new RestAdapter.Builder()
                     .setEndpoint(URL + "UploadService/rest/file")
+                            // .setEndpoint(URL + "RESTfulExample/rest/file")
                     .build();
         }
         return restAdapterUpload;

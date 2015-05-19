@@ -119,7 +119,7 @@ public class CaseDetailActivity extends ActionBarActivity implements View.OnClic
         getData();
 
 
-        if (isOfficial && caseId > 0) {
+        if (isOfficial || caseId > 0) {
             btnEdit.setVisibility(View.GONE);
             btnDelete.setVisibility(View.GONE);
         }

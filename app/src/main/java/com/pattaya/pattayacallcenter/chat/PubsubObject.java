@@ -15,6 +15,8 @@ public class PubsubObject {
 
     String username;
 
+
+
     public String getUsername() {
         return username;
     }

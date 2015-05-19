@@ -162,7 +162,7 @@ public class CaseDetailMemberActivity extends ActionBarActivity {
 
     void getData() {
         final ProgressDialog ringProgressDialog = ProgressDialog.show(this, getResources().getString(R.string.load_data), getResources().getString(R.string.please_wait), true);
-        ringProgressDialog.setCancelable(false);
+        ringProgressDialog.setCancelable(true);
         GetComplainObject getComplainObject = new GetComplainObject();
         getComplainObject.setAccessToken(token);
         getComplainObject.setClientId(clientId);
