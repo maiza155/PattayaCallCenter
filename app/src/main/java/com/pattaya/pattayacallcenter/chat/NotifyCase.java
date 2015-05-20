@@ -116,7 +116,7 @@ public class NotifyCase {
         int count = settings.getInt(caseStr, 0);
         Log.e("count ", "" + count);
         count = count + 1;
-        settings.edit().putInt(caseStr, count).commit();
+        //settings.edit().putInt(caseStr, count).commit();
         BusProvider.getInstance().post("update_case_list");
 
         String jidRoom = "case-"+object.getComplainId()+"@conference.pattaya-data";

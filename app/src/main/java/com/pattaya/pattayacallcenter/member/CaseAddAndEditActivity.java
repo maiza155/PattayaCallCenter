@@ -207,8 +207,8 @@ public class CaseAddAndEditActivity extends ActionBarActivity implements View.On
         spinner1.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                if (position > 0) {
-                    int pos = position - 1;
+                if (listData.size() > 0) {
+                    int pos = position;
                     setTypeMain(listData.get(pos).getId(), spinner2);
                     selectItem = listData.get(pos).getId();
                     System.out.println(selectItem);

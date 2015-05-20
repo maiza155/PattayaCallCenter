@@ -254,7 +254,14 @@ public class CaseListActivity extends ActionBarActivity implements View.OnClickL
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == TAG_ORGANIZE) {
             if (resultCode == Activity.RESULT_OK) {
-                finish();
+                Boolean bool = data.getBooleanExtra("state", true);
+                if (bool) {
+                    finish();
+                } else {
+                    badge.hide();
+                    badgeInSlide.hide();
+                }
+
 
             }
         }

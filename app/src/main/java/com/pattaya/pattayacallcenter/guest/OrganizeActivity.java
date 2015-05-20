@@ -185,6 +185,9 @@ public class OrganizeActivity extends ActionBarActivity implements View.OnClickL
                                     ringProgressDialog.dismiss();
                                     finish();
                                 } else {
+                                    Intent i = new Intent();
+                                    i.putExtra("state", false);
+                                    setResult(Activity.RESULT_OK, i);
                                     ringProgressDialog.dismiss();
                                     finish();
 

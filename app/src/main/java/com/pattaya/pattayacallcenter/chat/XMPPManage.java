@@ -78,7 +78,7 @@ import retrofit.client.Response;
  */
 public class XMPPManage implements MessageListener {
     public static final String HOST = "58.181.163.115";
-    // public static final String HOST = "172.16.1.128";
+    //public static final String HOST = "172.16.1.128";
     public static final int PORT = 5222;
     public static final String PASSWORD = "1234";
     static final RestAdapter restAdapterOpenFire = RestAdapterOpenFire.getInstance();

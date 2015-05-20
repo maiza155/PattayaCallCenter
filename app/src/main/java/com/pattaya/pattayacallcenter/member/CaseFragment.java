@@ -279,7 +279,6 @@ public class CaseFragment extends Fragment implements View.OnClickListener
                 return true;
 
             default:
-
                 return super.onOptionsItemSelected(item);
 
         }

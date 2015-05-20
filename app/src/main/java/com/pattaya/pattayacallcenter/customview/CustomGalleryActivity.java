@@ -4,7 +4,6 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
-import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.v7.app.ActionBar;
@@ -23,11 +22,9 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
-import com.bumptech.glide.request.animation.GlideAnimation;
-import com.bumptech.glide.request.target.SimpleTarget;
-import com.pattaya.pattayacallcenter.Application;
 import com.pattaya.pattayacallcenter.R;
 
+import java.io.File;
 import java.util.ArrayList;
 
 
@@ -42,6 +39,8 @@ public class CustomGalleryActivity extends ActionBarActivity {
     private int ids[];
     private int count;
 
+    private ArrayList<Integer> fail;
+
 
     /**
      * Overrides methods
@@ -52,7 +51,7 @@ public class CustomGalleryActivity extends ActionBarActivity {
         setContentView(R.layout.activity_custom_gallery);
         grdImages = (GridView) findViewById(R.id.grdImages);
         //btnSelect= (Button) findViewById(R.id.btnSelect);
-
+        fail = new ArrayList<>();
         final String[] columns = {MediaStore.Images.Media.DATA, MediaStore.Images.Media._ID, MediaStore.Images.Media.DATE_TAKEN};
         final String orderBy = MediaStore.Images.Media.DATE_TAKEN;
         @SuppressWarnings("deprecation")
@@ -210,21 +209,15 @@ public class CustomGalleryActivity extends ActionBarActivity {
             holder.bgImage.setId(position);
 
             //Log.e("TAG","=====> Array path => " + holder.imgThumb.getId());
+            File file = new File((String) mArray.get(position));
 
-            Glide.with(Application.getContext())
-                    .load(mArray.get(position))
-                    .asBitmap()
-                    .fitCenter()
+            Glide.with(context)
+                    .load(file)
+                    .override(500, 500)
+                    .centerCrop()
+                    .error(R.drawable.img_not_found)
+                    .into(holder.imgThumb);
 
-                    .into(new SimpleTarget<Bitmap>(200, 200) {
-                        @Override
-                        public void onResourceReady(Bitmap bitmap, GlideAnimation anim) {
-                            // Do something with bitmap here.
-                            if (bitmap != null && bitmap.getHeight() > 100 && bitmap.getWidth() > 100) {
-                                holder.imgThumb.setImageBitmap(bitmap);
-                            }
-                        }
-                    });
 
 
             if (thumbnailsselection[position]) {
@@ -238,20 +231,23 @@ public class CustomGalleryActivity extends ActionBarActivity {
             holder.imgThumb.setOnClickListener(new View.OnClickListener() {
                 public void onClick(View v) {
                     int id = holder.chkImage.getId();
-                    if (thumbnailsselection[id]) {
-                        holder.chkImage.setChecked(false);
-                        thumbnailsselection[id] = false;
-                        holder.chkImage.setVisibility(View.GONE);
-                        holder.bgImage.setBackgroundResource(R.color.black);
+                    if (!fail.contains(id)) {
+                        if (thumbnailsselection[id]) {
+                            holder.chkImage.setChecked(false);
+                            thumbnailsselection[id] = false;
+                            holder.chkImage.setVisibility(View.GONE);
+                            holder.bgImage.setBackgroundResource(R.color.black);
 
 
-                    } else {
-                        holder.chkImage.setChecked(true);
-                        thumbnailsselection[id] = true;
-                        holder.chkImage.setVisibility(View.VISIBLE);
-                        holder.bgImage.setBackgroundResource(R.color.bluedark);
+                        } else {
+                            holder.chkImage.setChecked(true);
+                            thumbnailsselection[id] = true;
+                            holder.chkImage.setVisibility(View.VISIBLE);
+                            holder.bgImage.setBackgroundResource(R.color.bluedark);
 
+                        }
                     }
+
                 }
             });
 

@@ -5,7 +5,6 @@ import android.app.Activity;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
-import android.view.WindowManager;
 
 import com.astuetz.PagerSlidingTabStrip;
 import com.pattaya.pattayacallcenter.R;
@@ -43,9 +42,7 @@ public class AdapterPager extends FragmentPagerAdapter implements PagerSlidingTa
     @Override
     public Fragment getItem(int position) {
         Fragment fragment = fragmentList.get(position);
-        context.getWindow().setSoftInputMode(
-                WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN
-        );
+
         return fragment;
     }
 

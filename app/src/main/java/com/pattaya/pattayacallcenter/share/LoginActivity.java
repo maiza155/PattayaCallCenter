@@ -821,7 +821,7 @@ public class LoginActivity extends Activity {
 
             @Override
             public void failure(RetrofitError error) {
-                System.out.println(error.getMessage());
+                System.out.println(error);
                 ringProgressDialog.dismiss();
                 alertDialogFailtoServer("Cannot connect to Server");
             }
