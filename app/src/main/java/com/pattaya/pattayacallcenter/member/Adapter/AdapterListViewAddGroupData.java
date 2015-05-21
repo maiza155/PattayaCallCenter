@@ -21,21 +21,11 @@ import java.util.ArrayList;
  * Created by PROSPORT on 3/2/2558.
  */
 public class AdapterListViewAddGroupData extends BaseAdapter {
-    private LayoutInflater mInflater;
-
-    private Context context; //รับ Context จาก CustomListViewActivity
     public ArrayList<InviteFriendObject> listData = new ArrayList(); //list ในการเก็บข้อมูลของ DataShow
     View convertView;
     OnClickListener onClickListener;
-
-    public interface OnClickListener {
-        public void itemClick(String jid, int position);
-    }
-
-    public void SetOnItemClickListener(OnClickListener onClickListener) {
-        this.onClickListener = onClickListener;
-
-    }
+    private LayoutInflater mInflater;
+    private Context context; //รับ Context จาก CustomListViewActivity
 
     public AdapterListViewAddGroupData(Context context, ArrayList listData) {
         // TODO Auto-generated constructor stub
@@ -44,12 +34,16 @@ public class AdapterListViewAddGroupData extends BaseAdapter {
         this.listData = listData;
     }
 
+    public void SetOnItemClickListener(OnClickListener onClickListener) {
+        this.onClickListener = onClickListener;
+
+    }
+
     public void resetAdapter(ArrayList listData){
         this.listData = listData;
         notifyDataSetChanged();
 
     }
-
 
     public void removeAt(int position) {
 
@@ -70,13 +64,6 @@ public class AdapterListViewAddGroupData extends BaseAdapter {
     @Override
     public long getItemId(int position) {
         return position;
-    }
-
-    public class HolderListAdapter {
-        RoundedImageView imageView;
-        TextView txtName;
-        TextView txtDepart;
-        ImageButton btnDelete;
     }
 
     @Override
@@ -104,15 +91,14 @@ public class AdapterListViewAddGroupData extends BaseAdapter {
         //ดึงข้อมูลจาก listData มาแสดงทีละ position
         holder.txtName.setText(listData.get(position).getName());
         //holder.txtDepart.setText(listData.get(position).getDepart());
-        String image = (listData.get(position).getImage().matches(""))?"No":listData.get(position).getImage();
+        String image = (listData.get(position).getImage() == null || listData.get(position).getImage().matches("")) ? "No" : listData.get(position).getImage();
 
         Glide.with(context)
                 .load(image)
                 .error(R.drawable.com_facebook_profile_picture_blank_square)
-                .override(200,200)
+                .override(200, 200)
                 .fitCenter()
-                .into( holder.imageView);
-
+                .into(holder.imageView);
 
 
         holder.txtDepart.setVisibility(View.GONE);
@@ -147,8 +133,18 @@ public class AdapterListViewAddGroupData extends BaseAdapter {
         });
 
 
-
         return convertView;
+    }
+
+    public interface OnClickListener {
+        public void itemClick(String jid, int position);
+    }
+
+    public class HolderListAdapter {
+        RoundedImageView imageView;
+        TextView txtName;
+        TextView txtDepart;
+        ImageButton btnDelete;
     }
 
 

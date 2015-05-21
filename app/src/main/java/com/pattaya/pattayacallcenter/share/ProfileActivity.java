@@ -284,13 +284,9 @@ public class ProfileActivity extends ActionBarActivity implements View.OnClickLi
         Gson gson = new Gson();
         String json = gson.toJson(accessUserObject, AccessUserObject.class);
         System.out.println(json);
+        progressDialog = ProgressDialog.show(ProfileActivity.this, null, getResources().getString(R.string.please_wait), true);
+        progressDialog.setCancelable(true);
 
-        runOnUiThread(new Runnable() {
-            public void run() {
-                progressDialog = ProgressDialog.show(ProfileActivity.this, null, getResources().getString(R.string.please_wait), true);
-                progressDialog.setCancelable(true);
-            }
-        });
         adapterRest.postUser(accessUserObject, new Callback<UpdateResult>() {
             @Override
             public void success(UpdateResult updateResult, Response response) {
@@ -550,7 +546,7 @@ public class ProfileActivity extends ActionBarActivity implements View.OnClickLi
                 System.out.println("FILE LENGTH" + ">>>>>>>>" + totalSize);
 
 
-                adapterRestUpload.uploadImage(new TypedFile("image/jpeg", fileImage), new Callback<Response>() {
+                adapterRestUpload.uploadImage(new TypedFile("image/jpeg", file), new Callback<Response>() {
                     @Override
                     public void success(Response result, Response response) {
                         //Try to get response body
@@ -579,10 +575,18 @@ public class ProfileActivity extends ActionBarActivity implements View.OnClickLi
                         System.out.println(fileListObject.getData().get(0).getUrl());
                         urlImage = fileListObject.getData().get(0).getUrl();
                         //setImageUrl(urlImage);
-                        accessUserObject.setUserImage(urlImage);
-                        ringProgressDialog.dismiss();
-                        updateDataAll();
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                Activity activity = ProfileActivity.this;
+                                if (activity != null) {
+                                    accessUserObject.setUserImage(urlImage);
+                                    ringProgressDialog.dismiss();
+                                    updateDataAll();
+                                }
 
+                            }
+                        });
                     }
 
                     @Override

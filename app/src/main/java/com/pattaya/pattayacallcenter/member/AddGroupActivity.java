@@ -460,6 +460,8 @@ public class AddGroupActivity extends ActionBarActivity implements View.OnClickL
         if (requestCode == TAG_ADD_EDIT_ACTIVITY) {
             if (resultCode == RESULT_OK) {
                 String name = data.getStringExtra("name");
+                String image = data.getStringExtra("image");
+                groupdata.setPic(image);
                 titleTextView.setText(name);
 
             }

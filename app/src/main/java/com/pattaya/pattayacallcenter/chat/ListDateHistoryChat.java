@@ -48,23 +48,7 @@ public class ListDateHistoryChat implements IQProvider {
         String mRoom = chatHistoryData.getCurrentListPacket(); // ห้องล่าสุดที่ ถูกส่ง request -> server  เพื่อดึง list
 
 
-        // Log.d("Parse", "Name: " + name);
-        // String xml = new XMLDocument(element).toString();
-        // Log.e("TAGG XML DATA",""+xml);
-        //convertNodeToString(element);
-/*
-        DOM2XmlPullBuilder dom2XmlPullBuilder = new DOM2XmlPullBuilder();
-        Element element = dom2XmlPullBuilder.parseSubTree(parser);
-        Transformer transformer = TransformerFactory.newInstance().newTransformer();
-        transformer.setOutputProperty(OutputKeys.INDENT, "yes");
 
-        StreamResult result = new StreamResult(new StringWriter());
-        DOMSource source = new DOMSource(element);
-        transformer.transform(source, result);
-
-        String xmlString = result.getWriter().toString();
-        System.out.println(xmlString);
-*/
         while (false == stop) {
             switch (parser.getEventType()) {
                 case XmlPullParser.START_TAG: {

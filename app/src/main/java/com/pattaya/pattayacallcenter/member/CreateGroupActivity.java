@@ -5,6 +5,8 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Bitmap;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
@@ -19,6 +21,7 @@ import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.google.gson.Gson;
+import com.pattaya.pattayacallcenter.Application;
 import com.pattaya.pattayacallcenter.BusProvider;
 import com.pattaya.pattayacallcenter.Data.MasterData;
 import com.pattaya.pattayacallcenter.R;
@@ -41,13 +44,18 @@ import com.pattaya.pattayacallcenter.webservice.WebserviceConnector;
 import com.pattaya.pattayacallcenter.webservice.object.upload.FileListObject;
 
 import java.io.BufferedReader;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+import java.util.UUID;
+import java.util.concurrent.ExecutionException;
 
 import retrofit.Callback;
 import retrofit.RestAdapter;
@@ -106,7 +114,6 @@ public class CreateGroupActivity extends ActionBarActivity implements View.OnCli
         txtName = (TextView) findViewById(R.id.name);
         image = (RoundedImageView) findViewById(R.id.image);
         cameraMange = new CameraMange(this);
-
         Onclick();
         if (isUpdate) {
             btn_createGroup.setText("Update");
@@ -315,6 +322,7 @@ public class CreateGroupActivity extends ActionBarActivity implements View.OnCli
                     BusProvider.getInstance().post("add_roster_complete");
                     Intent intent1 = new Intent();
                     intent1.putExtra("name", chatRoomObject.getNaturalName());
+                    intent1.putExtra("image", chatRoomObject.getDescription());
                     setResult(Activity.RESULT_OK, intent1);
                     Toast.makeText(getApplication(),
                             "success", Toast.LENGTH_SHORT)
@@ -356,55 +364,8 @@ public class CreateGroupActivity extends ActionBarActivity implements View.OnCli
 
             } else {
                 if (fileImage != null) {
-                    String mimeType = URLConnection.guessContentTypeFromName(fileImage.getName());
-                    adapterRestUpload.uploadImage(new TypedFile(mimeType, fileImage), new Callback<Response>() {
-                        @Override
-                        public void success(Response result, Response response) {
 
-                            BufferedReader reader = null;
-                            StringBuilder sb = new StringBuilder();
-                            try {
-
-                                reader = new BufferedReader(new InputStreamReader(result.getBody().in()));
-
-                                String line;
-
-                                try {
-                                    while ((line = reader.readLine()) != null) {
-                                        sb.append(line);
-                                    }
-                                } catch (IOException e) {
-                                    e.printStackTrace();
-                                }
-                            } catch (IOException e) {
-                                e.printStackTrace();
-                            }
-
-
-                            String JsonConvertData = "{data:" + sb.toString() + "}";
-
-                            FileListObject fileListObject = new Gson().fromJson(JsonConvertData, FileListObject.class);
-
-                            urlImage = fileListObject.getData().get(0).getUrl();
-                            setImageUrlToView(urlImage);
-
-                            if (isUpdate) {
-                                updateChatroom(urlImage);
-                            } else {
-                                createChatroom(urlImage);
-                            }
-                        }
-
-                        @Override
-                        public void failure(RetrofitError error) {
-                            System.out.println("error = [" + error + "]");
-                            Toast.makeText(getApplication(),
-                                    "Please check your internet connection", Toast.LENGTH_SHORT)
-                                    .show();
-
-                        }
-                    });
-
+                    new TaskResizeUpload().execute();
                 } else {
                     if (isUpdate) {
                         updateChatroom("");
@@ -451,7 +412,7 @@ public class CreateGroupActivity extends ActionBarActivity implements View.OnCli
                     if (fileImage.exists()) {
                         Log.d("TAG", "CAmera Capture path2" + fileImage.getPath());
                         setImageFileToView(fileImage);
-                        getImagePathUpload(fileImage);
+                        //getImagePathUpload(fileImage);
 
 
                     }
@@ -478,7 +439,7 @@ public class CreateGroupActivity extends ActionBarActivity implements View.OnCli
                 fileImage = new File(imagesPath[0]);
                 if (fileImage.exists()) {
                     setImageFileToView(fileImage);
-                    getImagePathUpload(fileImage);
+                    //getImagePathUpload(fileImage);
 
 
                 }
@@ -585,5 +546,132 @@ public class CreateGroupActivity extends ActionBarActivity implements View.OnCli
 
     }
 
+    class TaskResizeUpload extends AsyncTask<Void, Void, Boolean> {
+        ProgressDialog ringProgressDialog;
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            ringProgressDialog = ProgressDialog.show(CreateGroupActivity.this, null, getResources().getString(R.string.please_wait), true);
+            ringProgressDialog.setCancelable(true);
+        }
+
+        @Override
+        protected Boolean doInBackground(Void... params) {
+            String uuid = UUID.randomUUID().toString();
+            System.out.println("uuid = " + uuid);
+            int randomNum = 500 + (int) (Math.random() * 2000000000);
+            File file = new File(getCacheDir(), "pattaya" + randomNum + uuid);
+            try {
+                file.createNewFile();
+            } catch (IOException error) {
+                error.printStackTrace();
+            }
+            Bitmap bitmap = null;
+            try {
+                // resize
+                bitmap = Glide.with(Application.getContext())
+                        .load(fileImage)
+                        .asBitmap()
+                        .fitCenter()
+                        .into(500, 500) // Width and height
+                        .get();
+            } catch (InterruptedException error) {
+                error.printStackTrace();
+            } catch (ExecutionException error) {
+                error.printStackTrace();
+            }
+
+            System.out.println(bitmap);
+
+            if (bitmap != null) {
+                ByteArrayOutputStream bos = new ByteArrayOutputStream();
+                bitmap.compress(Bitmap.CompressFormat.JPEG, MasterData.PERCEN_OF_IMAGE_FILE, bos);
+                byte[] bitmapdata = bos.toByteArray();
+                FileOutputStream fos = null;
+                try {
+                    fos = new FileOutputStream(file);
+                } catch (FileNotFoundException error) {
+                    error.printStackTrace();
+                }
+                try {
+                    fos.write(bitmapdata);
+                    fos.flush();
+                    fos.close();
+                } catch (IOException error) {
+                    error.printStackTrace();
+                }
+                Log.e("File upload", "" + file.length());
+                Log.e("File upload", "" + file.getAbsolutePath());
+                // final long totalSize = file.length();
+
+
+                adapterRestUpload.uploadImage(new TypedFile("image/jpeg", file), new Callback<Response>() {
+                    @Override
+                    public void success(Response result, Response response) {
+
+                        BufferedReader reader = null;
+                        StringBuilder sb = new StringBuilder();
+                        try {
+
+                            reader = new BufferedReader(new InputStreamReader(result.getBody().in()));
+
+                            String line;
+
+                            try {
+                                while ((line = reader.readLine()) != null) {
+                                    sb.append(line);
+                                }
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+
+
+                        String JsonConvertData = "{data:" + sb.toString() + "}";
+
+                        FileListObject fileListObject = new Gson().fromJson(JsonConvertData, FileListObject.class);
+
+                        urlImage = fileListObject.getData().get(0).getUrl();
+                        System.out.println(urlImage);
+
+                        Activity activity = CreateGroupActivity.this;
+                        if (activity != null) {
+                            runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    setImageUrlToView(urlImage);
+                                    ringProgressDialog.dismiss();
+
+                                    if (isUpdate) {
+                                        updateChatroom(urlImage);
+                                    } else {
+                                        createChatroom(urlImage);
+                                    }
+                                }
+                            });
+
+                        }
+
+                    }
+
+                    @Override
+                    public void failure(RetrofitError error) {
+                        System.out.println("error = [" + error + "]");
+                        ringProgressDialog.dismiss();
+                        Toast.makeText(getApplication(),
+                                "Please check your internet connection", Toast.LENGTH_SHORT)
+                                .show();
+
+                    }
+                });
+
+            }
+            return null;
+        }
+
+    }
 
 }
