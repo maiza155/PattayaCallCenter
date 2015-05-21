@@ -292,7 +292,6 @@ public class ProfileActivity extends ActionBarActivity implements View.OnClickLi
             public void success(UpdateResult updateResult, Response response) {
                 System.out.println("updateResult = [" + updateResult.getResult() + "], response = [" + response + "]");
                 Boolean bool = updateResult.getResult();
-
                 if (bool) {
                     Toast.makeText(getApplication(),
                             getResources().getString(R.string.update_data_success), Toast.LENGTH_SHORT)

@@ -746,10 +746,13 @@ public class CaseAddAndEditActivity extends ActionBarActivity implements View.On
                                 imageObject.setInfoImage(fileListObject.getData().get(0).getUrl());
                                 listImageURL.add(imageObject);
                                 if (listImageURL.size() == mGridAdapter.getData().size()) {
-                                    dataCaseDetail.setInfoImageList(listImageURL);
-                                    saveData();
+                                    Activity activity = CaseAddAndEditActivity.this;
+                                    if (activity != null) {
+                                        dataCaseDetail.setInfoImageList(listImageURL);
+                                        saveData();
+                                        ringProgressDialog.dismiss();
+                                    }
 
-                                    ringProgressDialog.dismiss();
                                 }
                             }
 
@@ -766,18 +769,26 @@ public class CaseAddAndEditActivity extends ActionBarActivity implements View.On
                         imageObject.setInfoImage(e.getPath());
                         listImageURL.add(imageObject);
                         if (listImageURL.size() == mGridAdapter.getData().size()) {
-                            ringProgressDialog.dismiss();
-                            dataCaseDetail.setInfoImageList(listImageURL);
-                            saveData();
+                            Activity activity = CaseAddAndEditActivity.this;
+                            if (activity != null) {
+                                ringProgressDialog.dismiss();
+                                dataCaseDetail.setInfoImageList(listImageURL);
+                                saveData();
+                            }
+
 
                         }
                     }
                 }
 
             } else {
-                dataCaseDetail.setInfoImageList(listImageURL);
-                ringProgressDialog.dismiss();
-                saveData();
+                Activity activity = CaseAddAndEditActivity.this;
+                if (activity != null) {
+                    dataCaseDetail.setInfoImageList(listImageURL);
+                    ringProgressDialog.dismiss();
+                    saveData();
+                }
+
 
             }
 

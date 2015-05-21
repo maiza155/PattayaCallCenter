@@ -210,6 +210,9 @@ public class CustomGalleryActivity extends ActionBarActivity {
 
             //Log.e("TAG","=====> Array path => " + holder.imgThumb.getId());
             File file = new File((String) mArray.get(position));
+            if(!file.exists()){
+                fail.add(position);
+            }
 
             Glide.with(context)
                     .load(file)

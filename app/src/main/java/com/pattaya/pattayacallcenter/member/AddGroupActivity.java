@@ -56,7 +56,7 @@ public class AddGroupActivity extends ActionBarActivity implements View.OnClickL
     ArrayList memberlist = new ArrayList();
     ArrayList outcastlist = new ArrayList();
     Intent intent;
-    // widget
+    //widget
     ImageButton btn;
     TextView titleTextView;
     Users groupdata;
