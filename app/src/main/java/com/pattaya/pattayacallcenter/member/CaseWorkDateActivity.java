@@ -10,6 +10,7 @@ import android.os.Bundle;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
 import android.text.InputType;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
@@ -45,7 +46,7 @@ public class CaseWorkDateActivity extends ActionBarActivity implements View.OnCl
 
     private static SharedPreferences spConfig;
     private static SharedPreferences sp;
-    SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
+    SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy HH:mm");
     private EditText startDate;
     private EditText startTime;
     private EditText endDate;
@@ -227,7 +228,6 @@ public class CaseWorkDateActivity extends ActionBarActivity implements View.OnCl
     void getCaseData() {
         final ProgressDialog ringProgressDialog = ProgressDialog.show(this, null, getResources().getString(R.string.please_wait), true);
         ringProgressDialog.setCancelable(true);
-
         GetCaseDate getCaseDate = new GetCaseDate();
         getCaseDate.setClientId(clientId);
         getCaseDate.setAccessToken(token);
@@ -242,7 +242,35 @@ public class CaseWorkDateActivity extends ActionBarActivity implements View.OnCl
             @Override
             public void success(UpdateResult updateResult, Response response) {
 
-                System.out.println("updateResult = [" + updateResult.getResult() + "], response = [" + response + "]");
+                Log.e("START_DATE", "" + updateResult.getStartDateString());
+                Log.e("DUE_DATE", "" + updateResult.getDuleDateString());
+                if (updateResult.getStartDateString() != null) {
+                    Date datestart = null;
+                    try {
+                        datestart = sdf.parse(updateResult.getStartDateString());
+                        startDate.setText(dateFormatter.format(datestart));
+                        startTime.setText(dateFormatterTime.format(datestart));
+                    } catch (ParseException e) {
+                        e.printStackTrace();
+                    }
+
+                } else {
+                    Calendar cal = Calendar.getInstance();
+                    startDate.setText(dateFormatter.format(cal.getTime()));
+                    startTime.setText(dateFormatterTime.format(cal.getTime()));
+
+                }
+                if (updateResult.getDuleDateString() != null) {
+                    Date dateend = null;
+                    try {
+                        dateend = sdf.parse(updateResult.getDuleDateString());
+                        endDate.setText(dateFormatter.format(dateend));
+                        endTime.setText(dateFormatterTime.format(dateend));
+                    } catch (ParseException e) {
+                        e.printStackTrace();
+                    }
+
+                }
 
                 ringProgressDialog.dismiss();
 
@@ -284,8 +312,8 @@ public class CaseWorkDateActivity extends ActionBarActivity implements View.OnCl
                 && !endDate.getText().toString().isEmpty()
                 && !endTime.getText().toString().isEmpty()) {
             try {
-                Date start = dateFormatter.parse(startDate.getText().toString());
-                Date end = dateFormatter.parse(endDate.getText().toString());
+                Date start = sdf.parse(startDate.getText().toString() + " " + startTime.getText().toString());
+                Date end = sdf.parse(endDate.getText().toString() + " " + endTime.getText().toString());
                 if (start.before(end)) {
                     return true;
                 }

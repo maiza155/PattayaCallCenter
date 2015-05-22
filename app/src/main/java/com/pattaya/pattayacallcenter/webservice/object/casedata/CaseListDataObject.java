@@ -10,6 +10,11 @@ public class CaseListDataObject {
     String dateShort;
     Boolean isNew;
     int percentSuccess;
+    Boolean isAction;
+
+    public Boolean isAction() {
+        return isAction;
+    }
 
     public int getComplaintId() {
         return complaintId;

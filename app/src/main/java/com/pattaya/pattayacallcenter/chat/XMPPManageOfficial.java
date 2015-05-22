@@ -391,7 +391,7 @@ public class XMPPManageOfficial implements MessageListener {
                             String[] room = checkCase.split("-");
                             System.out.println(checkCase);
 
-                            if (room[0].matches("case")) {
+                            if (room[0].matches("complaint")) {
                                 NotifyCase.setNotifyChatCase(users.getName(), room[1], messages.getMessage());
                             }
                         }
@@ -414,7 +414,7 @@ public class XMPPManageOfficial implements MessageListener {
                                 if (alert) {
                                     String checkCase = messages.getRoom().split("@")[0];
                                     String[] room = checkCase.split("-");
-                                    if (room[0].matches("case")) {
+                                    if (room[0].matches("complaint")) {
                                         NotifyCase.setNotifyChatCase(user.getName(), room[1], messages.getMessage());
                                     }
 

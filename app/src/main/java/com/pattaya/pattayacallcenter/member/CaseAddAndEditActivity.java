@@ -139,6 +139,7 @@ public class CaseAddAndEditActivity extends ActionBarActivity implements View.On
     private int caseId;
     private int complainId;
     private String displayName;
+    private String userName;
     private String displayImage;
     private String jid;
 
@@ -247,6 +248,13 @@ public class CaseAddAndEditActivity extends ActionBarActivity implements View.On
         init();
 
 
+        if (displayName == null) {
+            txtName.setText(userName);
+        } else {
+            txtName.setText(displayName);
+        }
+
+
     }
 
     @Override
@@ -275,7 +283,7 @@ public class CaseAddAndEditActivity extends ActionBarActivity implements View.On
         displayImage = sp.getString(MasterData.SHARED_USER_IMAGE, null);
         displayName = sp.getString(MasterData.SHARED_USER_DISPLAY_NAME, null);
         jid = sp.getString(MasterData.SHARED_USER_JID, null);
-
+        userName = sp.getString(MasterData.SHARED_USER_USERNAME, null);
         spConfig = Application.getContext().getSharedPreferences(MasterData.SHARED_NAME_CONFIG_FILE, Context.MODE_PRIVATE);
         token = spConfig.getString(MasterData.SHARED_CONFIG_TOKEN, null);
         clientId = spConfig.getString(MasterData.SHARED_CONFIG_CLIENT_ID, null);

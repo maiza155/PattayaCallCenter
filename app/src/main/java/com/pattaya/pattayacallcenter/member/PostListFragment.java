@@ -102,8 +102,10 @@ public class PostListFragment extends Fragment implements AbsListView.OnScrollLi
 
         listViewDataResult.setEmptyView(tv_empty);
         listViewDataResult.setOnScrollListener(this);
-        adapterListViewCaseResult = new AdapterListViewPost(getActivity().getBaseContext(), listDataresult);
+        adapterListViewCaseResult = new AdapterListViewPost(getActivity(), listDataresult);
+        adapterListViewCaseResult.setFragment(this);
         listViewDataResult.setAdapter(adapterListViewCaseResult);
+
 
         progressBar = (ProgressBar) root.findViewById(R.id.progressBar);
         if (!isFirst) {
@@ -112,8 +114,11 @@ public class PostListFragment extends Fragment implements AbsListView.OnScrollLi
             loadPost();
         }
         //
+
         tv_empty.setOnClickListener(this);
         return root;
+
+
     }
 
 
@@ -370,7 +375,6 @@ public class PostListFragment extends Fragment implements AbsListView.OnScrollLi
         menu.clear();
         setActionBar((ActionBarActivity) getActivity());
         inflater.inflate(R.menu.menu_post, menu);
-
     }
 
     @Override
@@ -433,5 +437,25 @@ public class PostListFragment extends Fragment implements AbsListView.OnScrollLi
             update();
         }
 
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == adapterListViewCaseResult.TAG_EDITOR) {
+            if (resultCode == Activity.RESULT_OK) {
+                ArrayList<String> image = data.getStringArrayListExtra("image");
+                String detail = data.getStringExtra("detail");
+                int postId = data.getIntExtra("postId", 0);
+                System.out.println("" + postId);
+                System.out.println("" + detail);
+                if (postId > 0) {
+                    adapterListViewCaseResult.updateItem(postId, detail, image);
+                }
+
+
+            }
+
+        }
     }
 }

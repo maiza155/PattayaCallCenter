@@ -59,6 +59,7 @@ public class MemberMainActivity extends ActionBarActivity implements View.OnClic
         setContentView(R.layout.activity_member_main);
         BusProvider.getInstance().register(this);
         sp = getSharedPreferences(MasterData.SHARED_NAME_USER_FILE, Context.MODE_PRIVATE);
+        sp.edit().putBoolean(MasterData.SHARED_IS_MEMBER, true).commit();
         isOfficial = sp.getBoolean(MasterData.SHARED_IS_OFFICIAL, false);
         tabs = (PagerSlidingTabStrip) findViewById(R.id.titles);
         adapterPager = new AdapterPager(getSupportFragmentManager(), this);

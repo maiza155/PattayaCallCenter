@@ -1,7 +1,7 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:focusableInTouchMode="true"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:focusableInTouchMode="true">
 
     <ScrollView
         android:id="@+id/scroll"
@@ -54,8 +54,8 @@
                     android:id="@+id/check"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:gravity="center"
-                    android:button="@drawable/checkb0x" />
+                    android:button="@drawable/checkb0x"
+                    android:gravity="center" />
 
                 <TextView
                     style="@style/text_header_style"
@@ -77,12 +77,12 @@
                     android:text="- สถานที่ :" />
 
                 <TextView
-                    style="@style/text_detail_style"
                     android:id="@+id/txt_place"
+                    style="@style/text_detail_style"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="10dp"
-                    android:hint="@string/profile_address"
+
 
                     />
 

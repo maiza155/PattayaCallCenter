@@ -53,7 +53,9 @@ public class NotifyCase {
         Boolean alert = spConfig.getBoolean(MasterData.SHARED_CONFIG_ALERT, true);
 
         SharedPreferences sp = Application.getContext().getSharedPreferences(MasterData.SHARED_NAME_USER_FILE, Context.MODE_PRIVATE);
-        Boolean isOfficial = sp.getBoolean(MasterData.SHARED_IS_OFFICIAL,false);
+        Boolean isOfficial = sp.getBoolean(MasterData.SHARED_IS_OFFICIAL, false);
+        Boolean isMember = sp.getBoolean(MasterData.SHARED_IS_MEMBER,false);
+
         System.out.println(object.getDisplayData());
 
         Long millis = Long.parseLong(object.getDisplayData(), 10);
@@ -61,7 +63,6 @@ public class NotifyCase {
         Date cal = new Date(millis);
         RemoteViews contentView = new RemoteViews(Application.getContext().getPackageName(),
                 R.layout.notification_layout);
-
         contentView.setTextViewText(R.id.header, object.getAction());
         contentView.setTextViewText(R.id.title,"ชื่อเรื่อง:"+ Application.getContext().getResources().getString(R.string.tab) + object.getTitle());
         contentView.setTextViewText(R.id.name, "ชื่อผู้เเจ้ง:"+ Application.getContext().getResources().getString(R.string.tab) + object.getName());
@@ -90,7 +91,15 @@ public class NotifyCase {
             Uri alarmSound = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
             mBuilder.setSound(alarmSound);
         }
+        String jidRoom;
+
         if (object.getCaseId() > 0) {
+            if(isMember){
+                jidRoom = "case-"+object.getComplainId()+"@conference.pattaya-data";
+            }else{
+                jidRoom = "complaint-"+object.getComplainId()+"@conference.pattaya-data";
+            }
+
             Intent notificationIntent = new Intent(Application.getContext(), CaseChatMemberActivity.class);
             notificationIntent.putExtra("id", object.getCaseId());
             notificationIntent.putExtra("casename", object.getTitle());
@@ -101,6 +110,7 @@ public class NotifyCase {
                     notificationIntent, PendingIntent.FLAG_UPDATE_CURRENT);
             mBuilder.setContentIntent(intent);
         } else {
+            jidRoom = "complaint-"+object.getComplainId()+"@conference.pattaya-data";
             Intent notificationIntent = new Intent(Application.getContext(), CaseDetailActivity.class);
             notificationIntent.putExtra("id_case", object.getCaseId());
             notificationIntent.putExtra("id", object.getComplainId());
@@ -116,10 +126,8 @@ public class NotifyCase {
         int count = settings.getInt(caseStr, 0);
         Log.e("count ", "" + count);
         count = count + 1;
-        //settings.edit().putInt(caseStr, count).commit();
+        settings.edit().putInt(caseStr, count).commit();
         BusProvider.getInstance().post("update_case_list");
-
-        String jidRoom = "case-"+object.getComplainId()+"@conference.pattaya-data";
         Log.e("Notify - case",""+jidRoom);
 
         if(isOfficial){
@@ -191,6 +199,9 @@ public class NotifyCase {
 
         @Override
         protected Boolean doInBackground(Void... params) {
+            SharedPreferences sp = Application.getContext().getSharedPreferences(MasterData.SHARED_NAME_USER_FILE, Context.MODE_PRIVATE);
+            final Boolean isOfficial = sp.getBoolean(MasterData.SHARED_IS_OFFICIAL, false);
+            final Boolean isMember = sp.getBoolean(MasterData.SHARED_IS_MEMBER,false);
             GetComplainObject getComplainObject = new GetComplainObject();
             getComplainObject.setAccessToken(token);
             getComplainObject.setClientId(clientId);
@@ -203,7 +214,7 @@ public class NotifyCase {
                     Log.e("TAG Notification CaseID", "" + caseMainObject.getRefCasesId());
                     String[] sticker = msg.split("<s>");
                     String[] image = msg.split("<img>");
-                    String messages ;
+                    String messages;
                     if (sticker.length > 1) {
                         messages = "ส่งสติ๊กเกอร์";
                     } else if (image.length > 1) {
@@ -240,18 +251,32 @@ public class NotifyCase {
                         mBuilder.setSound(alarmSound);
                     }
                     if (caseMainObject.getRefCasesId() > 0) {
+                        if (isMember && !isOfficial) {
+                            Intent notificationIntent = new Intent(Application.getContext(), CaseChatMemberActivity.class);
+                            notificationIntent.putExtra("id", caseMainObject.getRefCasesId());
+                            notificationIntent.putExtra("casename", caseMainObject.getComplaintName());
+                            notificationIntent.putExtra("complainid", complainId);
+                            notificationIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+                            notificationIntent.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
 
-                        Intent notificationIntent = new Intent(Application.getContext(), CaseChatMemberActivity.class);
-                        notificationIntent.putExtra("id", caseMainObject.getRefCasesId());
-                        notificationIntent.putExtra("casename", caseMainObject.getComplaintName());
-                        notificationIntent.putExtra("complainid", complainId);
-                        notificationIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
-                        notificationIntent.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
+
+                            PendingIntent intent = PendingIntent.getActivity(Application.getContext(), 0,
+                                    notificationIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+                            mBuilder.setContentIntent(intent);
+                        } else {
+                            Intent notificationIntent = new Intent(Application.getContext(), CaseChatActivity.class);
+                            notificationIntent.putExtra("id", caseMainObject.getRefCasesId());
+                            notificationIntent.putExtra("casename", caseMainObject.getComplaintName());
+                            notificationIntent.putExtra("complainid", complainId);
+                            notificationIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+                            notificationIntent.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
 
 
-                        PendingIntent intent = PendingIntent.getActivity(Application.getContext(), 0,
-                                notificationIntent, PendingIntent.FLAG_UPDATE_CURRENT);
-                        mBuilder.setContentIntent(intent);
+                            PendingIntent intent = PendingIntent.getActivity(Application.getContext(), 0,
+                                    notificationIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+                            mBuilder.setContentIntent(intent);
+                        }
+
                     } else {
                         Intent notificationIntent = new Intent(Application.getContext(), CaseChatActivity.class);
                         notificationIntent.putExtra("id", caseMainObject.getRefCasesId());

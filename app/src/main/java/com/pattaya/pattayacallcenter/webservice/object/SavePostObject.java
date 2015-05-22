@@ -8,9 +8,17 @@ import java.util.List;
 public class SavePostObject {
     String detail;
     int postById;
-    List postImageList;
+    List<String> postImageList;
     String postType;
+    int postId;
 
+    public int getPostId() {
+        return postId;
+    }
+
+    public void setPostId(int postId) {
+        this.postId = postId;
+    }
 
     public String getDetail() {
         return detail;
@@ -28,7 +36,7 @@ public class SavePostObject {
         this.postById = postById;
     }
 
-    public List getPostImageList() {
+    public List<String> getPostImageList() {
         return postImageList;
     }
 

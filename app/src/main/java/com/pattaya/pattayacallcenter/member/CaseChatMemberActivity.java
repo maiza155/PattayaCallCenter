@@ -512,7 +512,7 @@ public class CaseChatMemberActivity extends ActionBarActivity implements View.On
             @Override
             protected Boolean doInBackground(Void... params) {
                 final String roomName = "case-" + complainId;
-                openfireQueary.getChatRoomDetail("case-" + complainId, new Callback<ChatRoom>() {
+                openfireQueary.getChatRoomDetail(roomName, new Callback<ChatRoom>() {
                     @Override
                     public void success(ChatRoom chatRoom, Response response) {
                         System.out.println("chatRoom = [" + chatRoom.getRoomName() + "], response = [" + response + "]");

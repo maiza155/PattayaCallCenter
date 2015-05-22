@@ -1,23 +1,44 @@
 package com.pattaya.pattayacallcenter.member.Adapter;
 
+import android.app.AlertDialog;
+import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.os.AsyncTask;
+import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
+import com.pattaya.pattayacallcenter.Application;
+import com.pattaya.pattayacallcenter.Data.MasterData;
 import com.pattaya.pattayacallcenter.R;
 import com.pattaya.pattayacallcenter.customview.FullscreenActivity;
 import com.pattaya.pattayacallcenter.customview.RoundedImageView;
+import com.pattaya.pattayacallcenter.member.PostActivity;
 import com.pattaya.pattayacallcenter.member.ShowPostData;
+import com.pattaya.pattayacallcenter.webservice.RestFulQueary;
+import com.pattaya.pattayacallcenter.webservice.WebserviceConnector;
+import com.pattaya.pattayacallcenter.webservice.object.DeletePostObject;
 import com.pattaya.pattayacallcenter.webservice.object.PostObject;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+
+import retrofit.Callback;
+import retrofit.RestAdapter;
+import retrofit.RetrofitError;
+import retrofit.client.Response;
 
 /**
  * Created by PROSPORT on 3/2/2558.
@@ -25,7 +46,14 @@ import java.util.List;
 public class AdapterListViewPost extends BaseAdapter {
 
 
+    public static int TAG_EDITOR = 634;
+    final RestAdapter restAdapterPost = WebserviceConnector.getInstanceCartdUI();
+    final RestFulQueary restFulQuearyPost = restAdapterPost.create(RestFulQueary.class);
     View convertView;
+    Map<Integer, Integer> mapPostId = new HashMap<>();
+    SharedPreferences sp;
+    int userId;
+    Fragment fragment;
     private LayoutInflater mInflater;
     private Context context; //รับ Context จาก CustomListViewActivity
     private ArrayList<PostObject> listData; //list ในการเก็บข้อมูลของ DataShow
@@ -35,13 +63,21 @@ public class AdapterListViewPost extends BaseAdapter {
         this.context = context;
         this.mInflater = LayoutInflater.from(context);
         this.listData = listData;
+
+        sp = Application.getContext().getSharedPreferences(MasterData.SHARED_NAME_USER_FILE, Context.MODE_PRIVATE);
+        userId = sp.getInt(MasterData.SHARED_USER_USER_ID, -10);
+    }
+
+    public void setFragment(Fragment fragment) {
+        this.fragment = fragment;
     }
 
     public void addItem(List<PostObject> data) {
         listData.addAll(data);
         notifyDataSetChanged();
-
-
+        for (PostObject e : listData) {
+            mapPostId.put(e.getPostId(), listData.indexOf(e));
+        }
     }
 
     public void addItemUpdate(ArrayList<PostObject> data) {
@@ -50,6 +86,23 @@ public class AdapterListViewPost extends BaseAdapter {
         tempList.addAll(listData);
         listData = tempList;
         notifyDataSetChanged();
+        for (PostObject e : listData) {
+            mapPostId.put(e.getPostId(), listData.indexOf(e));
+        }
+
+
+    }
+
+    public void updateItem(int id, String detail, ArrayList<String> image) {
+        System.out.println("?" + mapPostId.get(id));
+        if (mapPostId.get(id) != null) {
+            PostObject tempPost = listData.get(mapPostId.get(id));
+            tempPost.setDetail(detail);
+            tempPost.setPostImageList(image);
+
+            listData.set(mapPostId.get(id), tempPost);
+            notifyDataSetChanged();
+        }
 
 
     }
@@ -100,7 +153,7 @@ public class AdapterListViewPost extends BaseAdapter {
             holder.txtDateTime = (TextView) convertView.findViewById(R.id.txt_dateTime);
             holder.txtResultDetail = (TextView) convertView.findViewById(R.id.txt_resultDetail);
             holder.imageView = (RoundedImageView) convertView.findViewById(R.id.pic_logoAdapter);
-
+            holder.btnEdit = (ImageView) convertView.findViewById(R.id.btn_edit);
             convertView.setTag(holder);
         } else {
             holder = (Holder) convertView.getTag();
@@ -205,8 +258,90 @@ public class AdapterListViewPost extends BaseAdapter {
 
             }
         });
+        Log.e("TAG-Post", "UserId " + userId + "     Create BY = " + listData.get(position).getPostById());
+        if (userId != listData.get(position).getPostById()) {
+
+            holder.btnEdit.setVisibility(View.GONE);
+        } else {
+
+        }
+        holder.btnEdit.setVisibility(View.VISIBLE);
+        holder.btnEdit.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(final View v) {
+                final CharSequence[] items = {
+                        "เเก้ไข", "ลบ"
+                };
+
+                AlertDialog.Builder builder = new AlertDialog.Builder(v.getContext());
+                builder.setItems(items, new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int item) {
+                        if (item == 0) {
+                            Intent intent = new Intent(context, PostActivity.class);
+                            intent.putExtra("postdata", listData.get(position));
+                            fragment.startActivityForResult(intent, TAG_EDITOR);
+                        } else if (item == 1) {
+                            new TaskDelete(position, listData.get(position).getPostId(), v.getContext()).execute();
+
+                        }
+                    }
+                });
+                AlertDialog alert = builder.create();
+                alert.show();
+
+
+            }
+        });
 
         return convertView;
+    }
+
+    class TaskDelete extends AsyncTask<Void, Void, Boolean> {
+        int postId;
+        int position;
+        Context context;
+        ProgressDialog progressDialog;
+
+        public TaskDelete(int position, int postId, Context context) {
+            this.position = position;
+            this.postId = postId;
+            this.context = context;
+        }
+
+        public TaskDelete(int postId) {
+            this.postId = postId;
+        }
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            progressDialog = ProgressDialog.show(context, null, context.getResources().getString(R.string.please_wait), true);
+            progressDialog.setCancelable(true);
+        }
+
+        @Override
+        protected Boolean doInBackground(Void... params) {
+            restFulQuearyPost.deletePost(new DeletePostObject(postId), new Callback<Response>() {
+                @Override
+                public void success(Response response, Response response2) {
+                    System.out.println("response = [" + response + "], response2 = [" + response2 + "]");
+                    listData.remove(position);
+                    notifyDataSetChanged();
+                    progressDialog.dismiss();
+                }
+
+                @Override
+                public void failure(RetrofitError error) {
+                    System.out.println("error = [" + error + "]");
+                    Toast.makeText(Application.getContext(), "Unable connect server \n Please try again", Toast.LENGTH_SHORT).show();
+                    progressDialog.dismiss();
+
+                }
+            });
+
+            return null;
+        }
+
     }
 
 
@@ -217,6 +352,7 @@ public class AdapterListViewPost extends BaseAdapter {
         TextView txtResultDetail;
         TextView txtMore;
         TextView txtViewMore;
+        ImageView btnEdit;
 
         ImageView image1;
         ImageView image2;

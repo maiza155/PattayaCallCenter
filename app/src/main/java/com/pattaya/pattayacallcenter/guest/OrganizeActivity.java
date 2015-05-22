@@ -127,7 +127,7 @@ public class OrganizeActivity extends ActionBarActivity implements View.OnClickL
     }
 
     void acceptInvite(final Boolean bool) {
-        final ProgressDialog ringProgressDialog = ProgressDialog.show(OrganizeActivity.this, "Please login again", getResources().getString(R.string.please_wait), true);
+        final ProgressDialog ringProgressDialog = ProgressDialog.show(OrganizeActivity.this, null, getResources().getString(R.string.please_wait), true);
         ringProgressDialog.setCancelable(false);
         final AcceptInviteObject acceptInviteObject = new AcceptInviteObject();
         acceptInviteObject.setFirstname(txt_name.getText().toString());

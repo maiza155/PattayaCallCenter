@@ -13,7 +13,6 @@ import com.bumptech.glide.Glide;
 import com.pattaya.pattayacallcenter.R;
 import com.pattaya.pattayacallcenter.customview.FullscreenActivity;
 
-
 import java.io.File;
 import java.util.List;
 
@@ -21,24 +20,10 @@ import java.util.List;
  * Created by SWF on 1/29/2015.
  */
 public class ImageGridAdapter extends ArrayAdapter {
+    int image = 0;
     private Context context;
     private int layoutResourceId;
     private List<String> data;
-
-    int image = 0;
-
-    public int getImage() {
-        return image;
-    }
-
-    public void setImage(int image) {
-        this.image = image;
-    }
-
-
-    public List getData() {
-        return data;
-    }
 
     public ImageGridAdapter(Context context, int resource, List objects) {
         super(context, resource, objects);
@@ -50,6 +35,23 @@ public class ImageGridAdapter extends ArrayAdapter {
 
     }
 
+    public int getImage() {
+        return image;
+    }
+
+    public void setImage(int image) {
+        this.image = image;
+    }
+
+    public List getData() {
+        return data;
+    }
+
+    public void resetAdapter(List<String> data) {
+        this.data = data;
+        notifyDataSetChanged();
+
+    }
 
     public void addItem(String image) {
         data.add(image);

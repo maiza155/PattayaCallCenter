@@ -23,14 +23,47 @@
             android:maxLines="2"
             android:text="Sample Text" />
 
-        <TextView
-            android:id="@+id/text_time"
-            style="@style/sub_list_text_style"
+        <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="right|bottom"
-            android:paddingTop="5dp"
-            android:text="Sample Text" />
+            android:layout_height="match_parent"
+            android:layout_marginBottom="5dp"
+            android:layout_marginTop="15dp">
+
+            <TextView
+                android:id="@+id/progress_time"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentBottom="true"
+                android:layout_alignParentLeft="true"
+                android:layout_marginLeft="10dp"
+                android:gravity="center|left"
+                android:paddingLeft="5dp"
+                android:text="time"
+                android:textColor="@color/whiteColor"
+                android:textSize="@dimen/sub_list_date_text_size" />
+
+            <LinearLayout
+                android:id="@+id/imageLayout"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentBottom="true"
+                android:layout_marginLeft="10dp"
+                android:layout_toRightOf="@id/progress_time"
+                android:orientation="horizontal"></LinearLayout>
+
+            <TextView
+                android:id="@+id/text_time"
+                style="@style/date_sub_list_text_style"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentBottom="true"
+                android:layout_alignParentRight="true"
+                android:layout_gravity="bottom"
+                android:layout_marginRight="10dp"
+                android:text="time" />
+
+
+        </RelativeLayout>
 
 
     </LinearLayout>

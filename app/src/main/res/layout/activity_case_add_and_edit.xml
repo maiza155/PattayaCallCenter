@@ -25,16 +25,16 @@
                 android:hint="@string/txt_detail_message" />
 
             <EditText
-                android:singleLine="true"
                 android:id="@+id/edit_text_name"
                 style="@style/edittext_style"
-                android:hint="@string/case_name" />
+                android:hint="@string/case_name"
+                android:singleLine="true" />
 
             <EditText
-                android:singleLine="true"
                 android:id="@+id/edit_text_phone"
                 style="@style/edittext_style"
-                android:hint="@string/profile_mobile" />
+                android:hint="@string/profile_mobile"
+                android:singleLine="true" />
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -45,15 +45,15 @@
                     android:id="@+id/chk_select"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:gravity="center"
-                    android:button="@drawable/checkb0x" />
+                    android:button="@drawable/checkb0x"
+                    android:gravity="center" />
 
                 <TextView
+                    style="@style/text_header_style"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:gravity="left|center"
-                    android:text="@string/hidden"
-                    style="@style/text_header_style" />
+                    android:text="@string/hidden" />
 
             </LinearLayout>
 
@@ -63,18 +63,17 @@
                 android:orientation="horizontal">
 
                 <TextView
+                    style="@style/text_header_style"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="- สถานที่ :"
-                    style="@style/text_header_style" />
+                    android:text="- สถานที่ :" />
 
                 <TextView
                     android:id="@+id/txt_place"
+                    style="@style/text_detail_style"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginLeft="10dp"
-                    android:text="บ้านเลขที่"
-                    style="@style/text_detail_style" />
+                    android:layout_marginLeft="10dp" />
 
             </LinearLayout>
 
@@ -111,8 +110,8 @@
             android:layout_weight="1">
 
             <Button
-                style="@style/button_style"
                 android:id="@+id/btn_place"
+                style="@style/button_style"
                 android:layout_width="wrap_content"
                 android:layout_gravity="center_horizontal"
                 android:drawableLeft="@drawable/asset_icon_normal_location_white"
@@ -132,8 +131,8 @@
             android:layout_weight="1">
 
             <Button
-                style="@style/button_style"
                 android:id="@+id/btn_image"
+                style="@style/button_style"
                 android:layout_width="wrap_content"
                 android:layout_gravity="center_horizontal"
                 android:drawableLeft="@drawable/asset_icon_normal_photo_white"

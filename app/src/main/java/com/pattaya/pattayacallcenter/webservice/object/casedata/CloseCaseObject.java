@@ -6,6 +6,7 @@ import java.util.List;
  * Created by SWF on 4/27/2015.
  */
 public class CloseCaseObject {
+    Boolean isAction = false;
     int casesId;
     int userId;
     int updateBy;

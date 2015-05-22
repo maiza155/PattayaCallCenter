@@ -98,17 +98,6 @@ public class AdpterListCase extends BaseAdapter {
 
 
         if (data.get(position).getCasesId() > 0) {
-            if (data.get(position).getIsAction()) {
-                ImageView image = new ImageView(context);
-                Drawable drawable = context.getResources().getDrawable(asset_icon_status_green);
-                image.setImageDrawable(drawable);
-                holder.layout.addView(image);
-            } else {
-                ImageView image = new ImageView(context);
-                Drawable drawable = context.getResources().getDrawable(asset_icon_status_gray);
-                image.setImageDrawable(drawable);
-                holder.layout.addView(image);
-            }
 
             if (data.get(position).getIsFollowUp()) {
                 ImageView image = new ImageView(context);
@@ -118,6 +107,18 @@ public class AdpterListCase extends BaseAdapter {
             }
 
 
+        }
+
+        if (data.get(position).getIsAction()) {
+            ImageView image = new ImageView(context);
+            Drawable drawable = context.getResources().getDrawable(asset_icon_status_green);
+            image.setImageDrawable(drawable);
+            holder.layout.addView(image);
+        } else {
+            ImageView image = new ImageView(context);
+            Drawable drawable = context.getResources().getDrawable(asset_icon_status_gray);
+            image.setImageDrawable(drawable);
+            holder.layout.addView(image);
         }
 
 

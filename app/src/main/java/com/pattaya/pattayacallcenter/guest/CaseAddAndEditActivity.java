@@ -109,7 +109,10 @@ public class CaseAddAndEditActivity extends ActionBarActivity implements View.On
     SharedPreferences sp, spConfig;
     String token, clientId;
     int userId;
+    String userName;
     int contactInfoId;
+    String jid;
+
     ProgressListener listener;
     SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy HH:mm");
     ProgressDialog ringProgressDialog;
@@ -157,6 +160,15 @@ public class CaseAddAndEditActivity extends ActionBarActivity implements View.On
         mGridAdapter = new ImageUpdateGridAdapter(this, R.layout.custom_gridview_image, imageData);
         gridView.setAdapter(mGridAdapter);
 
+        if (displayName == null) {
+            txtUserName.setText(userName);
+        } else {
+            txtUserName.setText(displayName);
+        }
+
+
+
+
     }
 
 
@@ -185,10 +197,13 @@ public class CaseAddAndEditActivity extends ActionBarActivity implements View.On
         sp = getSharedPreferences("PREF_USER", Context.MODE_PRIVATE);
         displayImage = sp.getString(MasterData.SHARED_USER_IMAGE, null);
         displayName = sp.getString(MasterData.SHARED_USER_DISPLAY_NAME, null);
+        userName = sp.getString(MasterData.SHARED_USER_USERNAME, null);
         spConfig = getSharedPreferences("APP_CONFIG", Context.MODE_PRIVATE);
         userId = sp.getInt("USER_ID", -10);
         token = spConfig.getString("TOKEN", null);
         clientId = spConfig.getString("CLIENT_ID", null);
+
+        jid = sp.getString(MasterData.SHARED_USER_JID, null);
     }
 
     void setData() {
@@ -262,7 +277,7 @@ public class CaseAddAndEditActivity extends ActionBarActivity implements View.On
                                         System.out.println("updateResult = [" + updateResult.getResult() + "], response = [" + response + "]");
                                         Log.e("TAG", "Save Data Success");
                                         if (updateResult.getResult()) {
-                                            String roomName = "case-" + updateResult.getPrimaryKeyId();
+                                            String roomName = "complaint-" + updateResult.getPrimaryKeyId();
                                             final ChatRoomObject chatRoomObject = new ChatRoomObject();
                                             chatRoomObject.setRoomName(roomName);
                                             chatRoomObject.setNaturalName(roomName);
@@ -315,8 +330,10 @@ public class CaseAddAndEditActivity extends ActionBarActivity implements View.On
                                                             pub.setCaseId(caseId);
                                                             pub.setName(displayName);
                                                             pub.setTitle(caseMainObject.getComplaintName());
+                                                            if (!e.getJid().matches(jid)) {
+                                                                listNotify.add(pub);
+                                                            }
 
-                                                            listNotify.add(pub);
                                                         }
 
                                                     }

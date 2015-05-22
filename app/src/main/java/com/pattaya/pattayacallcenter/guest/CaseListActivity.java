@@ -25,6 +25,7 @@ import android.widget.TextView;
 import com.facebook.login.LoginManager;
 import com.google.gson.Gson;
 import com.pattaya.pattayacallcenter.BusProvider;
+import com.pattaya.pattayacallcenter.Data.MasterData;
 import com.pattaya.pattayacallcenter.R;
 import com.pattaya.pattayacallcenter.chat.DatabaseChatHelper;
 import com.pattaya.pattayacallcenter.chat.XMPPManage;
@@ -153,8 +154,9 @@ public class CaseListActivity extends ActionBarActivity implements View.OnClickL
 
 
     void init() {
-        sp = getSharedPreferences("PREF_USER", Context.MODE_PRIVATE);
-        userId = sp.getInt("USER_ID", -10);
+        sp = getSharedPreferences(MasterData.SHARED_NAME_USER_FILE, Context.MODE_PRIVATE);
+        userId = sp.getInt(MasterData.SHARED_USER_USER_ID, -10);
+        sp.edit().putBoolean(MasterData.SHARED_IS_MEMBER, false).commit();
         sp = getSharedPreferences("APP_CONFIG", Context.MODE_PRIVATE);
         token = sp.getString("TOKEN", "null");
         clientId = sp.getString("CLIENT_ID", "null");

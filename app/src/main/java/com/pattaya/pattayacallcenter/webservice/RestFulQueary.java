@@ -3,6 +3,7 @@ package com.pattaya.pattayacallcenter.webservice;
 import com.pattaya.pattayacallcenter.webservice.object.AccessUserObject;
 import com.pattaya.pattayacallcenter.webservice.object.AcessTokenObject;
 import com.pattaya.pattayacallcenter.webservice.object.ChangePassObject;
+import com.pattaya.pattayacallcenter.webservice.object.DeletePostObject;
 import com.pattaya.pattayacallcenter.webservice.object.GetInviteUserObject;
 import com.pattaya.pattayacallcenter.webservice.object.GetTokenObject;
 import com.pattaya.pattayacallcenter.webservice.object.GetUserObject;
@@ -166,6 +167,10 @@ public interface RestFulQueary {
     @Headers("Content-Type:application/json;charset=UTF-8")
     @POST("/post/getPostList")
     void getPost(@Body GetPostObject object, Callback<Response> json);
+
+    @Headers("Content-Type:application/json;charset=UTF-8")
+    @POST("/post/deletePost")
+    void deletePost(@Body DeletePostObject object, Callback<Response> json);
 
 
     /**

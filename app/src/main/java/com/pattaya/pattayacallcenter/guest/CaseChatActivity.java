@@ -358,9 +358,9 @@ public class CaseChatActivity extends ActionBarActivity implements View.OnClickL
 
 
     void setRoom() {
-        final String roomName = "case-" + complainId;
+        final String roomName = "complaint-" + complainId;
         Log.e("ChatRoom", "" + roomName);
-        openfireQueary.getChatRoomDetail("case-" + complainId, new Callback<ChatRoom>() {
+        openfireQueary.getChatRoomDetail(roomName, new Callback<ChatRoom>() {
             @Override
             public void success(ChatRoom chatRoom, Response response) {
                 System.out.println("chatRoom = [" + chatRoom.getRoomName() + "], response = [" + response + "]");

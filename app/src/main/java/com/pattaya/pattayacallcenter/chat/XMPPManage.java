@@ -488,7 +488,7 @@ public class XMPPManage implements MessageListener {
 
                             System.out.println("indatabase " + checkCase);
 
-                            if (room[0].matches("case")) {
+                            if (room[0].matches("case") || room[0].matches("complaint")) {
                                 NotifyCase.setNotifyChatCase(users.getName(), room[1], messages.getMessage());
                             } else {
                                 NotifyChat.setNotifyChat(users.getName(), messages.getRoom(), messages.getMessage());
@@ -520,7 +520,7 @@ public class XMPPManage implements MessageListener {
                                     String[] room = checkCase.split("-");
                                     System.out.println("in server " + checkCase);
 
-                                    if (room[0].matches("case")) {
+                                    if (room[0].matches("case") || room[0].matches("complaint")) {
                                         NotifyCase.setNotifyChatCase(user.getName(), room[1], messages.getMessage());
                                     } else {
                                         NotifyChat.setNotifyChat(user.getName(), messages.getRoom(), messages.getMessage());
@@ -551,7 +551,7 @@ public class XMPPManage implements MessageListener {
             protected Boolean doInBackground(Void... params) {
                 ConnectionConfiguration config = new ConnectionConfiguration(HOST, PORT, SERVICE);
                 config.setSecurityMode(ConnectionConfiguration.SecurityMode.disabled);
-                config.setDebuggerEnabled(true);
+                //config.setDebuggerEnabled(true);
                 config.setReconnectionAllowed(true);
                 XMPPTCPConnection admin = new XMPPTCPConnection(config);
                 PubSubManager manager;
@@ -1043,7 +1043,7 @@ public class XMPPManage implements MessageListener {
 
                 ConnectionConfiguration config = new ConnectionConfiguration(HOST, PORT, SERVICE);
                 config.setSecurityMode(ConnectionConfiguration.SecurityMode.disabled);
-                config.setDebuggerEnabled(true);
+                // config.setDebuggerEnabled(true);
                 admin = new XMPPTCPConnection(config);
                 manager = new PubSubManager(admin);
                 final String username = pubsubObject.getUsername() + "_notify";

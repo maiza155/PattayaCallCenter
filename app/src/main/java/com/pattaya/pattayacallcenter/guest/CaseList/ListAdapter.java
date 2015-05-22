@@ -3,11 +3,14 @@ package com.pattaya.pattayacallcenter.guest.CaseList;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.drawable.Drawable;
 import android.support.v7.widget.RecyclerView;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.pattaya.pattayacallcenter.Application;
@@ -19,6 +22,9 @@ import com.readystatesoftware.viewbadger.BadgeView;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import static com.pattaya.pattayacallcenter.R.drawable.asset_icon_status_gray;
+import static com.pattaya.pattayacallcenter.R.drawable.asset_icon_status_green;
 
 /**
  * Created by SWF on 1/27/2015.
@@ -65,7 +71,19 @@ public class ListAdapter extends RecyclerView.Adapter<ListAdapter.ViewHolder> {
             holder.badge.show();
         } else
             holder.badge.hide();
-
+        if (data.isAction() != null) {
+            if (data.isAction()) {
+                ImageView image = new ImageView(mContext);
+                Drawable drawable = mContext.getResources().getDrawable(asset_icon_status_green);
+                image.setImageDrawable(drawable);
+                holder.layout.addView(image);
+            } else {
+                ImageView image = new ImageView(mContext);
+                Drawable drawable = mContext.getResources().getDrawable(asset_icon_status_gray);
+                image.setImageDrawable(drawable);
+                holder.layout.addView(image);
+            }
+        }
 
         holder.frame.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -78,7 +96,6 @@ public class ListAdapter extends RecyclerView.Adapter<ListAdapter.ViewHolder> {
                 mContext.startActivity(intent);
             }
         });
-
 
 
     }
@@ -95,10 +112,12 @@ public class ListAdapter extends RecyclerView.Adapter<ListAdapter.ViewHolder> {
         TextView textTime;
         View frame;
         View budget;
+        LinearLayout layout;
         BadgeView badge = null;
 
         public ViewHolder(View v) {
             super(v);
+            layout = (LinearLayout) v.findViewById(R.id.imageLayout);
             textTitle = (TextView) v.findViewById(R.id.text_title);
             textTime = (TextView) v.findViewById(R.id.text_time);
             frame = v.findViewById(R.id.frame);

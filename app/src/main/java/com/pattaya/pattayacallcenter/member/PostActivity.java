@@ -12,6 +12,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
+import android.util.Log;
 import android.view.ContextMenu;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -34,11 +35,14 @@ import com.pattaya.pattayacallcenter.R;
 import com.pattaya.pattayacallcenter.customview.CameraMange;
 import com.pattaya.pattayacallcenter.customview.CustomGalleryActivity;
 import com.pattaya.pattayacallcenter.customview.ExpandableHeightGridView;
-import com.pattaya.pattayacallcenter.guest.CaseDetail.ImageGridAdapter;
+import com.pattaya.pattayacallcenter.guest.CaseDetail.ImageData;
+import com.pattaya.pattayacallcenter.guest.CaseDetail.ImageUpdateGridAdapter;
 import com.pattaya.pattayacallcenter.webservice.RestFulQueary;
 import com.pattaya.pattayacallcenter.webservice.WebserviceConnector;
+import com.pattaya.pattayacallcenter.webservice.object.PostObject;
 import com.pattaya.pattayacallcenter.webservice.object.SavePostObject;
 import com.pattaya.pattayacallcenter.webservice.object.UpdateResult;
+import com.pattaya.pattayacallcenter.webservice.object.casedata.ImageObject;
 import com.pattaya.pattayacallcenter.webservice.object.upload.FileListObject;
 
 import java.io.BufferedReader;
@@ -65,10 +69,11 @@ public class PostActivity extends ActionBarActivity implements View.OnClickListe
     private final RestFulQueary restFulQuearyPost = restAdapterPost.create(RestFulQueary.class);
     private final RestFulQueary restFulQuearyUpload = restAdapterUpload.create(RestFulQueary.class);
     ProgressDialog ringProgressDialog;
+    PostObject postObject;
     private List<String> imageData;
     private List imageUploadURL;
     private CameraMange cameraMange;
-    private ImageGridAdapter mGridAdapter;
+    private ImageUpdateGridAdapter mGridAdapter;
     private ExpandableHeightGridView gridView;
     private View btnImage;
     private EditText txt_detail;
@@ -79,12 +84,15 @@ public class PostActivity extends ActionBarActivity implements View.OnClickListe
     private TextView titleTextView;
     private SharedPreferences spUser;
     private int userId;
+    private int postId = 0;
     private SavePostObject savePostObject;
+    private List<ImageObject> listOldImageUrl;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_post);
+        Bundle data = getIntent().getExtras();
 
         txt_detail = (EditText) findViewById(R.id.detail);
         imageHeader = (TextView) findViewById(R.id.image_header);
@@ -96,6 +104,22 @@ public class PostActivity extends ActionBarActivity implements View.OnClickListe
         imageHeader.setOnCreateContextMenuListener(this);
         initImageManage();
         initRest();
+
+        if (data != null) {
+            postObject = data.getParcelable("postdata");
+            System.out.println("postId " + postObject.getPostId());
+            txt_detail.setText(postObject.getDetail());
+            postId = postObject.getPostId();
+            if (postObject.getPostImageList().size() > 0) {
+                for (String e : postObject.getPostImageList()) {
+                    mGridAdapter.addItemUpdate(e);
+                }
+
+
+            }
+
+        }
+
     }
 
 
@@ -121,7 +145,7 @@ public class PostActivity extends ActionBarActivity implements View.OnClickListe
         cameraMange = new CameraMange(this);
         gridView = (ExpandableHeightGridView) findViewById(R.id.grid_view);
         gridView.setExpanded(true);
-        mGridAdapter = new ImageGridAdapter(this, R.layout.custom_gridview_image, imageData);
+        mGridAdapter = new ImageUpdateGridAdapter(this, R.layout.custom_gridview_image, imageData);
         gridView.setAdapter(mGridAdapter);
     }
 
@@ -143,7 +167,6 @@ public class PostActivity extends ActionBarActivity implements View.OnClickListe
     public boolean onOptionsItemSelected(MenuItem item) {
 
         int id = item.getItemId();
-
         if (id == R.id.action_save) {
 
             if (txt_detail.getText().toString().matches("")) {
@@ -188,6 +211,19 @@ public class PostActivity extends ActionBarActivity implements View.OnClickListe
                             runOnUiThread(new Runnable() {
                                 @Override
                                 public void run() {
+                                    if (postId > 0) {
+                                        Log.e("TAG", "Update Caassst");
+                                        ArrayList<String> listOfStrings = new ArrayList<String>();
+                                        if (savePostObject.getPostImageList() != null) {
+                                            listOfStrings.addAll(savePostObject.getPostImageList());
+                                        }
+
+                                        Intent intent = new Intent();
+                                        intent.putExtra("detail", savePostObject.getDetail());
+                                        intent.putExtra("postId", postId);
+                                        intent.putStringArrayListExtra("image", listOfStrings);
+                                        setResult(Activity.RESULT_OK, intent);
+                                    }
                                     ringProgressDialog.dismiss();
                                     finish();
                                 }
@@ -334,148 +370,173 @@ public class PostActivity extends ActionBarActivity implements View.OnClickListe
             savePostObject.setDetail(txt_detail.getText().toString());
             savePostObject.setPostById(userId);
             savePostObject.setPostType("0");
-            if (imageData.size() > 0) {
-                imageUploadURL = new ArrayList();
+            if (postId > 0) {
+                savePostObject.setPostId(postId);
+            }
+            final List<String> listImageURL = new ArrayList<>();
+            if (mGridAdapter.getData().size() > 0) {
                 int imageCount = 0;
-                final boolean[] fail = {false};
-                for (String e : imageData) {
-                    imageCount++;
-                    String uuid = UUID.randomUUID().toString();
-                    System.out.println("uuid = " + uuid);
-                    System.out.println(e);
-                    int randomNum = 500 + (int) ((Math.random() * 1204006080) / Math.random());
-                    File file = new File(getCacheDir(), "pattaya-post" + randomNum + uuid);
-                    try {
-                        file.createNewFile();
-                    } catch (IOException error) {
-                        error.printStackTrace();
-                    }
-                    Bitmap bitmap = null;
-                    try {
-                        bitmap = Glide.with(Application.getContext())
-                                .load(e)
-                                .asBitmap()
-                                .fitCenter()
-                                .into(500, 500) // Width and height
-                                .get();
-                    } catch (InterruptedException error) {
-                        error.printStackTrace();
-                    } catch (ExecutionException error) {
-                        error.printStackTrace();
-                    }
-
-                    System.out.println(bitmap);
-                    ByteArrayOutputStream bos = new ByteArrayOutputStream();
-                    bitmap.compress(Bitmap.CompressFormat.JPEG, MasterData.PERCEN_OF_IMAGE_FILE, bos);
-                    byte[] bitmapdata = bos.toByteArray();
-                    FileOutputStream fos = null;
-                    try {
-                        fos = new FileOutputStream(file);
-                    } catch (FileNotFoundException error) {
-                        error.printStackTrace();
-                    }
-                    try {
-                        fos.write(bitmapdata);
-                        fos.flush();
-                        fos.close();
-                    } catch (IOException error) {
-                        error.printStackTrace();
-                    }
-
-
-                    //String mimeType = URLConnection.guessContentTypeFromName(file.getName());
-                    System.out.println(file.getName().toString());
-                    final long totalSize = file.length();
-                    final int finalImageCount = imageCount;
-                    listener = new ProgressListener() {
-                        String fileID = "Please wait... \nimage" + finalImageCount + " uploading";
-
-                        @Override
-                        public void transferred(long num) {
-                            final int[] count = {Math.round(((num / (float) totalSize) * 100))};
-                            runOnUiThread(new Thread(new Runnable() {
-                                public void run() {
-                                    if (count[0] == 100) {
-                                        ringProgressDialog.setMessage(fileID);
-                                    }
-                                }
-                            }));
-
-
+                for (ImageData e : mGridAdapter.getData()) {
+                    if (e.getTag() == 1) {
+                        imageCount++;
+                        String uuid = UUID.randomUUID().toString();
+                        System.out.println("uuid = " + uuid);
+                        System.out.println(e);
+                        int randomNum = 500 + (int) ((Math.random() * 1204006080) / Math.random());
+                        File file = new File(getCacheDir(), "pattaya-post" + randomNum + uuid);
+                        try {
+                            file.createNewFile();
+                        } catch (IOException error) {
+                            error.printStackTrace();
                         }
-                    };
+                        Bitmap bitmap = null;
+                        try {
+                            bitmap = Glide.with(Application.getContext())
+                                    .load(e.getPath())
+                                    .asBitmap()
+                                    .fitCenter()
+                                    .into(500, 500) // Width and height
+                                    .get();
+                        } catch (InterruptedException error) {
+                            error.printStackTrace();
+                        } catch (ExecutionException error) {
+                            error.printStackTrace();
+                        }
 
-                    restFulQuearyUpload.uploadImage(new CountingTypedFile("image/jpeg", file, listener), new Callback<Response>() {
-                        @Override
-                        public void success(Response result, Response response) {
+                        System.out.println(bitmap);
+                        ByteArrayOutputStream bos = new ByteArrayOutputStream();
+                        bitmap.compress(Bitmap.CompressFormat.JPEG, MasterData.PERCEN_OF_IMAGE_FILE, bos);
+                        byte[] bitmapdata = bos.toByteArray();
+                        FileOutputStream fos = null;
+                        try {
+                            fos = new FileOutputStream(file);
+                        } catch (FileNotFoundException error) {
+                            error.printStackTrace();
+                        }
+                        try {
+                            fos.write(bitmapdata);
+                            fos.flush();
+                            fos.close();
+                        } catch (IOException error) {
+                            error.printStackTrace();
+                        }
 
-                            BufferedReader reader = null;
-                            StringBuilder sb = new StringBuilder();
-                            try {
 
-                                reader = new BufferedReader(new InputStreamReader(result.getBody().in()));
+                        //String mimeType = URLConnection.guessContentTypeFromName(file.getName());
+                        System.out.println(file.getName().toString());
+                        final long totalSize = file.length();
+                        final int finalImageCount = imageCount;
+                        listener = new ProgressListener() {
+                            String fileID = "Please wait... \nimage" + finalImageCount + " uploading";
 
-                                String line;
+                            @Override
+                            public void transferred(long num) {
+                                final int[] count = {Math.round(((num / (float) totalSize) * 100))};
+                                runOnUiThread(new Thread(new Runnable() {
+                                    public void run() {
+                                        if (count[0] == 100) {
+                                            ringProgressDialog.setMessage(fileID);
+                                        }
+                                    }
+                                }));
 
+
+                            }
+                        };
+
+                        restFulQuearyUpload.uploadImage(new CountingTypedFile("image/jpeg", file, listener), new Callback<Response>() {
+                            @Override
+                            public void success(Response result, Response response) {
+
+                                BufferedReader reader = null;
+                                StringBuilder sb = new StringBuilder();
                                 try {
-                                    while ((line = reader.readLine()) != null) {
-                                        sb.append(line);
+
+                                    reader = new BufferedReader(new InputStreamReader(result.getBody().in()));
+
+                                    String line;
+
+                                    try {
+                                        while ((line = reader.readLine()) != null) {
+                                            sb.append(line);
+                                        }
+                                    } catch (IOException e) {
+                                        e.printStackTrace();
                                     }
                                 } catch (IOException e) {
                                     e.printStackTrace();
                                 }
-                            } catch (IOException e) {
-                                e.printStackTrace();
+
+
+                                String JsonConvertData = "{data:" + sb.toString() + "}";
+
+                                FileListObject fileListObject = new Gson().fromJson(JsonConvertData, FileListObject.class);
+
+                                listImageURL.add(fileListObject.getData().get(0).getUrl());
+                                if (listImageURL.size() == mGridAdapter.getData().size()) {
+                                    Activity activity = PostActivity.this;
+                                    if (activity != null) {
+                                        runOnUiThread(new Runnable() {
+                                            @Override
+                                            public void run() {
+                                                savePostObject.setPostImageList(listImageURL);
+                                                ringProgressDialog.dismiss();
+                                                savePost();
+                                            }
+                                        });
+                                        System.out.println("UPload Complete!!!");
+
+                                    }
+
+                                }
+
                             }
 
-
-                            String JsonConvertData = "{data:" + sb.toString() + "}";
-
-                            FileListObject fileListObject = new Gson().fromJson(JsonConvertData, FileListObject.class);
-
-                            imageUploadURL.add(fileListObject.getData().get(0).getUrl());
-                            if (imageUploadURL.size() == imageData.size()) {
+                            @Override
+                            public void failure(RetrofitError error) {
+                                System.out.println("error = [" + error + "]");
                                 Activity activity = PostActivity.this;
                                 if (activity != null) {
                                     runOnUiThread(new Runnable() {
                                         @Override
                                         public void run() {
-                                            savePostObject.setPostImageList(imageUploadURL);
+                                            alertDialogFailtoServer();
                                             ringProgressDialog.dismiss();
-                                            savePost();
                                         }
                                     });
 
                                 }
 
+
                             }
+                        });
 
-                        }
 
-                        @Override
-                        public void failure(RetrofitError error) {
-                            System.out.println("error = [" + error + "]");
-                            fail[0] = true;
-                            Activity activity = PostActivity.this;
-                            if (activity != null) {
-                                runOnUiThread(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        alertDialogFailtoServer();
+                    } else if (e.getTag() == 0) {
+                        listImageURL.add(e.getPath());
+                        if (listImageURL.size() == mGridAdapter.getData().size()) {
+                            runOnUiThread(new Runnable() {
+
+                                @Override
+                                public void run() {
+                                    Activity activity = PostActivity.this;
+                                    if (activity != null) {
+                                        savePostObject.setPostImageList(listImageURL);
                                         ringProgressDialog.dismiss();
+                                        savePost();
                                     }
-                                });
-
-                            }
 
 
+                                }
+                            });
+
+
+                            System.out.println("UPload Complete!!!");
                         }
-                    });
-
-                    if (fail[0]) break;
-
-
+                    }
                 }
+
+
             } else {
                 Activity activity = PostActivity.this;
                 if (activity != null) {

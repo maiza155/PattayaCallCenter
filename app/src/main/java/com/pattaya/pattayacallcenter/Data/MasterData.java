@@ -23,6 +23,7 @@ public class MasterData {
     public static final String SHARED_USER_FRIST_NAME = "FIRST_NAME";
     public static final String SHARED_USER_LAST_NAME = "LAST_NAME";
     public static final String SHARED_IS_OFFICIAL = "OFFICIAL";
+    public static final String SHARED_IS_MEMBER = "MEMBER";
 
     public static final String SHARED_NAME_CONFIG_FILE = "APP_CONFIG";
     public static final String SHARED_CONFIG_ALERT = "ALERT";
