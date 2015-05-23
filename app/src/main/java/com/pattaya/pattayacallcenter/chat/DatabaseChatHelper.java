@@ -659,7 +659,8 @@ public class DatabaseChatHelper extends SQLiteOpenHelper {
                     // Log.e("TAG ERROR", ""+time);
 
                     //เช็ค time ==  null เพราะ ไม่มีข้อมูล History ให้ get
-                    if (time != null && date.after(time)) {
+
+                   /* if (time != null && date.after(time)) {
                         if (!lastMessage.equalsIgnoreCase(messages.getMessage())) {
                             isOk = true;
                         }
@@ -677,7 +678,7 @@ public class DatabaseChatHelper extends SQLiteOpenHelper {
 
                             //System.out.println("Database Chat :: InSeterT  Other " + messages.getMessage() + "   " + todo_id);
                         }
-                    }
+                    }*/
                 }
             }
             return success;
