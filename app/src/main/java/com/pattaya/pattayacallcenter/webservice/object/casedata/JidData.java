@@ -6,6 +6,13 @@ package com.pattaya.pattayacallcenter.webservice.object.casedata;
 public class JidData {
     String jid;
 
+    public JidData() {
+    }
+
+    public JidData(String jid) {
+        this.jid = jid;
+    }
+
     public String getJid() {
         return jid;
     }

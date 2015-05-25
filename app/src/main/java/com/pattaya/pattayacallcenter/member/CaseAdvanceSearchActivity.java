@@ -43,9 +43,9 @@ public class CaseAdvanceSearchActivity extends ActionBarActivity {
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 if (position > 0) {
                     if (position == 2) {
-                        action = true;
-                    } else {
                         action = false;
+                    } else {
+                        action = true;
                     }
                 }
             }

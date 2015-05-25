@@ -19,6 +19,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.gson.Gson;
+import com.pattaya.pattayacallcenter.Application;
 import com.pattaya.pattayacallcenter.BusProvider;
 import com.pattaya.pattayacallcenter.Data.MasterData;
 import com.pattaya.pattayacallcenter.R;
@@ -77,7 +78,9 @@ public class CaseDetailActivity extends ActionBarActivity implements View.OnClic
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_case_detail);
         setActionBar();
-
+        SharedPreferences settings = Application.getContext().getSharedPreferences(MasterData.SHARED_CASE_COUNT, Context.MODE_PRIVATE);
+        String caseStr = "id_" + complainId;
+        settings.edit().putInt(caseStr, 0).commit();
         sp = getSharedPreferences(MasterData.SHARED_NAME_CONFIG_FILE, Context.MODE_PRIVATE);
         token = sp.getString(MasterData.SHARED_CONFIG_TOKEN, "null");
         clientId = sp.getString(MasterData.SHARED_CONFIG_CLIENT_ID, "null");

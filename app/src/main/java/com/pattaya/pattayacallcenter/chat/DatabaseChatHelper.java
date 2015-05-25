@@ -353,7 +353,7 @@ public class DatabaseChatHelper extends SQLiteOpenHelper {
         String checkCase = messages.getRoom().split("@")[0];
         checkCase = checkCase.split("-")[0];
         System.out.println(checkCase);
-        if (!checkCase.matches("case")) {
+        if (!checkCase.matches("case") && !checkCase.matches("complaint")) {
             saveLastMessage(messages);
         }
 
@@ -551,6 +551,7 @@ public class DatabaseChatHelper extends SQLiteOpenHelper {
         String room;
         Date time = null;
         String lastMessage = "";
+        String lastMessageInDB = "";
         Map<String, Messages> map = new HashMap<>();
         ArrayList<Messages> messageses;
         ArrayList<String> duplicateMsg = new ArrayList<>();
@@ -613,22 +614,24 @@ public class DatabaseChatHelper extends SQLiteOpenHelper {
 
 
                     db.insert(Logs.TABLE_NAME, null, values);
-                    //Date dateTime = dateFormat.parse(messages.getTime());
-                    //Log.d("Time >>>>>>>>>>>>>:", messages.getMessage() + ">>>>>>>>>>>>>>>>>>" +date);
+                    // Date dateTime = dateFormat.parse(messages.getTime());
+                    Log.d("Time >>>>>>>>>>>>>:", messages.getMessage() + ">>>>>>>>>>>>>>>>>>" + date);
 
                     //ตรวจดูว่าข้อความไหนคือข้อความล่าสุด
                     if (time == null || time.before(date)) {
                         time = date;
                         lastMessage = messages.getMessage();
-                        // Log.d("Time >>>>>>>>>>>>>:", lastMessage + ">>>>>>>>>>>>>>>>>>" + time);
+                        Log.d("Lastmessag", lastMessage + ">>>>>>>>>>>>>>>>>>" + time);
                     }
 
                     Messages tempMsg = map.get(messages.getTime()); // map เพื่อดูว่าซึ้ากับ message ที่ดึงมาจา server หรือไม่
+
+
                     if (tempMsg == null) {
                         // Log.e("DATA TIME  >>>>", " Null");
                     } else {
                         //Log.e("DATA TIME  HAVE>>>>", "" + tempMsg.getTime());
-                        // Log.e("DATA TIME  HAVE>>>>", "" + tempMsg.getMessage());
+                        Log.e("DATA TIME  HAVE REMOVED", "" + tempMsg.getMessage());
                         map.remove(messages.getTime());
                     }
 
@@ -641,30 +644,46 @@ public class DatabaseChatHelper extends SQLiteOpenHelper {
                     e.printStackTrace();
             }
             if (success == true) {
-                // Log.e("Database Chat", "SUCCESS DATA INSERT>>>>>>>>>>>>>>>>>>>>>>>");
+                Log.e("Database Chat", "SUCCESS DATA INSERT>>>>>>>>>>>>>>>>>>>>>>>");
                 Boolean isOk = false;
+                Date lastMessageTime = null;
+
                 //ขั้นตอนการตรวจสอบ ข้อมูลที่ดึงมาจาก database กับ ทีาจาก server มีค่าตรงกันไหม
                 for (Map.Entry<String, Messages> entry : map.entrySet()) {
                     ContentValues values = new ContentValues();
                     Date date = null;
                     Messages messages = entry.getValue();
-                    //System.out.println("Key : " + entry.getKey() + " Value : " + messages.toString());
+                    System.out.println("Key : " + entry.getKey() + " Value : " + messages.toString());
                     try {
                         date = dateFormat.parse(messages.getTime());
                     } catch (ParseException e) {
                         //Log.e("TAG ERROR", ""+e);
                         e.printStackTrace();
                     }
-                    // Log.e("TAG ERROR", ""+date);
-                    // Log.e("TAG ERROR", ""+time);
-
                     //เช็ค time ==  null เพราะ ไม่มีข้อมูล History ให้ get
-
-                   /* if (time != null && date.after(time)) {
-                        if (!lastMessage.equalsIgnoreCase(messages.getMessage())) {
-                            isOk = true;
+                    if (time != null && date != null && date.after(time)) {
+                        // เช็คเวลา ที่ดึงมาจาก DB ว่าอันไหนล่าสุด
+                        if (lastMessageTime == null || lastMessageTime.after(date)) {
+                            lastMessageTime = date;
+                            lastMessageInDB = messages.getMessage();
                         }
-                        if (isOk && !duplicateMsg.contains(messages.getMessage())) {
+
+                    }
+                }
+                // ตรวจสอบว่า ข้อความล่าสุด ที่เอามาจา DB กับ server ต้องไม่ตรงกัน จึง ให้บันทึก ลง DB
+                if (!lastMessageInDB.matches(lastMessage)) {
+                    for (Map.Entry<String, Messages> entry : map.entrySet()) {
+                        ContentValues values = new ContentValues();
+                        Date date = null;
+                        Messages messages = entry.getValue();
+                        try {
+                            date = dateFormat.parse(messages.getTime());
+                        } catch (ParseException e) {
+                            //Log.e("TAG ERROR", ""+e);
+                            e.printStackTrace();
+                        }
+                        if (time != null && date != null && date.after(time)) {
+                            System.out.println("Key : " + entry.getKey() + " Value : " + messages.toString());
                             values.put(Logs.Column.ROOM, messages.getRoom());
                             values.put(Logs.Column.MESSAGE, messages.getMessage());
                             values.put(Logs.Column.TIME, dateFormat.format(date));
@@ -674,12 +693,15 @@ public class DatabaseChatHelper extends SQLiteOpenHelper {
                             User user = openfireQueary.getUserInTask(messages.getSender().split("@")[0]);
                             values.put(Logs.Column.SENDER_NAME, user.getName());
                             values.put(Logs.Column.SENDER_IMAGE, user.getProperty().get("userImage"));
-                            Long todo_id = db.insert(Logs.TABLE_NAME, null, values);
+                            db.insert(Logs.TABLE_NAME, null, values);
 
-                            //System.out.println("Database Chat :: InSeterT  Other " + messages.getMessage() + "   " + todo_id);
+                            System.out.println("Database Chat :: InSeterT  Other " + messages.getMessage() + "   ");
+
                         }
-                    }*/
+                    }
                 }
+
+
             }
             return success;
         }

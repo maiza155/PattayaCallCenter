@@ -18,10 +18,23 @@ public class OpenCaseAssignObject {
     String accessToken;
     String clientId;
     int casesId;
+    ChaConObject channelContact = new ChaConObject();
 
+
+    public ChaConObject getChannelContact() {
+        return channelContact;
+    }
+
+    public void setChannelContact(ChaConObject channelContact) {
+        this.channelContact = channelContact;
+    }
 
     public CaseDataObject getContactInfo() {
         return contactInfo;
+    }
+
+    public void setContactInfo(CaseDataObject contactInfo) {
+        this.contactInfo = contactInfo;
     }
 
     public void setCasesNo(int casesId) {
@@ -30,10 +43,6 @@ public class OpenCaseAssignObject {
 
     public void setServiceTypeId(int serviceTypeId) {
         this.serviceTypeId = serviceTypeId;
-    }
-
-    public void setCasesName(String casesName) {
-        this.casesName = casesName;
     }
 
     public void setComplaintDateString(String complaintDateString) {
@@ -60,10 +69,6 @@ public class OpenCaseAssignObject {
         this.createBy = createBy;
     }
 
-    public void setContactInfo(CaseDataObject contactInfo) {
-        this.contactInfo = contactInfo;
-    }
-
     public void setAccessToken(String accessToken) {
         this.accessToken = accessToken;
     }
@@ -74,5 +79,9 @@ public class OpenCaseAssignObject {
 
     public String getCasesName() {
         return casesName;
+    }
+
+    public void setCasesName(String casesName) {
+        this.casesName = casesName;
     }
 }

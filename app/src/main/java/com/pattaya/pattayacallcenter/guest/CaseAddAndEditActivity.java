@@ -92,6 +92,7 @@ public class CaseAddAndEditActivity extends ActionBarActivity implements View.On
     Button btnPlace;
     Button btnImage;
 
+
     List<ImageObject> listOldImageUrl;
     EditText txtName, txtUserName, txtPhone;
     CheckBox checkBox;
@@ -312,7 +313,10 @@ public class CaseAddAndEditActivity extends ActionBarActivity implements View.On
                                                     List<String> listJid = new ArrayList();
                                                     final List<PubsubObject> listNotify = new ArrayList<PubsubObject>();
                                                     Calendar c = Calendar.getInstance();
-                                                    for (JidData e : listObject.getData()) {
+                                                    List<JidData> data = listObject.getData();
+                                                    data.add(new JidData(jid));
+
+                                                    for (JidData e : data) {
                                                         if (!e.getJid().isEmpty() && e.getJid() != null) {
                                                             listJid.add(e.getJid());
                                                             PubsubObject pub = new PubsubObject();
@@ -346,6 +350,7 @@ public class CaseAddAndEditActivity extends ActionBarActivity implements View.On
                                                         public void success(Response response, Response response2) {
                                                             Log.e("TAG", "Create Room Success  ");
                                                             //System.out.println("response = [" + response + "], response2 = [" + response2 + "]");
+                                                            XMPPManage.getInstance().setJoinRoom(chatRoomObject.getRoomName() + "@conference.pattaya-data");
                                                             for (PubsubObject e : listNotify) {
                                                                 XMPPManage.getInstance().new TaskSendNotify(e).execute();
                                                             }

@@ -293,7 +293,7 @@ public class XMPPManage implements MessageListener {
                             checkcase = checkcase.split("-")[0];
                             Log.e("IsOfficial is flase >>>", "    " + checkcase);
                             isOfficial = sp.getBoolean(MasterData.SHARED_IS_OFFICIAL, false);
-                            if (checkcase.matches("case") && isOfficial) {
+                            if (checkcase.matches("complaint") && isOfficial) {
                                 Log.e("IsOfficial is true >>>", "    JA");
 
                             } else {
@@ -312,9 +312,8 @@ public class XMPPManage implements MessageListener {
 
                 mConnection.addPacketListener(new PacketListener() {
                     public void processPacket(Packet packet) {
-                        Log.e("Tag, ", "////////////// notify messages //////////////////////////");
+                        Log.e("Tag, ", "////////////// notify messages Normal/////////////////////////");
                         PubsubObject pubsubObject = new PubsubObject();
-
                         Message message = (Message) packet;
                         SimpleXmlConverter xmlphase = new SimpleXmlConverter();
 
@@ -348,7 +347,10 @@ public class XMPPManage implements MessageListener {
                                 Log.e("TAg", "INVITE TO oRG");
                                 BusProvider.getInstance().post("org_update");
                             } else {
-                                NotifyCase.setNotifyChat(pubsubObject);
+                                if (!isOfficial) {
+                                    NotifyCase.setNotifyChat(pubsubObject);
+                                }
+
                             }
 
 
@@ -479,9 +481,10 @@ public class XMPPManage implements MessageListener {
                     alert = spConfig.getBoolean(MasterData.SHARED_CONFIG_ALERT, true);
                     if (!messages.getSender().equalsIgnoreCase(mConnection.getUser().split("/")[0])) {
                         if (alert) {
+                            /*
                             if (messages.getRoom().matches(messages.getSender())) {
                                 NotifyChat.setNotifyChat(users.getName(), users.getJid(), messages.getMessage());
-                            }
+                            }*/
 
                             String checkCase = messages.getRoom().split("@")[0];
                             String[] room = checkCase.split("-");
@@ -512,9 +515,10 @@ public class XMPPManage implements MessageListener {
                             alert = spConfig.getBoolean(MasterData.SHARED_CONFIG_ALERT, true);
                             if (!messages.getSender().equalsIgnoreCase(mConnection.getUser().split("/")[0])) {
                                 if (alert) {
+                                    /*
                                     if (messages.getRoom().matches(messages.getSender())) {
                                         NotifyChat.setNotifyChat(user.getName(), user.getUsername() + "@pattaya-data", messages.getMessage());
-                                    }
+                                    }*/
 
                                     String checkCase = messages.getRoom().split("@")[0];
                                     String[] room = checkCase.split("-");

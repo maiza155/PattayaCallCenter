@@ -310,6 +310,9 @@ public class CaseChatMemberActivity extends ActionBarActivity implements View.On
 
 
         }
+        SharedPreferences settings = Application.getContext().getSharedPreferences(MasterData.SHARED_CASE_COUNT, Context.MODE_PRIVATE);
+        String caseStr = "id_" + complainId;
+        settings.edit().putInt(caseStr, 0).commit();
 
 
     }
@@ -482,6 +485,9 @@ public class CaseChatMemberActivity extends ActionBarActivity implements View.On
     public void onBusReciver(Messages messages) {
         if (roomIsCreated) {
             if (messages.getRoom().equalsIgnoreCase(otherUser.getJid())) {
+                SharedPreferences settings = Application.getContext().getSharedPreferences(MasterData.SHARED_CASE_COUNT, Context.MODE_PRIVATE);
+                String caseStr = "id_" + complainId;
+                settings.edit().putInt(caseStr, 0).commit();
                 //  Toast.makeText(getApplication(), messages.getRoom() + " New Messages ", Toast.LENGTH_SHORT).show();
                 DatabaseChatHelper.init().clearCountLastMessage(messages.getRoom());
                 if (!messages.getSender().matches(jid)) {

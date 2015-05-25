@@ -26,6 +26,7 @@ import com.github.ksoichiro.android.observablescrollview.ScrollState;
 import com.pattaya.pattayacallcenter.AdapterChat;
 import com.pattaya.pattayacallcenter.AdapterOfficial;
 import com.pattaya.pattayacallcenter.AdapterStricker;
+import com.pattaya.pattayacallcenter.Application;
 import com.pattaya.pattayacallcenter.BusProvider;
 import com.pattaya.pattayacallcenter.Data.MasterData;
 import com.pattaya.pattayacallcenter.Data.Messages;
@@ -285,6 +286,10 @@ public class CaseChatActivity extends ActionBarActivity implements View.OnClickL
         if (roomIsCreated) {
             if (messages.getRoom().equalsIgnoreCase(otherUser.getJid())) {
                 //  Toast.makeText(getApplication(), messages.getRoom() + " New Messages ", Toast.LENGTH_SHORT).show();
+                SharedPreferences settings = Application.getContext().getSharedPreferences(MasterData.SHARED_CASE_COUNT, Context.MODE_PRIVATE);
+                String caseStr = "id_" + complainId;
+                settings.edit().putInt(caseStr, 0).commit();
+
                 DatabaseChatHelper.init().clearCountLastMessage(messages.getRoom());
                 if (!messages.getSender().matches(jid)) {
                     NotifyChat.cancelNotification(NotifyChat.NOTIFY_CHAT_ID);

@@ -226,39 +226,48 @@ public class XMPPManageOfficial implements MessageListener {
         PacketFilter filter2 = new MessageTypeFilter(Message.Type.normal);
         mConnection.addPacketListener(new PacketListener() {
             public void processPacket(Packet packet) {
-                Log.e("Tag, ", "////////////// notify messages //////////////////////////");
+                Log.e("Tag, ", "////////////// notify messages v Official//////////////////////////");
                 PubsubObject pubsubObject = new PubsubObject();
 
                 Message message = (Message) packet;
-                SimpleXmlConverter xmlphase = new SimpleXmlConverter();
-
-                EventElement event = packet.getExtension("event", PubSubNamespace.EVENT.getXmlns());
-                ItemsExtension itemsElem = (ItemsExtension) event.getEvent();
-                List<? extends PacketExtension> pubItems = itemsElem.getItems();
-                PayloadItem itemPubsub = (PayloadItem) pubItems.get(0);
-
-                DataForm dataForm = (DataForm) itemPubsub.getPayload();
-                for (FormField e : dataForm.getFields()) {
-                    if (e.getVariable().matches("ownerImage")) {
-                        pubsubObject.setImage(e.getValues().get(0));
-                    } else if (e.getVariable().matches("ownerName")) {
-                        pubsubObject.setName(e.getValues().get(0));
-                    } else if (e.getVariable().matches("title")) {
-                        pubsubObject.setTitle(e.getValues().get(0));
-                    } else if (e.getVariable().matches("displayDate")) {
-                        pubsubObject.setDisplayData(String.valueOf(System.currentTimeMillis()));
-                    } else if (e.getVariable().matches("action")) {
-                        pubsubObject.setAction(e.getValues().get(0));
-                    } else if (e.getVariable().matches("primaryKey")) {
-                        pubsubObject.setPrimarykey(Integer.parseInt(e.getValues().get(0)));
-                    } else if (e.getVariable().matches("caseId")) {
-                        pubsubObject.setCaseId(Integer.parseInt(e.getValues().get(0)));
-                    } else if (e.getVariable().matches("complainId")) {
-                        pubsubObject.setComplainId(Integer.parseInt(e.getValues().get(0)));
-                    }
+                DelayInformation inf = null;
+                try {
+                    inf = packet.getExtension("x", "jabber:x:delay");
+                } catch (Exception e) {
+                    Log.e("XMPPManage Error", "" + e);
                 }
+                SimpleXmlConverter xmlphase = new SimpleXmlConverter();
+                Log.d("XML Message :: ", " >> " + message);
 
-                NotifyCase.setNotifyChat(pubsubObject);
+                if (inf == null) {
+                    EventElement event = packet.getExtension("event", PubSubNamespace.EVENT.getXmlns());
+                    ItemsExtension itemsElem = (ItemsExtension) event.getEvent();
+                    List<? extends PacketExtension> pubItems = itemsElem.getItems();
+                    PayloadItem itemPubsub = (PayloadItem) pubItems.get(0);
+
+                    DataForm dataForm = (DataForm) itemPubsub.getPayload();
+                    for (FormField e : dataForm.getFields()) {
+                        if (e.getVariable().matches("ownerImage")) {
+                            pubsubObject.setImage(e.getValues().get(0));
+                        } else if (e.getVariable().matches("ownerName")) {
+                            pubsubObject.setName(e.getValues().get(0));
+                        } else if (e.getVariable().matches("title")) {
+                            pubsubObject.setTitle(e.getValues().get(0));
+                        } else if (e.getVariable().matches("displayDate")) {
+                            pubsubObject.setDisplayData(String.valueOf(System.currentTimeMillis()));
+                        } else if (e.getVariable().matches("action")) {
+                            pubsubObject.setAction(e.getValues().get(0));
+                        } else if (e.getVariable().matches("primaryKey")) {
+                            pubsubObject.setPrimarykey(Integer.parseInt(e.getValues().get(0)));
+                        } else if (e.getVariable().matches("caseId")) {
+                            pubsubObject.setCaseId(Integer.parseInt(e.getValues().get(0)));
+                        } else if (e.getVariable().matches("complainId")) {
+                            pubsubObject.setComplainId(Integer.parseInt(e.getValues().get(0)));
+                        }
+                    }
+
+                    NotifyCase.setNotifyChat(pubsubObject);
+                }
 
 
             }

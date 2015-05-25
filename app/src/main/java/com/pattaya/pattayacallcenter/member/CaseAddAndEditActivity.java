@@ -423,6 +423,7 @@ public class CaseAddAndEditActivity extends ActionBarActivity implements View.On
         openCaseAssignObject.setContactInfo(dataPlace);
         openCaseAssignObject.setTypeCaseAssign(STATE_FORWARD);
         openCaseAssignObject.setAccessToken(token);
+        //openCaseAssignObject.setChannelContact(new ChaConObject());
         if (selectItem != -1) {
             System.out.println("Item >>>>" + selectItem);
             openCaseAssignObject.setServiceTypeId(selectItem);

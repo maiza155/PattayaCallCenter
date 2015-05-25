@@ -332,7 +332,7 @@ public class FriendFragment extends Fragment implements SwipeRefreshLayout.OnRef
                 } else if (users.getType() == Users.TYPE_GROUP) {
                     String temp = users.getJid().split("@")[0];
                     String isCase = temp.split("-")[0];
-                    if (!isCase.matches("case")) {
+                    if (!isCase.matches("case") && !isCase.matches("complaint")) {
                         childListGroup.add(users);
                     }
 
@@ -404,7 +404,7 @@ public class FriendFragment extends Fragment implements SwipeRefreshLayout.OnRef
                 } else if (users.getType() == Users.TYPE_GROUP) {
                     String temp = users.getJid().split("@")[0];
                     String isCase = temp.split("-")[0];
-                    if (!isCase.matches("case")) {
+                    if (!isCase.matches("case") && !isCase.matches("complaint")) {
                         arrGroup.add(users);
                     }
 

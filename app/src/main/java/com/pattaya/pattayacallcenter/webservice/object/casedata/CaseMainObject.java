@@ -15,7 +15,7 @@ public class CaseMainObject {
     int complaintTypeString;
     int complaintId;
     int contactInfoId;
-
+    ChaConObject channelContact = new ChaConObject();
 
     public int getContactInfoId() {
         return contactInfoId;
