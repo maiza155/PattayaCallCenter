@@ -276,7 +276,8 @@ public class XMPPManage implements MessageListener {
                         if (inf == null) {
                             String[] arry = message.getFrom().split("/");
                             String room = arry[0];
-                            String from = arry[1] + "@" + SERVICE;
+                            // String from = arry[1] + "@" + SERVICE;
+                            String from = arry[1];
                             Log.e("XMPPManage", "////////////// MultiUser  Chat //////////////////////////");
                             Log.e("XMPPManage", "From :: " + " >> " + from);
                             Log.e("XMPPManage", "room :: " + " >> " + room);
@@ -732,7 +733,8 @@ public class XMPPManage implements MessageListener {
             try {
                 Log.e("XMPPManage", "Join ? : " + muc.isJoined());
                 Log.e("XMPPManage", "Nick Name >>" + mConnection.getUser());
-                String name = jid.split("@")[0];
+                String name = mConnection.getUser();
+                //String name = jid.split("@")[0];
                 muc.join(name);
                 Log.e("XMPPManage", "mConnector  : " + mConnection.isConnected());
                 Log.e("XMPPManage", "Join ? : " + muc.isJoined());
@@ -1193,7 +1195,9 @@ public class XMPPManage implements MessageListener {
                 MultiUserChat muc = new MultiUserChat(mConnection, room);
                 try {
                     // Log.e("XMPPManage", "Join ? 1: " + room + "   " + muc.isJoined());
-                    String name = jid.split("@")[0];
+                    // String name = jid.split("@")[0];
+                    String name = mConnection.getUser();
+                    Log.e("XMPPManage", "Join ? 1: " + room + "   " + name);
                     muc.join(name);
                     Log.e("XMPPManage", "mConnector  1: " + room + "   " + muc.isJoined());
                     //Log.e("XMPPManage", "Join ? 1 : " + room + "   " + muc.isJoined());

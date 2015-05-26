@@ -119,12 +119,15 @@ public class SettingFragment extends Fragment implements View.OnClickListener {
             XMPPManageOfficial.getInstance().disConnect();
             editor.putString(MasterData.SHARED_CONFIG_TOKEN, null);
             editor.commit();
-
-            editorUser.putBoolean(MasterData.SHARED_IS_OFFICIAL, false);
-            editorUser.commit();
-            v.getContext().stopService(new Intent(v.getContext(), XMPPService.class));
-            v.getContext().stopService(new Intent(v.getContext(), XMPPServiceOfficial.class));
-            LoginManager.getInstance().logOut();
+            try {
+                editorUser.putBoolean(MasterData.SHARED_IS_OFFICIAL, false);
+                editorUser.commit();
+                v.getContext().stopService(new Intent(v.getContext(), XMPPService.class));
+                v.getContext().stopService(new Intent(v.getContext(), XMPPServiceOfficial.class));
+                LoginManager.getInstance().logOut();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
 
             Intent intent = new Intent(getActivity(), LoginActivity.class);
             getActivity().startActivity(intent);

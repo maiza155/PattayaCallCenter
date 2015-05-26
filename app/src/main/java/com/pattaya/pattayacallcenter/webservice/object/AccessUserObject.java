@@ -21,6 +21,7 @@ public class AccessUserObject {
     String orgName;
     String displayName;
     String username;
+    int orgId;
 
 
     @Override
@@ -41,6 +42,14 @@ public class AccessUserObject {
                 ", accessToken='" + accessToken + '\'' +
                 ", clientId='" + clientId + '\'' +
                 '}';
+    }
+
+    public int getOrgId() {
+        return orgId;
+    }
+
+    public void setOrgId(int orgId) {
+        this.orgId = orgId;
     }
 
     public String getFirstname() {

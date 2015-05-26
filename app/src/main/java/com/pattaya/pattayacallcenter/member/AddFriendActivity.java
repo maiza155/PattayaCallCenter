@@ -52,23 +52,19 @@ import retrofit.client.Response;
 
 public class AddFriendActivity extends ActionBarActivity implements View.OnClickListener, SwipeRefreshLayout.OnRefreshListener {
 
+    private final RestAdapter restAdapter = WebserviceConnector.getInstance();
+    private final RestFulQueary restFulQueary = restAdapter.create(RestFulQueary.class);
     private List<String> groupList;
     private List<DataListInviteFriend> listfriend;
     private List<DataListInviteFriend> listGroup;
     private Map<String, List<DataListInviteFriend>> laptopCollection;
-
     private ExpandableListView expandableListView;
     private ExpandableListAdapterAddFriend adapterList;
-
     private ImageButton btn;
     private TextView titleTextView;
     private Button btnAddFriend;
-
     private EditText search;
     private XMPPManage xmppManage = XMPPManage.getInstance();
-
-    private final RestAdapter restAdapter = WebserviceConnector.getInstance();
-    private final RestFulQueary restFulQueary = restAdapter.create(RestFulQueary.class);
     private String jid;
     private Boolean isGroup;
 
@@ -222,7 +218,8 @@ public class AddFriendActivity extends ActionBarActivity implements View.OnClick
             }
         });
         GetListInviteFriendObject getListInviteFriendObject = new GetListInviteFriendObject();
-        getListInviteFriendObject.setUsername(s);
+        getListInviteFriendObject.setFirstname(s);
+        getListInviteFriendObject.setLastname(s);
         listfriend = new ArrayList<>();
         listGroup = new ArrayList<>();
         restFulQueary.getInviteFriend(getListInviteFriendObject, new Callback<Response>() {

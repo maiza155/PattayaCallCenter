@@ -89,6 +89,7 @@ public class ProfileActivity extends ActionBarActivity implements View.OnClickLi
 
 
     int userId;
+    int orgId;
     String jid;
     String token;
     Context context = this;
@@ -152,6 +153,7 @@ public class ProfileActivity extends ActionBarActivity implements View.OnClickLi
         username = sp.getString(MasterData.SHARED_USER_USERNAME, "Unknown");
         jid = sp.getString(MasterData.SHARED_USER_JID, null);
         fristName = sp.getString(MasterData.SHARED_USER_FRIST_NAME, null);
+        orgId = Integer.parseInt(sp.getString(MasterData.SHARED_USER_ORGANIZE, null));
         lastName = sp.getString(MasterData.SHARED_USER_LAST_NAME, null);
         editor = sp.edit();
 
@@ -248,7 +250,7 @@ public class ProfileActivity extends ActionBarActivity implements View.OnClickLi
             accessUserObject.setClientId(clientId);
             accessUserObject.setEmail(txtEmail.getText().toString());
             accessUserObject.setUserName(txtEmail.getText().toString());
-
+            accessUserObject.setOrgId(orgId);
             if (urlImage != null) {
                 //update file successfull
                 ringProgressDialog.dismiss();

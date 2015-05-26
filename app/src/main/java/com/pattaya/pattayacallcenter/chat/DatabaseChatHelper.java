@@ -615,13 +615,13 @@ public class DatabaseChatHelper extends SQLiteOpenHelper {
 
                     db.insert(Logs.TABLE_NAME, null, values);
                     // Date dateTime = dateFormat.parse(messages.getTime());
-                    Log.d("Time >>>>>>>>>>>>>:", messages.getMessage() + ">>>>>>>>>>>>>>>>>>" + date);
+                   // Log.d("Time >>>>>>>>>>>>>:", messages.getMessage() + ">>>>>>>>>>>>>>>>>>" + date);
 
                     //ตรวจดูว่าข้อความไหนคือข้อความล่าสุด
                     if (time == null || time.before(date)) {
                         time = date;
                         lastMessage = messages.getMessage();
-                        Log.d("Lastmessag", lastMessage + ">>>>>>>>>>>>>>>>>>" + time);
+                        //Log.d("Lastmessag", lastMessage + ">>>>>>>>>>>>>>>>>>" + time);
                     }
 
                     Messages tempMsg = map.get(messages.getTime()); // map เพื่อดูว่าซึ้ากับ message ที่ดึงมาจา server หรือไม่
@@ -631,7 +631,7 @@ public class DatabaseChatHelper extends SQLiteOpenHelper {
                         // Log.e("DATA TIME  >>>>", " Null");
                     } else {
                         //Log.e("DATA TIME  HAVE>>>>", "" + tempMsg.getTime());
-                        Log.e("DATA TIME  HAVE REMOVED", "" + tempMsg.getMessage());
+                       // Log.e("DATA TIME  HAVE REMOVED", "" + tempMsg.getMessage());
                         map.remove(messages.getTime());
                     }
 

@@ -339,6 +339,8 @@ public class AdapterChat extends BaseAdapter {
     }
 
     void enterImage(String message, int position) {
+        Log.e("Error", "Connection Fail wait .... for login  " + position);
+
         if (!xmppManage.getmConnection().isConnected()
                 || xmppManage.getmConnection().isSocketClosed()
                 || (xmppManage.getChat() == null && dataUser.getType() == Users.TYPE_FRIEND)) {
@@ -395,7 +397,6 @@ public class AdapterChat extends BaseAdapter {
     }
 
     public void enterMsg(String message) {
-
         if (!xmppManage.getmConnection().isConnected()
                 || xmppManage.getmConnection().isSocketClosed()
                 || (xmppManage.getChat() == null && dataUser.getType() == Users.TYPE_FRIEND)) {
@@ -559,12 +560,13 @@ public class AdapterChat extends BaseAdapter {
             Log.d("TAG Click " + position, "" + tv.getText() + "   " + messages.getError());
 
             if (messages.getError() == 1) {
-                AlertDialog alertDialog = new AlertDialog.Builder(context).create();
+                final AlertDialog alertDialog = new AlertDialog.Builder(context).create();
                 alertDialog.setTitle("Fail Message");
                 alertDialog.setMessage(tv.getText());
                 alertDialog.setButton("Resend", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
                         // TODO Add your code for the button here.
+                        alertDialog.dismiss();
                         Log.d("Recen", "" + tv.getText() + "   " + position);
                         //boolean active = sp.getBoolean("active", false);
                         enterMsg(messages.getMessage());
@@ -579,6 +581,7 @@ public class AdapterChat extends BaseAdapter {
                 alertDialog.setButton2("Delete", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
                         // TODO Add your code for the button here.
+                        alertDialog.dismiss();
                         Log.d("Delete", "" + data.get(position).getMessage());
                         data.remove(position);
                         notifyDataSetChanged();

@@ -145,7 +145,7 @@ public class XMPPService extends Service {
 
                                                 for (Member member : e.getMembers().getListMember()) {
                                                     if (member.getText().matches(jid)) {
-                                                        System.out.println("join room >> " + jid);
+                                                        System.out.println("join room >> " + room);
                                                         xmppManage.setJoinRoom(room);
                                                     }
 
