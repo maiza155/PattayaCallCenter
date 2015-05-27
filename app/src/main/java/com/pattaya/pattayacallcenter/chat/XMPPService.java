@@ -15,6 +15,7 @@ import com.pattaya.pattayacallcenter.chat.xmlobject.Chatroom.ChatRooms;
 import com.pattaya.pattayacallcenter.chat.xmlobject.Chatroom.Member;
 
 import org.jivesoftware.smack.SmackException;
+import org.jivesoftware.smack.packet.DefaultPacketExtension;
 import org.jivesoftware.smack.packet.Presence;
 
 import retrofit.RestAdapter;
@@ -76,7 +77,7 @@ public class XMPPService extends IntentService {
                                                 presence.setTo(room);
                                                 //final DefaultPacketExtension extension=new DefaultPacketExtension(elementName,namespace);
                                                 //Element xml = presence.addChildElement("custom", "http://www.custom.com/xmpp");
-
+                                                presence.addExtension(new DefaultPacketExtension("x", "http://jabber.org/protocol/muc"));
                                                 //presence.setDefaultXmlns("<x xmlns='http://jabber.org/protocol/muc'/>");
                                                 System.out.println("" + presence.toXML());
 
