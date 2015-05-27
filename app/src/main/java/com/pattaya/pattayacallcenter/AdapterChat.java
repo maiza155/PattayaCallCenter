@@ -27,6 +27,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.bitmap_recycle.BitmapPool;
 import com.google.gson.Gson;
 import com.pattaya.pattayacallcenter.Data.MasterData;
 import com.pattaya.pattayacallcenter.Data.Messages;
@@ -56,8 +57,10 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 import java.util.concurrent.ExecutionException;
 
+import jp.wasabeef.glide.transformations.RoundedCornersTransformation;
 import retrofit.Callback;
 import retrofit.RestAdapter;
 import retrofit.RetrofitError;
@@ -147,8 +150,16 @@ public class AdapterChat extends BaseAdapter {
         if (position == null) {
             mapTime.put(dataDate, this.data.size() - 1);
         }
+        Activity activity = ((Activity) context);
+        if (activity != null) {
+            ((Activity) context).runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    notifyDataSetChanged();
+                }
+            });
+        }
 
-        notifyDataSetChanged();
 
     }
 
@@ -156,7 +167,7 @@ public class AdapterChat extends BaseAdapter {
         for (int i = 0; i < image.length; i++) {
             //mGridAdapter.addItem(imagesPath[i], "" + i);
             System.out.println(image[i]);
-            String temp_image_message = "<img>xxx<img>0";
+            String temp_image_message = "<img>xxx<img>0<img>" + image[i];
             Messages messages = new Messages();
             messages.setMessage(temp_image_message);
             messages.setSender(mUser);
@@ -216,7 +227,7 @@ public class AdapterChat extends BaseAdapter {
             holder.imageStickerMsg.setLayoutParams(params);
             holder.imageContrainer.setLayoutParams(params);
             holder.txtTime.setText(stTime);
-            if (data.get(position).getError() == 1) {
+            if (data.get(position).getError() != null && data.get(position).getError() == 1) {
                 holder.txtMessage.setBackgroundResource(R.drawable.chatbox_fail);
 
             } else {
@@ -288,12 +299,20 @@ public class AdapterChat extends BaseAdapter {
             if (imagedata[1].matches("xxx")) {
                 int progress = Integer.parseInt(imagedata[2]);
                 holder.progress.setProgress(progress);
+                BitmapPool pool = Glide.get(context).getBitmapPool();
+                Glide.with(context).load(imagedata[3])
+                        .override(150, 150)
+                        .bitmapTransform(new RoundedCornersTransformation(pool, 9, 5))
+                        .error(R.drawable.img_not_found)
+                        .into(holder.imageViewMsg);
+                //holder.progress.setVisibility(View.GONE);
             } else {
                 System.out.println(imagedata[1]);
+                BitmapPool pool = Glide.get(context).getBitmapPool();
                 Glide.with(context).load(imagedata[1])
                         .placeholder(R.drawable.loading)
-                        .override(200, 200)
-                        .fitCenter()
+                        .override(150, 150)
+                        .bitmapTransform(new RoundedCornersTransformation(pool, 9, 5))
                         .error(R.drawable.img_not_found)
                         .into(holder.imageViewMsg);
                 holder.progress.setVisibility(View.GONE);
@@ -338,115 +357,87 @@ public class AdapterChat extends BaseAdapter {
 
     }
 
-    void enterImage(String message, int position) {
+    void enterImage(final String message, int position) {
         Log.e("Error", "Connection Fail wait .... for login  " + position);
-
-        if (!xmppManage.getmConnection().isConnected()
-                || xmppManage.getmConnection().isSocketClosed()
-                || (xmppManage.getChat() == null && dataUser.getType() == Users.TYPE_FRIEND)) {
-            Log.e("Error", "Connection Fail wait .... for login  " + xmppManage.getChat());
-            initChatService();
-            Calendar c = Calendar.getInstance();
-            Messages messages = new Messages();
-            messages.setTime(sdf.format(c.getTime()));
-            messages.setSender(mUser);
-            messages.setMessage(message);
-            messages.setError(1);
-            // add(messages);
-
-        } else {
-            Log.e("TAG Chat Socket", "" + xmppManage.getmConnection().isSocketClosed());
-            if (multiUserChat != null && dataUser.getType() == Users.TYPE_GROUP) {
-                xmppManage.setJoinGroupChat(multiUserChat);
-                if (multiUserChat.isJoined()) {
-                    try {
-                        Calendar c = Calendar.getInstance();
-                        Messages messages = new Messages();
-                        messages.setTime(sdf.format(c.getTime()));
-                        messages.setSender(mUser);
-                        messages.setMessage(message);
-                        add(messages);
-                        multiUserChat.sendMessage(message);
-                    } catch (XMPPException e) {
-                        e.printStackTrace();
-                    } catch (SmackException.NotConnectedException e) {
-                        e.printStackTrace();
-                    }
-                } else {
-                    Log.e("Smack", "Join ? : " + multiUserChat.isJoined());
-                    xmppManage.setJoinGroupChat(multiUserChat);
-                    Log.e("Smack", "Join ? : " + multiUserChat.isJoined());
+        new AsyncTask<Void, Void, Boolean>() {
+            @Override
+            protected Boolean doInBackground(Void... params) {
+                if (!xmppManage.getmConnection().isConnected()
+                        || xmppManage.getmConnection().isSocketClosed()
+                        || (xmppManage.getChat() == null && dataUser.getType() == Users.TYPE_FRIEND)) {
+                    Log.e("Error", "Connection Fail wait .... for login  " + xmppManage.getChat());
+                    initChatService();
                     Calendar c = Calendar.getInstance();
                     Messages messages = new Messages();
                     messages.setTime(sdf.format(c.getTime()));
                     messages.setSender(mUser);
                     messages.setMessage(message);
                     messages.setError(1);
-                    add(messages);
-                }
-            } else if (dataUser.getType() == Users.TYPE_FRIEND || dataUser.getType() == Users.TYPE_NOT_FRIEND) {
-                Messages messages = new Messages();
-                Calendar c = Calendar.getInstance();
-                messages.setTime(sdf.format(c.getTime()));
-                messages.setSender(mUser);
-                messages.setMessage(message);
-                add(messages);
-                xmppManage.chat(message, dataUser.getJid());
-            }
-        }
-    }
+                    // add(messages);
 
-    public void enterMsg(String message) {
-        if (!xmppManage.getmConnection().isConnected()
-                || xmppManage.getmConnection().isSocketClosed()
-                || (xmppManage.getChat() == null && dataUser.getType() == Users.TYPE_FRIEND)) {
-            Log.e("Error", "Connection Fail wait .... for login  " + xmppManage.getChat());
-            initChatService();
-            Calendar c = Calendar.getInstance();
-            Messages messages = new Messages();
-            messages.setTime(sdf.format(c.getTime()));
-            messages.setSender(mUser);
-            messages.setMessage(message);
-            messages.setError(1);
-            add(messages);
-
-        } else {
-            Log.e("TAG Chat Socket", "" + xmppManage.getmConnection().isSocketClosed());
-            if (dataUser.getType() == Users.TYPE_GROUP) {
-                if (multiUserChat != null) {
-                    xmppManage.setJoinGroupChat(multiUserChat);
-                    if (multiUserChat.isJoined()) {
-                        try {
+                } else {
+                    Log.e("TAG Chat Socket", "" + xmppManage.getmConnection().isSocketClosed());
+                    if (multiUserChat != null && dataUser.getType() == Users.TYPE_GROUP) {
+                        xmppManage.setJoinGroupChat(multiUserChat);
+                        if (multiUserChat.isJoined()) {
+                            try {
+                                Calendar c = Calendar.getInstance();
+                                Messages messages = new Messages();
+                                messages.setTime(sdf.format(c.getTime()));
+                                messages.setSender(mUser);
+                                messages.setMessage(message);
+                                add(messages);
+                                multiUserChat.sendMessage(message);
+                            } catch (XMPPException e) {
+                                e.printStackTrace();
+                            } catch (SmackException.NotConnectedException e) {
+                                e.printStackTrace();
+                            }
+                        } else {
+                            Log.e("Smack", "Join ? : " + multiUserChat.isJoined());
+                            xmppManage.setJoinGroupChat(multiUserChat);
+                            Log.e("Smack", "Join ? : " + multiUserChat.isJoined());
                             Calendar c = Calendar.getInstance();
                             Messages messages = new Messages();
                             messages.setTime(sdf.format(c.getTime()));
                             messages.setSender(mUser);
                             messages.setMessage(message);
+                            messages.setError(1);
                             add(messages);
-                            System.out.println(mUser);
-
-                            multiUserChat.sendMessage(message);
-                        } catch (XMPPException e) {
-                            e.printStackTrace();
-                        } catch (SmackException.NotConnectedException e) {
-                            e.printStackTrace();
                         }
-                    } else {
-
-                        Calendar c = Calendar.getInstance();
+                    } else if (dataUser.getType() == Users.TYPE_FRIEND || dataUser.getType() == Users.TYPE_NOT_FRIEND) {
                         Messages messages = new Messages();
+                        Calendar c = Calendar.getInstance();
                         messages.setTime(sdf.format(c.getTime()));
                         messages.setSender(mUser);
                         messages.setMessage(message);
-                        messages.setError(1);
                         add(messages);
+                        xmppManage.chat(message, dataUser.getJid());
                     }
-                } else {
-                    System.out.println("Null MUC");
+                }
+                return null;
+            }
+        }.execute();
 
-                    multiUserChat = xmppManage.initGroupChat(dataUser.getJid());
-                    xmppManage.setJoinGroupChat(multiUserChat);
-                    Calendar c = Calendar.getInstance();
+    }
+
+    public void enterMsg(final String message) {
+        final Calendar c = Calendar.getInstance();
+        final Messages messagesTemp = new Messages();
+        messagesTemp.setTime(sdf.format(c.getTime()));
+        messagesTemp.setSender(mUser);
+        messagesTemp.setMessage(message);
+        add(messagesTemp);
+        System.out.println(mUser);
+        new AsyncTask<Void, Void, Boolean>() {
+            @Override
+            protected Boolean doInBackground(Void... params) {
+                if (!xmppManage.getmConnection().isConnected()
+                        || xmppManage.getmConnection().isSocketClosed()
+                        || (xmppManage.getChat() == null && dataUser.getType() == Users.TYPE_FRIEND)) {
+                    Log.e("Error", "Connection Fail wait .... for login  " + xmppManage.getChat());
+                    initChatService();
+                    data.remove(messagesTemp);
                     Messages messages = new Messages();
                     messages.setTime(sdf.format(c.getTime()));
                     messages.setSender(mUser);
@@ -454,18 +445,63 @@ public class AdapterChat extends BaseAdapter {
                     messages.setError(1);
                     add(messages);
 
-                }
+                } else {
+                    Log.e("TAG Chat Socket", "" + xmppManage.getmConnection().isSocketClosed());
+                    if (dataUser.getType() == Users.TYPE_GROUP) {
+                        if (multiUserChat != null) {
+                            xmppManage.setJoinGroupChat(multiUserChat);
+                            if (multiUserChat.isJoined()) {
+                                try {
 
-            } else if (dataUser.getType() == Users.TYPE_FRIEND || dataUser.getType() == Users.TYPE_NOT_FRIEND) {
-                Messages messages = new Messages();
-                Calendar c = Calendar.getInstance();
-                messages.setTime(sdf.format(c.getTime()));
-                messages.setSender(mUser);
-                messages.setMessage(message);
-                add(messages);
-                xmppManage.chat(message, dataUser.getJid());
+//                            Messages messages = new Messages();
+//                            messages.setTime(sdf.format(c.getTime()));
+//                            messages.setSender(mUser);
+//                            messages.setMessage(message);
+//                            add(messages);
+//                            System.out.println(mUser);
+
+                                    multiUserChat.sendMessage(message);
+                                } catch (XMPPException e) {
+                                    e.printStackTrace();
+                                } catch (SmackException.NotConnectedException e) {
+                                    e.printStackTrace();
+                                }
+                            } else {
+                                data.remove(messagesTemp);
+                                Messages messages = new Messages();
+                                messages.setTime(sdf.format(c.getTime()));
+                                messages.setSender(mUser);
+                                messages.setMessage(message);
+                                messages.setError(1);
+                                add(messages);
+                            }
+                        } else {
+                            System.out.println("Null MUC");
+                            multiUserChat = xmppManage.initGroupChat(dataUser.getJid());
+                            xmppManage.setJoinGroupChat(multiUserChat);
+                            data.remove(messagesTemp);
+                            Messages messages = new Messages();
+                            messages.setTime(sdf.format(c.getTime()));
+                            messages.setSender(mUser);
+                            messages.setMessage(message);
+                            messages.setError(1);
+                            add(messages);
+
+                        }
+
+                    } else if (dataUser.getType() == Users.TYPE_FRIEND || dataUser.getType() == Users.TYPE_NOT_FRIEND) {
+//                Messages messages = new Messages();
+//                messages.setTime(sdf.format(c.getTime()));
+//                messages.setSender(mUser);
+//                messages.setMessage(message);
+//                add(messages);
+                        xmppManage.chat(message, dataUser.getJid());
+                    }
+                }
+                return null;
             }
-        }
+        }.execute();
+
     }
 
     public void queryChatLogs(Boolean bool) {
@@ -592,21 +628,22 @@ public class AdapterChat extends BaseAdapter {
         }
     }
 
-    class TaskResizeUpload extends AsyncTask<Void,Void,Boolean>{
+    class TaskResizeUpload extends AsyncTask<Void, Void, Boolean> {
         String s;
         int position;
 
-        public TaskResizeUpload( String s,int position) {
+        public TaskResizeUpload(String s, int position) {
             this.position = position;
             this.s = s;
         }
 
         @Override
         protected Boolean doInBackground(Void... params) {
-
+            String uuid = UUID.randomUUID().toString();
+            System.out.println("uuid = " + uuid);
             int randomNum = 500 + (int) ((Math.random() * 1204006080) / Math.random() + Math.random());
             int randomNum2 = 500 + (int) ((Math.random() * 1204006080) / Math.random() + Math.random());
-            String name = "pattaya-image-chat" + randomNum + "ToiP" + randomNum2;
+            String name = "pattaya-image-chat" + randomNum + "ToiP" + randomNum2 + uuid;
             File file = new File(context.getCacheDir(), name);
             try {
                 file.createNewFile();
@@ -644,8 +681,8 @@ public class AdapterChat extends BaseAdapter {
             } catch (IOException error) {
                 error.printStackTrace();
             }
-            Log.e("File upload",""+file.length());
-            Log.e("File upload",""+file.getAbsolutePath());
+            Log.e("File upload", "" + file.length());
+            Log.e("File upload", "" + file.getAbsolutePath());
 
             final long totalSize = file.length();
 
@@ -655,7 +692,7 @@ public class AdapterChat extends BaseAdapter {
                     //publishProgress((int) ((num / (float) totalSize) * 100));
                     final int[] count = {Math.round(((num / (float) totalSize) * 100))};
                     System.out.println("position   " + position + "          >>>>>>>" + count[0]);
-                    data.get(position).setMessage("<img>xxx<img>" + count[0]);
+                    data.get(position).setMessage("<img>xxx<img>" + count[0] + "<img>" + s + "<img>");
                     ((Activity) context).runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
@@ -704,7 +741,7 @@ public class AdapterChat extends BaseAdapter {
                 @Override
                 public void failure(RetrofitError error) {
                     System.out.println("error = [" + error + "]");
-                    data.remove(position);
+                    data.get(position).setError(1);
                     Toast.makeText(context.getApplicationContext(), "Fail uploading ,please try again.", Toast.LENGTH_SHORT).show();
                     notifyDataSetChanged();
 

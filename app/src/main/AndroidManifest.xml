@@ -207,12 +207,16 @@
             android:name=".member.ShowPostData"
             android:label="@string/title_activity_show_post_data"></activity>
 
-        <service android:name=".chat.XMPPService" />
-        <service android:name=".chat.XMPPServiceOfficial" />
+        <service
+            android:name=".chat.XMPPService"
+            android:exported="false" />
+
+        <service
+            android:name=".chat.XMPPServiceOfficial"
+            android:exported="false" />
         <service
             android:name=".chat.StrickLoaderService"
-            android:enabled="true"
-            android:exported="true"></service>
+            android:exported="false"></service>
     </application>
 
 </manifest>

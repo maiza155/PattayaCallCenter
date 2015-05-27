@@ -462,7 +462,6 @@ public class CaseAddAndEditActivity extends ActionBarActivity implements View.On
             @Override
             protected void onPreExecute() {
                 super.onPreExecute();
-
                 ringProgressDialog = ProgressDialog.show(CaseAddAndEditActivity.this, null, getResources().getString(R.string.please_wait), true);
                 ringProgressDialog.setCancelable(true);
             }
@@ -473,6 +472,8 @@ public class CaseAddAndEditActivity extends ActionBarActivity implements View.On
                     GetUserObject getUserObject = new GetUserObject(userId, token, clientId);
 
                     // query user data from webservice
+                    Gson nSon = new Gson();
+                    System.out.println(" >>>>>>>>>>>>>>>>>>>>>>>>" + nSon.toJson(getUserObject));
                     adapterRestUser.getUser(getUserObject, new Callback<AccessUserObject>() {
                         @Override
                         public void success(AccessUserObject accessUserObject, Response response) {
@@ -516,7 +517,7 @@ public class CaseAddAndEditActivity extends ActionBarActivity implements View.On
                                     @Override
                                     public void failure(RetrofitError error) {
                                         System.out.println("error = [" + error + "]");
-
+                                        // Toast.makeText(getApplication(), " Openfire Unable connect server. Please try again", Toast.LENGTH_SHORT).show();
                                     }
                                 });
 
@@ -657,7 +658,7 @@ public class CaseAddAndEditActivity extends ActionBarActivity implements View.On
 
                                                                 }
                                                             });
-                                                            Toast.makeText(getApplication(), "Unable connect server. Please try again", Toast.LENGTH_SHORT).show();
+                                                            Toast.makeText(getApplication(), " Openfire Unable connect server. Please try again", Toast.LENGTH_SHORT).show();
                                                         }
                                                     });
 
@@ -673,7 +674,7 @@ public class CaseAddAndEditActivity extends ActionBarActivity implements View.On
                                                             ringProgressDialog.dismiss();
                                                         }
                                                     });
-                                                    Toast.makeText(getApplication(), "Unable connect server \n Please try again", Toast.LENGTH_SHORT).show();
+                                                    Toast.makeText(getApplication(), "Webservice Unable connect server \n Please try again", Toast.LENGTH_SHORT).show();
                                                 }
                                             });
 
@@ -708,7 +709,7 @@ public class CaseAddAndEditActivity extends ActionBarActivity implements View.On
                                             }
                                         });
                                         System.out.println("error = [" + error.getResponse() + "]");
-                                        Toast.makeText(getApplication(), "Unable connect server. Please try again", Toast.LENGTH_SHORT).show();
+                                        Toast.makeText(getApplication(), "Webservice Unable connect server. Please try again", Toast.LENGTH_SHORT).show();
                                     }
                                 });
 
@@ -730,7 +731,7 @@ public class CaseAddAndEditActivity extends ActionBarActivity implements View.On
                             });
 
                             System.out.println("error get user data = [" + error + "]");
-                            Toast.makeText(getApplication(), "Unable connect server. Please try again", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(getApplication(), "Webservice Unable connect server. Please try again", Toast.LENGTH_SHORT).show();
 
                         }
                     });
@@ -1025,7 +1026,7 @@ public class CaseAddAndEditActivity extends ActionBarActivity implements View.On
                                                     }
                                                 });
 
-                                                Toast.makeText(getApplication(), "Unable connect server. Please try again", Toast.LENGTH_SHORT).show();
+                                                Toast.makeText(getApplication(), "Openfire Unable connect server. Please try again", Toast.LENGTH_SHORT).show();
                                             }
                                         });
 
@@ -1041,7 +1042,7 @@ public class CaseAddAndEditActivity extends ActionBarActivity implements View.On
                                                 ringProgressDialog.dismiss();
                                             }
                                         });
-                                        Toast.makeText(getApplication(), "Unable connect server \n Please try again", Toast.LENGTH_SHORT).show();
+                                        Toast.makeText(getApplication(), "WebService Unable connect server \n Please try again", Toast.LENGTH_SHORT).show();
                                     }
                                 });
 
@@ -1068,7 +1069,7 @@ public class CaseAddAndEditActivity extends ActionBarActivity implements View.On
                                 }
                             });
                             System.out.println("error = [" + error.getResponse() + "]");
-                            Toast.makeText(getApplication(), "Unable connect server \n Please try again", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(getApplication(), "WebService Sevecase Unable connect server \n Please try again", Toast.LENGTH_SHORT).show();
                         }
                     });
                 } else {

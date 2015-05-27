@@ -53,7 +53,7 @@ public class AdapterMenuCaseChat extends BaseAdapter {
     }
 
     void init() {
-        mMenuData.put(1, new MenuObject(R.drawable.asset_icon_normal_info_white, "รายละเอียดงาน", 1));
+        mMenuData.put(1, new MenuObject(R.drawable.asset_icon_normal_chat, "ห้องสนทนา", 1));
         mMenuData.put(2, new MenuObject(R.drawable.asset_icon_normal_edit, "เเก้ไข", 2));
         mMenuData.put(3, new MenuObject(R.drawable.asset_icon_normal_doc, "ผลลัพธ์", 3));
         mMenuData.put(4, new MenuObject(R.drawable.asset_icon_normal_delete, "ลบ", 4));

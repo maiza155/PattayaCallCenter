@@ -1,12 +1,11 @@
 package com.pattaya.pattayacallcenter.chat;
 
-import android.app.Service;
+import android.app.IntentService;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
 import android.os.AsyncTask;
-import android.os.Build;
 import android.os.IBinder;
 
 import com.pattaya.pattayacallcenter.BusProvider;
@@ -29,7 +28,7 @@ import retrofit.RestAdapter;
 import retrofit.RetrofitError;
 import retrofit.client.Response;
 
-public class StrickLoaderService extends Service {
+public class StrickLoaderService extends IntentService {
     RestAdapter webserviceConnector = WebserviceConnector.getInstanceCase();
     RestFulQueary adapterRest = null;
     DatabaseChatHelper databaseChatHelper = DatabaseChatHelper.init();
@@ -38,6 +37,7 @@ public class StrickLoaderService extends Service {
     private int duo;
 
     public StrickLoaderService() {
+        super("StrickLoaderService");
 
     }
 
@@ -84,48 +84,81 @@ public class StrickLoaderService extends Service {
     }
 
     @Override
-    public int onStartCommand(Intent intent, int flags, int startId) {
-
-        new Thread() {
+    protected void onHandleIntent(Intent intent) {
+        System.out.println("starting service stricker");
+        targetList = new ArrayList();
+        //Log.e("Service Stricker", "Start Service");
+        adapterRest = webserviceConnector.create(RestFulQueary.class);
+        adapterRest.getStricket(new JSONObject(), new Callback<StickerListObject>() {
             @Override
-            public void run() {
-                super.run();
-                System.out.println("starting service stricker");
-                targetList = new ArrayList();
-                //Log.e("Service Stricker", "Start Service");
-                adapterRest = webserviceConnector.create(RestFulQueary.class);
-                adapterRest.getStricket(new JSONObject(), new Callback<StickerListObject>() {
-                    @Override
-                    public void success(final StickerListObject stickerListObject, Response response) {
-                        arraySize = stickerListObject.getStickerSettingList().size();
-                        if (arraySize > 0) {
-                            duo = stickerListObject.getStickerSettingList().size();
-                            for (final StickerObject e : stickerListObject.getStickerSettingList()) {
-                                //System.out.println("stickerListObject = [" + e.toString() + "], response = [" + response + "]");
-                                new TaskLoadBitmap(e.getStickerImage(), e.getStickerSettingId()).execute();
-                            }
-                        } else {
-                            stopSelf();
-                            BusProvider.getInstance().post("sticker_fin_no_data");
-                        }
-
+            public void success(final StickerListObject stickerListObject, Response response) {
+                arraySize = stickerListObject.getStickerSettingList().size();
+                if (arraySize > 0) {
+                    duo = stickerListObject.getStickerSettingList().size();
+                    for (final StickerObject e : stickerListObject.getStickerSettingList()) {
+                        //System.out.println("stickerListObject = [" + e.toString() + "], response = [" + response + "]");
+                        new TaskLoadBitmap(e.getStickerImage(), e.getStickerSettingId()).execute();
                     }
-
-                    @Override
-                    public void failure(RetrofitError error) {
-                        System.out.println("error = [" + error + "]");
-                        stopSelf();
-                        BusProvider.getInstance().post("sticker_fin_no_data");
-
-                    }
-                });
+                } else {
+                    stopSelf();
+                    BusProvider.getInstance().post("sticker_fin_no_data");
+                }
 
             }
-        }.start();
 
+            @Override
+            public void failure(RetrofitError error) {
+                System.out.println("error = [" + error + "]");
+                stopSelf();
+                BusProvider.getInstance().post("sticker_fin_no_data");
 
-        return (getApplicationInfo().targetSdkVersion < Build.VERSION_CODES.ECLAIR) ? START_STICKY_COMPATIBILITY : START_STICKY;
+            }
+        });
     }
+
+//    @Override
+//    public int onStartCommand(Intent intent, int flags, int startId) {
+//
+//        new Thread() {
+//            @Override
+//            public void run() {
+//                super.run();
+//                System.out.println("starting service stricker");
+//                targetList = new ArrayList();
+//                //Log.e("Service Stricker", "Start Service");
+//                adapterRest = webserviceConnector.create(RestFulQueary.class);
+//                adapterRest.getStricket(new JSONObject(), new Callback<StickerListObject>() {
+//                    @Override
+//                    public void success(final StickerListObject stickerListObject, Response response) {
+//                        arraySize = stickerListObject.getStickerSettingList().size();
+//                        if (arraySize > 0) {
+//                            duo = stickerListObject.getStickerSettingList().size();
+//                            for (final StickerObject e : stickerListObject.getStickerSettingList()) {
+//                                //System.out.println("stickerListObject = [" + e.toString() + "], response = [" + response + "]");
+//                                new TaskLoadBitmap(e.getStickerImage(), e.getStickerSettingId()).execute();
+//                            }
+//                        } else {
+//                            stopSelf();
+//                            BusProvider.getInstance().post("sticker_fin_no_data");
+//                        }
+//
+//                    }
+//
+//                    @Override
+//                    public void failure(RetrofitError error) {
+//                        System.out.println("error = [" + error + "]");
+//                        stopSelf();
+//                        BusProvider.getInstance().post("sticker_fin_no_data");
+//
+//                    }
+//                });
+//
+//            }
+//        }.start();
+//
+//
+//        return (getApplicationInfo().targetSdkVersion < Build.VERSION_CODES.ECLAIR) ? START_STICKY_COMPATIBILITY : START_STICKY;
+//    }
 
     public Bitmap getResizedBitmap(Bitmap bm, int newWidth, int newHeight) {
         int width = 0;

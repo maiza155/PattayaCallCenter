@@ -227,7 +227,6 @@ public class XMPPManage implements MessageListener {
                         Log.e("XMPPManage", "From :: " + " >> " + from);
                         Log.e("XMPPManage", "Received message :: " + " >> " + message.getBody());
                         Log.d("XMPPManage", "XML Message  " + " >> " + message);
-
                         if (!from.equalsIgnoreCase(mConnection.getUser().split("/")[0])
                                 && DatabaseChatHelper.init().getOneUsers(from) != null) {
                             Calendar c = Calendar.getInstance();
@@ -556,7 +555,7 @@ public class XMPPManage implements MessageListener {
             protected Boolean doInBackground(Void... params) {
                 ConnectionConfiguration config = new ConnectionConfiguration(HOST, PORT, SERVICE);
                 config.setSecurityMode(ConnectionConfiguration.SecurityMode.disabled);
-                //config.setDebuggerEnabled(true);
+                config.setDebuggerEnabled(true);
                 config.setReconnectionAllowed(true);
                 XMPPTCPConnection admin = new XMPPTCPConnection(config);
                 PubSubManager manager;
@@ -577,7 +576,6 @@ public class XMPPManage implements MessageListener {
                     try {
                         System.out.println("///////////////////////////////////////////////////////");
                         LeafNode myNode = (LeafNode) manager.createNode(username, form);
-
                         subscribePubSub();
                         String itemData =
                                 "<x xmlns='jabber:x:data' type='result'>" +
@@ -672,7 +670,33 @@ public class XMPPManage implements MessageListener {
     }
 
     public void setJoinRoom(String room) {
-        new TaskJoin(room).execute();
+        ///new TaskJoin(room).execute();
+        if (mConnection != null && mConnection.isConnected()) {
+            final MultiUserChat muc = new MultiUserChat(mConnection, room);
+            final String name = mConnection.getUser();
+
+            new Thread() {
+                @Override
+                public void run() {
+                    super.run();
+                    try {
+                        muc.join(name);
+                    } catch (SmackException.NoResponseException e) {
+                        e.printStackTrace();
+                    } catch (XMPPException.XMPPErrorException e) {
+                        e.printStackTrace();
+                    } catch (SmackException.NotConnectedException e) {
+                        e.printStackTrace();
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+
+                }
+            }.start();
+
+
+        }
+
     }
 
     public void initConnection() {
@@ -725,28 +749,35 @@ public class XMPPManage implements MessageListener {
         return muc;
     }
 
-    public void setJoinGroupChat(MultiUserChat muc) {
-        if (mConnection != null
-                && muc != null
-                && mConnection.isConnected()
-                && mConnection.getUser() != null) {
-            try {
-                Log.e("XMPPManage", "Join ? : " + muc.isJoined());
-                Log.e("XMPPManage", "Nick Name >>" + mConnection.getUser());
-                String name = mConnection.getUser();
-                //String name = jid.split("@")[0];
-                muc.join(name);
-                Log.e("XMPPManage", "mConnector  : " + mConnection.isConnected());
-                Log.e("XMPPManage", "Join ? : " + muc.isJoined());
+    public void setJoinGroupChat(final MultiUserChat muc) {
+        new AsyncTask<Void, Void, Boolean>() {
 
-            } catch (SmackException.NoResponseException e) {
-                e.printStackTrace();
-            } catch (XMPPException.XMPPErrorException e) {
-                e.printStackTrace();
-            } catch (SmackException.NotConnectedException e) {
-                e.printStackTrace();
+            @Override
+            protected Boolean doInBackground(Void... params) {
+                if (mConnection != null
+                        && muc != null
+                        && mConnection.isConnected()
+                        && mConnection.getUser() != null) {
+                    try {
+                        Log.e("XMPPManage", "Join ? : " + muc.isJoined());
+                        //   Log.e("XMPPManage", "Nick Name >>" + mConnection.getUser());
+                        String name = mConnection.getUser();
+                        //String name = jid.split("@")[0];
+                        muc.join(name);
+                        Log.e("XMPPManage", "mConnector  : " + mConnection.isConnected());
+                        Log.e("XMPPManage", "Join ? : " + muc.isJoined());
+
+                    } catch (SmackException.NoResponseException e) {
+                        e.printStackTrace();
+                    } catch (XMPPException.XMPPErrorException e) {
+                        e.printStackTrace();
+                    } catch (SmackException.NotConnectedException e) {
+                        e.printStackTrace();
+                    }
+                }
+                return null;
             }
-        }
+        }.execute();
 
 
     }
@@ -1194,14 +1225,8 @@ public class XMPPManage implements MessageListener {
             if (mConnection != null && mConnection.isConnected()) {
                 MultiUserChat muc = new MultiUserChat(mConnection, room);
                 try {
-                    // Log.e("XMPPManage", "Join ? 1: " + room + "   " + muc.isJoined());
-                    // String name = jid.split("@")[0];
                     String name = mConnection.getUser();
-                    Log.e("XMPPManage", "Join ? 1: " + room + "   " + name);
                     muc.join(name);
-                    Log.e("XMPPManage", "mConnector  1: " + room + "   " + muc.isJoined());
-                    //Log.e("XMPPManage", "Join ? 1 : " + room + "   " + muc.isJoined());
-
                 } catch (SmackException.NoResponseException e) {
                     e.printStackTrace();
                 } catch (XMPPException.XMPPErrorException e) {
@@ -1210,9 +1235,10 @@ public class XMPPManage implements MessageListener {
                     e.printStackTrace();
                 } catch (XMPPException e) {
                     e.printStackTrace();
+                } catch (Exception e) {
+                    e.printStackTrace();
                 }
             }
-
             return null;
         }
     }

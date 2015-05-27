@@ -7,6 +7,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.os.AsyncTask;
+import android.os.Handler;
 import android.provider.BaseColumns;
 import android.util.Log;
 
@@ -615,7 +616,7 @@ public class DatabaseChatHelper extends SQLiteOpenHelper {
 
                     db.insert(Logs.TABLE_NAME, null, values);
                     // Date dateTime = dateFormat.parse(messages.getTime());
-                   // Log.d("Time >>>>>>>>>>>>>:", messages.getMessage() + ">>>>>>>>>>>>>>>>>>" + date);
+                    // Log.d("Time >>>>>>>>>>>>>:", messages.getMessage() + ">>>>>>>>>>>>>>>>>>" + date);
 
                     //ตรวจดูว่าข้อความไหนคือข้อความล่าสุด
                     if (time == null || time.before(date)) {
@@ -631,7 +632,7 @@ public class DatabaseChatHelper extends SQLiteOpenHelper {
                         // Log.e("DATA TIME  >>>>", " Null");
                     } else {
                         //Log.e("DATA TIME  HAVE>>>>", "" + tempMsg.getTime());
-                       // Log.e("DATA TIME  HAVE REMOVED", "" + tempMsg.getMessage());
+                        // Log.e("DATA TIME  HAVE REMOVED", "" + tempMsg.getMessage());
                         map.remove(messages.getTime());
                     }
 
@@ -650,10 +651,12 @@ public class DatabaseChatHelper extends SQLiteOpenHelper {
 
                 //ขั้นตอนการตรวจสอบ ข้อมูลที่ดึงมาจาก database กับ ทีาจาก server มีค่าตรงกันไหม
                 for (Map.Entry<String, Messages> entry : map.entrySet()) {
+
+
                     ContentValues values = new ContentValues();
                     Date date = null;
                     Messages messages = entry.getValue();
-                    System.out.println("Key : " + entry.getKey() + " Value : " + messages.toString());
+                    // System.out.println("Key : " + entry.getKey() + " Value : " + messages.toString());
                     try {
                         date = dateFormat.parse(messages.getTime());
                     } catch (ParseException e) {
@@ -673,31 +676,38 @@ public class DatabaseChatHelper extends SQLiteOpenHelper {
                 // ตรวจสอบว่า ข้อความล่าสุด ที่เอามาจา DB กับ server ต้องไม่ตรงกัน จึง ให้บันทึก ลง DB
                 if (!lastMessageInDB.matches(lastMessage)) {
                     for (Map.Entry<String, Messages> entry : map.entrySet()) {
-                        ContentValues values = new ContentValues();
-                        Date date = null;
-                        Messages messages = entry.getValue();
                         try {
-                            date = dateFormat.parse(messages.getTime());
-                        } catch (ParseException e) {
-                            //Log.e("TAG ERROR", ""+e);
-                            e.printStackTrace();
+                            Log.e("Database Chat", "Check loop map");
+                            ContentValues values = new ContentValues();
+                            Date date = null;
+                            Messages messages = entry.getValue();
+                            try {
+                                date = dateFormat.parse(messages.getTime());
+                            } catch (ParseException e) {
+                                //Log.e("TAG ERROR", ""+e);
+                                e.printStackTrace();
+                            }
+                            if (time != null && date != null && date.after(time)) {
+                                //  System.out.println("Key : " + entry.getKey() + " Value : " + messages.toString());
+                                values.put(Logs.Column.ROOM, messages.getRoom());
+                                values.put(Logs.Column.MESSAGE, String.valueOf(messages.getMessage()));
+                                values.put(Logs.Column.TIME, dateFormat.format(date));
+                                values.put(Logs.Column.SENDER, messages.getSender());
+
+
+                                User user = openfireQueary.getUserInTask(messages.getSender().split("@")[0]);
+                                values.put(Logs.Column.SENDER_NAME, user.getName());
+                                values.put(Logs.Column.SENDER_IMAGE, user.getProperty().get("userImage"));
+                                db.insert(Logs.TABLE_NAME, null, values);
+
+                                // System.out.println("Database Chat :: InSeterT  Other " + messages.getMessage() + "   ");
+
+                            }
+
+                        } catch (Exception x) {
+                            x.printStackTrace();
                         }
-                        if (time != null && date != null && date.after(time)) {
-                            System.out.println("Key : " + entry.getKey() + " Value : " + messages.toString());
-                            values.put(Logs.Column.ROOM, messages.getRoom());
-                            values.put(Logs.Column.MESSAGE, messages.getMessage());
-                            values.put(Logs.Column.TIME, dateFormat.format(date));
-                            values.put(Logs.Column.SENDER, messages.getSender());
 
-
-                            User user = openfireQueary.getUserInTask(messages.getSender().split("@")[0]);
-                            values.put(Logs.Column.SENDER_NAME, user.getName());
-                            values.put(Logs.Column.SENDER_IMAGE, user.getProperty().get("userImage"));
-                            db.insert(Logs.TABLE_NAME, null, values);
-
-                            System.out.println("Database Chat :: InSeterT  Other " + messages.getMessage() + "   ");
-
-                        }
                     }
                 }
 
@@ -709,8 +719,17 @@ public class DatabaseChatHelper extends SQLiteOpenHelper {
         @Override
         protected void onPostExecute(Boolean success) {
             super.onPostExecute(success);
-            // Log.e("room ",room);
-            BusProvider.getInstance().post(room);
+            final Handler handler = new Handler();
+            handler.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    // Do something after 5s = 5000ms
+                    System.out.println("run on ui thread");
+                    BusProvider.getInstance().post(room);
+                }
+            }, 3000);
+
+
         }
     }
 

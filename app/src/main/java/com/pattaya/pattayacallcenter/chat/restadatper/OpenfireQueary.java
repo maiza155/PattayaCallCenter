@@ -46,6 +46,11 @@ public interface OpenfireQueary {
     void getChatRoom(Callback<ChatRooms> callback);
 
     @Headers("Authorization : hello")
+    @GET("/chatrooms?type=all")
+    ChatRooms  getChatRoomInThread();
+
+
+    @Headers("Authorization : hello")
     @GET("/chatrooms/{room}")
     void getChatRoomDetail(@Path("room") String room,Callback<ChatRoom> callback);
 

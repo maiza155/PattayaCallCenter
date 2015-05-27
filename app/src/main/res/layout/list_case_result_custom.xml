@@ -2,9 +2,9 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:paddingTop="5dp"
     android:background="#ffffff"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    android:paddingTop="5dp">
 
     <LinearLayout
         android:id="@+id/layout_profile"
@@ -27,8 +27,8 @@
             android:paddingLeft="5dp">
 
             <TextView
-                style="@style/text_header_list_style"
                 android:id="@+id/txt_name"
+                style="@style/text_header_list_style"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:gravity="left"
@@ -37,8 +37,8 @@
                 android:text="name" />
 
             <TextView
-                style="@style/date_sub_list_text_style"
                 android:id="@+id/txt_dateTime"
+                style="@style/date_sub_list_text_style"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:gravity="left"
@@ -51,7 +51,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:gravity="left"
-                android:paddingLeft="20dp"
+                android:paddingLeft="5dp"
                 android:paddingTop="5dp"
                 android:text="detail" />
 

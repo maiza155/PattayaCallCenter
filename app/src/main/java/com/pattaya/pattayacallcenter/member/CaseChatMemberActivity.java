@@ -144,11 +144,11 @@ public class CaseChatMemberActivity extends ActionBarActivity implements View.On
         BusProvider.getInstance().register(this);
 
 
-        menu = new ArrayList<>();
-        mMenuContainer = (FrameLayout) findViewById(R.id.menuview_container);
-        mGridMenu = (GridView) findViewById(R.id.menugrid);
-        adapterMenuCaseChat = new AdapterMenuCaseChat(this, menu);
-        mGridMenu.setAdapter(adapterMenuCaseChat);
+//        menu = new ArrayList<>();
+//        mMenuContainer = (FrameLayout) findViewById(R.id.menuview_container);
+//        mGridMenu = (GridView) findViewById(R.id.menugrid);
+//        adapterMenuCaseChat = new AdapterMenuCaseChat(this, menu);
+//        mGridMenu.setAdapter(adapterMenuCaseChat);
 
 
         init();
@@ -166,8 +166,8 @@ public class CaseChatMemberActivity extends ActionBarActivity implements View.On
 
         //STATE_USER_LOGIN = STATE_MENU_2;
         // initMenuCase(STATE_USER_LOGIN);
-        mSlideMenuManage = new SlideMenuManage(mMenuContainer, this);
-        setClickCaseMenu();
+        //mSlideMenuManage = new SlideMenuManage(mMenuContainer, this);
+        //setClickCaseMenu();
 
 
         /** //////////////////////////////////////////////////////////////////////////// */
@@ -259,7 +259,6 @@ public class CaseChatMemberActivity extends ActionBarActivity implements View.On
         }
         userId = spUser.getInt(MasterData.SHARED_USER_USER_ID, 0);
 
-
         SharedPreferences spConfig = Application.getContext().getSharedPreferences(MasterData.SHARED_NAME_CONFIG_FILE, Context.MODE_PRIVATE);
         token = spConfig.getString(MasterData.SHARED_CONFIG_TOKEN, null);
         clientId = spConfig.getString(MasterData.SHARED_CONFIG_CLIENT_ID, null);
@@ -275,38 +274,38 @@ public class CaseChatMemberActivity extends ActionBarActivity implements View.On
             System.out.println("name >>" + caseName);
             System.out.println("complainId >>" + complainId);
 
-            String type = data.getString("type");
-            if (isOfficial) {
-                menu = new ArrayList<>();
-                menu.add(5);
-                adapterMenuCaseChat.resetAdapter(menu);
-            } else {
-                if (type != null) {
-                    System.out.println("Type : " + type);
-                    String[] dataType = type.split(",");
-                    menu = new ArrayList<>();
-                    for (String e : dataType) {
-                        switch (e) {
-                            case "IsOper":
-                                menu.add(1);
-                                break;
-                            case "IsOwner":
-                                menu.add(2);
-                                break;
-                            case "IsNoti":
-                                menu.add(3);
-                                break;
-                            case "IsClose":
-                                menu.add(4);
-                                break;
-                        }
-
-                    }
-                    adapterMenuCaseChat.resetAdapter(menu);
-                } else {
-                    getTypeList();
-                }
-            }
+//            String type = data.getString("type");
+//            if (isOfficial) {
+//                menu = new ArrayList<>();
+//                menu.add(5);
+//                adapterMenuCaseChat.resetAdapter(menu);
+//            } else {
+//                if (type != null) {
+//                    System.out.println("Type : " + type);
+//                    String[] dataType = type.split(",");
+//                    menu = new ArrayList<>();
+//                    for (String e : dataType) {
+//                        switch (e) {
+//                            case "IsOper":
+//                                menu.add(1);
+//                                break;
+//                            case "IsOwner":
+//                                menu.add(2);
+//                                break;
+//                            case "IsNoti":
+//                                menu.add(3);
+//                                break;
+//                            case "IsClose":
+//                                menu.add(4);
+//                                break;
+//                        }
+//
+//                    }
+//                    adapterMenuCaseChat.resetAdapter(menu);
+//                } else {
+//                    getTypeList();
+//                }
+//            }
 
 
         }
@@ -332,59 +331,59 @@ public class CaseChatMemberActivity extends ActionBarActivity implements View.On
         getSupportActionBar().setDisplayShowHomeEnabled(false);
     }
 
-    void setClickCaseMenu() {
-        adapterMenuCaseChat.SetOnItemClickListener(new AdapterMenuCaseChat.OnItemClickListener() {
-            @Override
-            public void onItemClick(int id) {
-                Intent intent;
-                switch (id) {
-                    case 1:
-                        intent = new Intent(getApplicationContext(), CaseDetailMemberActivity.class);
-                        intent.putExtra("id", idCase);
-                        startActivity(intent);
-                        break;
-                    case 2:
-                        intent = new Intent(getApplicationContext(), CaseAddAndEditActivity.class);
-                        intent.putExtra("id", idCase);
-                        intent.putExtra("complainid", complainId);
-                        startActivityForResult(intent, EDIT_ACTIVITY);
-                        break;
-                    case 3:
-                        intent = new Intent(getApplicationContext(), CaseResultMemberActivity.class);
-                        intent.putExtra("id", idCase);
-                        intent.putExtra("complainid", complainId);
-
-                        startActivity(intent);
-                        break;
-                    case 4:
-                        deleteCase();
-                        break;
-                    case 5:
-                        intent = new Intent(getApplicationContext(), CaseForwardActivity.class);
-                        intent.putExtra("id", idCase);
-                        intent.putExtra("complainid", complainId);
-                        intent.putExtra("casename", caseName);
-                        startActivityForResult(intent, TAG_INTENT_FORWARD);
-                        break;
-                    case 6:
-                        intent = new Intent(getApplicationContext(), CaseWorkDateActivity.class);
-                        intent.putExtra("id", idCase);
-                        startActivity(intent);
-                        break;
-                    case 7:
-                        intent = new Intent(getApplicationContext(), CloseCaseActivity.class);
-                        intent.putExtra("id", idCase);
-                        intent.putExtra("complainid", complainId);
-                        intent.putExtra("casename", caseName);
-                        startActivityForResult(intent, TAG_INTENT_CLOSE);
-                        break;
-
-
-                }
-                mSlideMenuManage.stateShowMenu(mSlideMenuManage.SETTING_MENU_HIDE);
-            }
-        });
-    }
+//    void setClickCaseMenu() {
+//        adapterMenuCaseChat.SetOnItemClickListener(new AdapterMenuCaseChat.OnItemClickListener() {
+//            @Override
+//            public void onItemClick(int id) {
+//                Intent intent;
+//                switch (id) {
+//                    case 1:
+//                        intent = new Intent(getApplicationContext(), CaseDetailMemberActivity.class);
+//                        intent.putExtra("id", idCase);
+//                        startActivity(intent);
+//                        break;
+//                    case 2:
+//                        intent = new Intent(getApplicationContext(), CaseAddAndEditActivity.class);
+//                        intent.putExtra("id", idCase);
+//                        intent.putExtra("complainid", complainId);
+//                        startActivityForResult(intent, EDIT_ACTIVITY);
+//                        break;
+//                    case 3:
+//                        intent = new Intent(getApplicationContext(), CaseResultMemberActivity.class);
+//                        intent.putExtra("id", idCase);
+//                        intent.putExtra("complainid", complainId);
+//
+//                        startActivity(intent);
+//                        break;
+//                    case 4:
+//                        deleteCase();
+//                        break;
+//                    case 5:
+//                        intent = new Intent(getApplicationContext(), CaseForwardActivity.class);
+//                        intent.putExtra("id", idCase);
+//                        intent.putExtra("complainid", complainId);
+//                        intent.putExtra("casename", caseName);
+//                        startActivityForResult(intent, TAG_INTENT_FORWARD);
+//                        break;
+//                    case 6:
+//                        intent = new Intent(getApplicationContext(), CaseWorkDateActivity.class);
+//                        intent.putExtra("id", idCase);
+//                        startActivity(intent);
+//                        break;
+//                    case 7:
+//                        intent = new Intent(getApplicationContext(), CloseCaseActivity.class);
+//                        intent.putExtra("id", idCase);
+//                        intent.putExtra("complainid", complainId);
+//                        intent.putExtra("casename", caseName);
+//                        startActivityForResult(intent, TAG_INTENT_CLOSE);
+//                        break;
+//
+//
+//                }
+//                mSlideMenuManage.stateShowMenu(mSlideMenuManage.SETTING_MENU_HIDE);
+//            }
+//        });
+//    }
 
 
     void deleteCase() {
@@ -609,7 +608,7 @@ public class CaseChatMemberActivity extends ActionBarActivity implements View.On
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_case_chat_member, menu);
+        //  getMenuInflater().inflate(R.menu.menu_case_chat_member, menu);
         return true;
     }
 

@@ -17,7 +17,7 @@ import com.pattaya.pattayacallcenter.Application;
 import com.pattaya.pattayacallcenter.Data.MasterData;
 import com.pattaya.pattayacallcenter.R;
 import com.pattaya.pattayacallcenter.guest.CaseDetailActivity;
-import com.pattaya.pattayacallcenter.member.CaseChatMemberActivity;
+import com.pattaya.pattayacallcenter.member.CaseDetailMemberActivity;
 import com.pattaya.pattayacallcenter.webservice.object.casedata.CaseListMemberData;
 import com.readystatesoftware.viewbadger.BadgeView;
 
@@ -144,7 +144,7 @@ public class AdpterListCase extends BaseAdapter {
                 notifyDataSetChanged();
                 if (data.get(position).getCasesId() != 0) {
                     System.out.println("case" + data.get(position).getCasesId());
-                    Intent intent = new Intent(context, CaseChatMemberActivity.class);
+                    Intent intent = new Intent(context, CaseDetailMemberActivity.class);
                     intent.putExtra("type", data.get(position).getCasesType());
                     intent.putExtra("id", data.get(position).getCasesId());
                     intent.putExtra("casename", data.get(position).getCaseName());
