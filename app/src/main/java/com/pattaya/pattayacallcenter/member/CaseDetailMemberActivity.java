@@ -1,5 +1,6 @@
 package com.pattaya.pattayacallcenter.member;
 
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
@@ -163,7 +164,6 @@ public class CaseDetailMemberActivity extends ActionBarActivity {
                         intent = new Intent(getApplicationContext(), CaseResultMemberActivity.class);
                         intent.putExtra("id", caseId);
                         intent.putExtra("complainid", complainId);
-
                         startActivity(intent);
                         break;
                     case 4:
@@ -637,5 +637,30 @@ public class CaseDetailMemberActivity extends ActionBarActivity {
         });
 
 
+    }
+
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == TAG_INTENT_CLOSE) {
+            if (resultCode == Activity.RESULT_OK) {
+                finish();
+
+            }
+        }
+
+        if (requestCode == TAG_INTENT_FORWARD) {
+            if (resultCode == Activity.RESULT_OK) {
+                finish();
+
+            }
+        }
+
+        if (requestCode == EDIT_ACTIVITY) {
+            if (resultCode == Activity.RESULT_OK) {
+                finish();
+
+            }
+        }
     }
 }

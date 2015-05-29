@@ -5,7 +5,6 @@ package com.pattaya.pattayacallcenter.webservice.object.casedata;
  */
 public class GetCaseListData {
 
-
     String textSearch;
     int filterType;
     int userId;
@@ -14,7 +13,25 @@ public class GetCaseListData {
     String clientId;
     Boolean action;
     int completed;
+    // int itemPerPage;
+    //int pageNo;
 
+
+//    public int getItemPerPage() {
+//        return itemPerPage;
+//    }
+//
+//    public void setItemPerPage(int itemPerPage) {
+//        this.itemPerPage = itemPerPage;
+//    }
+//
+//    public int getPageNo() {
+//        return pageNo;
+//    }
+//
+//    public void setPageNo(int pageNo) {
+//        this.pageNo = pageNo;
+//    }
 
     public void setAction(Boolean action) {
         this.action = action;

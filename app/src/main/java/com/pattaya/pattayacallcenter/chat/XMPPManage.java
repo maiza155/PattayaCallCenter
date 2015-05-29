@@ -100,8 +100,8 @@ public class XMPPManage implements MessageListener {
     static PubSubManager manager;
     static XMPPTCPConnection admin;
     static Boolean isOfficial;
-    final String GROUP_FRIEND = "Friends";
-    final String GROUP_FAVORITE = "Favorite";
+    public final String GROUP_FRIEND = "Friends";
+    public final String GROUP_FAVORITE = "Favorite";
 
     ReconnectionManager reconnectionManager;
 
@@ -793,7 +793,7 @@ public class XMPPManage implements MessageListener {
                         for (String e : jid) {
                             muc.invite(e, "Please Join From Android");
                         }
-
+                        muc.leave();
                         Log.d("adnan", "gg : " + room + "  ------------- " + jid);
                     } catch (SmackException.NotConnectedException e) {
                         e.printStackTrace();

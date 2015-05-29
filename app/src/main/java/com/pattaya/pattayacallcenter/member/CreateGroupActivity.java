@@ -24,7 +24,9 @@ import com.google.gson.Gson;
 import com.pattaya.pattayacallcenter.Application;
 import com.pattaya.pattayacallcenter.BusProvider;
 import com.pattaya.pattayacallcenter.Data.MasterData;
+import com.pattaya.pattayacallcenter.Data.Users;
 import com.pattaya.pattayacallcenter.R;
+import com.pattaya.pattayacallcenter.chat.DatabaseChatHelper;
 import com.pattaya.pattayacallcenter.chat.XMPPManage;
 import com.pattaya.pattayacallcenter.chat.jsonobject.ChatRoomObject;
 import com.pattaya.pattayacallcenter.chat.jsonobject.Members;
@@ -224,7 +226,7 @@ public class CreateGroupActivity extends ActionBarActivity implements View.OnCli
                 if (isUpdate) {
                     inviteUser.addAll(outcastlist);
                 }
-
+                //inviteUser.add(jid);
                 for (InviteFriendObject e : adapterListCreateGroup.getListData()) {
                     inviteUser.add(e.getJid());
                 }
@@ -280,7 +282,10 @@ public class CreateGroupActivity extends ActionBarActivity implements View.OnCli
                                 chatRoomObject.getRoomName() + "@conference.pattaya-data"
                                 , (ArrayList<String>) chatRoomObject.getOutcasts().getOutcast());
                     }
-
+                    final Users mUser = new Users(chatRoomObject.getRoomName() + "@conference.pattaya-data", chatRoomObject.getNaturalName(), null, Users.TYPE_GROUP);
+                    mUser.setPic(chatRoomObject.getDescription());
+                    DatabaseChatHelper.init().addUsers(mUser);
+                    XMPPManage.getInstance().setJoinRoom(chatRoomObject.getRoomName() + "@conference.pattaya-data");
                     Toast.makeText(getApplication(),
                             "success", Toast.LENGTH_SHORT)
                             .show();

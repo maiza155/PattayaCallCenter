@@ -50,9 +50,20 @@ public class AdpterListCase extends BaseAdapter {
         notifyDataSetChanged();
     }
 
+    public void addItem(List<CaseListMemberData> caseListMemberDataList) {
+        data.addAll(caseListMemberDataList);
+        notifyDataSetChanged();
+        // this.data = caseListMemberDataList;
+    }
+
+
     @Override
     public int getCount() {
         return data.size();
+    }
+
+    public List<CaseListMemberData> getListData() {
+        return data;
     }
 
     @Override

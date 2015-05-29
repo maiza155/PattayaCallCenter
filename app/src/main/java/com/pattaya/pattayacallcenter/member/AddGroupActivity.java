@@ -415,7 +415,7 @@ public class AddGroupActivity extends ActionBarActivity implements View.OnClickL
                         for (InviteFriendObject e : mData) {
                             if (!userList.contains(e.getJid())) {
                                 arrJid.add(e.getJid());
-                                openfireQuearyJson.updateChatRoom(groupdata.getJid().split("@")[0], "outcasts", e.getJid(), new Callback<Response>() {
+                                openfireQuearyJson.updateChatRoom(groupdata.getJid().split("@")[0], "outcasts", e.getJid(), "", new Callback<Response>() {
                                     @Override
                                     public void success(Response response, Response response2) {
                                         System.out.println("response = [" + response + "], response2 = [" + response2 + "]");

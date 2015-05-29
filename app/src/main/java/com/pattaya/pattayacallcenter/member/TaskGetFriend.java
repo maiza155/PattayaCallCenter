@@ -3,6 +3,7 @@ package com.pattaya.pattayacallcenter.member;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
+import android.os.Looper;
 import android.util.Log;
 
 import com.pattaya.pattayacallcenter.BusProvider;
@@ -95,6 +96,9 @@ public class TaskGetFriend extends AsyncTask<Void, Void, Boolean> {
                                     final Users mUser = new Users(room, e.getNaturalName(), null, Users.TYPE_GROUP);
                                     mUser.setPic(e.getDescription());
                                     arrUser.add(mUser);
+                                    if (Looper.myLooper() == Looper.getMainLooper()) {
+                                        Log.e("RUN_ON_UI_THREAD", "GOOOO");
+                                    }
                                     DatabaseChatHelper.init().addUsers(mUser);
                                 }
 
@@ -134,7 +138,7 @@ public class TaskGetFriend extends AsyncTask<Void, Void, Boolean> {
             @Override
             public void success(final Roster roster, retrofit.client.Response response) {
                 final ArrayList<String> tempArr = new ArrayList<>();
-                DatabaseChatHelper.init().clearUserTable();
+                //DatabaseChatHelper.init().clearUserTable();
                 getGroupFromServer();
 
                 if (roster.getRosterItem() != null) {
@@ -145,7 +149,6 @@ public class TaskGetFriend extends AsyncTask<Void, Void, Boolean> {
                         if (e.getGroups().getGroup() != null) {
                             //Friend
                             if (e.getGroups().getGroup().size() == 1) {
-
                                 final Users mUser = new Users(e.getJid(), e.getNickname(), null, Users.TYPE_FRIEND);
                                 openfireQueary.getUser(e.getJid().split("@")[0], new Callback<User>() {
                                     @Override
@@ -211,17 +214,20 @@ public class TaskGetFriend extends AsyncTask<Void, Void, Boolean> {
 
                         }// ไม่มี group
                         else {
-                            //System.out.println("///////No Group " + e.getJid());
-
+                            System.out.println(jid + "///////No Group " + e.getJid());
                             final Users mUser = new Users(e.getJid(), e.getNickname(), null, Users.TYPE_NOT_FRIEND);
                             openfireQueary.getUser(e.getJid().split("@")[0], new Callback<User>() {
                                 @Override
                                 public void success(User user, retrofit.client.Response response) {
                                     mUser.setName(user.getName());
                                     mUser.setPic(user.getProperty().get("userImage"));
-                                    DatabaseChatHelper.init().addUsers(mUser);
+                                    if (!e.getJid().matches(jid)) {
+                                        DatabaseChatHelper.init().addUsers(mUser);
+                                        countInviteFriend++;
+                                    }
+
                                     tempArr.add(mUser.getJid());
-                                    countInviteFriend++;
+
                                     if (tempArr.size() == roster.getRosterItem().size()) {
                                         checkUser = true;
                                         if (checkUser && checkGroup) {
@@ -238,10 +244,9 @@ public class TaskGetFriend extends AsyncTask<Void, Void, Boolean> {
 
                                 }
                             });
-
-
                         }
                     }
+
                 } else {
                     //System.out.println("///////No Roster ");
                     checkUser = true;

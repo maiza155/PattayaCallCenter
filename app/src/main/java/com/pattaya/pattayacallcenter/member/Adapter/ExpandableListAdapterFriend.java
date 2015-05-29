@@ -13,6 +13,7 @@ import android.widget.ImageButton;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.pattaya.pattayacallcenter.Application;
 import com.pattaya.pattayacallcenter.Data.MasterData;
 import com.pattaya.pattayacallcenter.Data.Users;
@@ -34,13 +35,12 @@ import retrofit.RestAdapter;
  */
 public class ExpandableListAdapterFriend extends BaseExpandableListAdapter {
 
-    Activity context;
-    private Map<String, List<Users>> laptopCollections;
-    private List<String> laptops;
     final RestAdapter restAdapterOpenFire = RestAdapterOpenFire.getInstanceJson();
     final OpenfireQueary openfireQueary = restAdapterOpenFire.create(OpenfireQueary.class);
-
+    Activity context;
     String jid;
+    private Map<String, List<Users>> laptopCollections;
+    private List<String> laptops;
 
 
     public ExpandableListAdapterFriend(Activity context, List<String> groupList,
@@ -140,6 +140,7 @@ public class ExpandableListAdapterFriend extends BaseExpandableListAdapter {
         String image = (laptop.getPic() == null || laptop.getPic().matches("")) ? "NO" : laptop.getPic();
         Glide.with(context)
                 .load(image)
+                .diskCacheStrategy(DiskCacheStrategy.ALL)
                 .error(R.drawable.com_facebook_profile_picture_blank_square)
                 .override(100, 100)
                 .fitCenter()

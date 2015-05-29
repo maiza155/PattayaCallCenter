@@ -8,6 +8,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.os.AsyncTask;
 import android.os.Handler;
+import android.os.Looper;
 import android.provider.BaseColumns;
 import android.util.Log;
 
@@ -69,7 +70,7 @@ public class DatabaseChatHelper extends SQLiteOpenHelper {
     @Override
     public void onCreate(SQLiteDatabase db) {
         db.execSQL("CREATE TABLE " + RosterEntry.TABLE_NAME + " ("
-                + RosterEntry.Column.JID + " TEXT PRIMARY KEY, "
+                + RosterEntry.Column.JID + " TEXT UNIQUE, "
                 + RosterEntry.Column.NAME + " TEXT, "
                 + RosterEntry.Column.ORGANIZE + " TEXT, "
                 + RosterEntry.Column.EMAIL + " TEXT, "
@@ -184,6 +185,9 @@ public class DatabaseChatHelper extends SQLiteOpenHelper {
 
     //////////////////////////////////////////////////////////////
     public void addUsers(Users users) {
+        if (Looper.myLooper() == Looper.getMainLooper()) {
+            Log.e("RUN_ON_UI_THREAD", "GOOOO IN DATABASE `");
+        }
         SQLiteDatabase db = databaseChatHelper.getWritableDatabase();
         ContentValues values = new ContentValues();
         values.put(RosterEntry.Column.JID, users.getJid());

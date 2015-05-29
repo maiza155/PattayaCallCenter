@@ -21,6 +21,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
+import android.widget.AbsListView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
@@ -63,6 +64,7 @@ import retrofit.client.Response;
 
 
 public class CaseFragment extends Fragment implements View.OnClickListener
+        , AbsListView.OnScrollListener
         , SwipeRefreshLayout.OnRefreshListener
         , TextWatcher {
 
@@ -102,8 +104,8 @@ public class CaseFragment extends Fragment implements View.OnClickListener
     // widget
     View btn;
     TextView titleTextView;
+    int pagesLoader = 1;
     private SwipeRefreshLayout mSwipeRefreshLayout;
-
 
     public CaseFragment() {
         // Required empty public constructor
@@ -169,7 +171,7 @@ public class CaseFragment extends Fragment implements View.OnClickListener
                 android.R.color.holo_red_light);
 
         adpterListCase = new AdpterListCase(dataList, getActivity());
-
+        list.setOnScrollListener(this);
         list.setAdapter(adpterListCase);
         // btn.setOnClickListener(this);
 
@@ -286,7 +288,7 @@ public class CaseFragment extends Fragment implements View.OnClickListener
 
     }
 
-
+    //Clicklistener
     @Override
     public void onClick(View v) {
         if (v == btnClick) {
@@ -404,6 +406,7 @@ public class CaseFragment extends Fragment implements View.OnClickListener
                 }
                 getCaseListData.setAccessToken(token);
                 getCaseListData.setTextSearch(s);
+
                 adapterRest.getCaseList(getCaseListData, new Callback<Response>() {
                     @Override
                     public void success(Response result, Response response2) {
@@ -493,6 +496,46 @@ public class CaseFragment extends Fragment implements View.OnClickListener
 
                 getCaseListData.setAccessToken(token);
                 getCaseListData.setTextSearch(s);
+                int itemPerPage;
+                if (dataList.size() == 0) {
+                    System.out.println("first page");
+                    dataList = new ArrayList<>();
+                    pagesLoader = 1;
+                    itemPerPage = 10;
+                    //getCaseListData.setPageNo(pagesLoader);
+                    //getCaseListData.setItemPerPage(itemPerPage);
+                } else {
+                    if ((dataList.size() % 5) == 0) {
+                        System.out.println("sub page mod 5");
+                        pagesLoader = (dataList.size() / 5) + 1;
+                        itemPerPage = 5;
+                    } else if ((dataList.size() % 6) == 0) {
+                        System.out.println("sub page mod 6");
+                        pagesLoader = (dataList.size() / 6) + 1;
+                        itemPerPage = 6;
+                    } else if ((dataList.size() % 7) == 0) {
+                        System.out.println("sub page mod 7");
+                        pagesLoader = (dataList.size() / 7) + 1;
+                        itemPerPage = 7;
+                    } else if ((dataList.size() % 8) == 0) {
+                        System.out.println("sub page mod 8");
+                        pagesLoader = (dataList.size() / 8) + 1;
+                        itemPerPage = 8;
+                    } else if ((dataList.size() % 9) == 0) {
+                        System.out.println("sub page mod 9");
+                        pagesLoader = (dataList.size() / 9) + 1;
+                        itemPerPage = 9;
+                    } else {
+                        System.out.println("sub page mod other");
+                        pagesLoader = 2;
+                        itemPerPage = dataList.size();
+                    }
+
+                    //getCaseListData.setPageNo(pagesLoader);
+                    ///getCaseListData.setItemPerPage(itemPerPage);
+                }
+
+
                 adapterRest.getCaseList(getCaseListData, new Callback<Response>() {
                     @Override
                     public void success(Response result, Response response2) {
@@ -512,24 +555,28 @@ public class CaseFragment extends Fragment implements View.OnClickListener
                         }
                         String JsonConvertData = "{data:" + sb.toString() + "}";
                         System.out.println(JsonConvertData);
-                        CaseListMemberObject caseListObject = new Gson().fromJson(JsonConvertData, CaseListMemberObject.class);
+                        final CaseListMemberObject caseListObject = new Gson().fromJson(JsonConvertData, CaseListMemberObject.class);
 
-                        dataList = caseListObject.getData();
+                        if (caseListObject.getData().size() > 0) {
+                            //pagesLoader++;
+                            if (getActivity() != null) {
+                                getActivity().runOnUiThread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        Activity activity = getActivity();
+                                        if (activity != null) {
+                                            progressBar.setVisibility(View.GONE);
+                                            txtEmpty.setVisibility(View.VISIBLE);
+                                            adpterListCase.resetAdpter(caseListObject.getData());
+                                            mSwipeRefreshLayout.setRefreshing(false);
+                                        }
 
-                        getActivity().runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                Activity activity = getActivity();
-                                if (activity != null) {
-                                    progressBar.setVisibility(View.GONE);
-                                    txtEmpty.setVisibility(View.VISIBLE);
-
-                                    adpterListCase.resetAdpter(dataList);
-                                    mSwipeRefreshLayout.setRefreshing(false);
-                                }
-
+                                    }
+                                });
                             }
-                        });
+                        }
+
+
 
 
                     }
@@ -644,6 +691,30 @@ public class CaseFragment extends Fragment implements View.OnClickListener
 
             }
 
+        }
+    }
+
+    @Override
+    public void onScrollStateChanged(AbsListView view, int scrollState) {
+
+    }
+
+    @Override
+    public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
+        if (firstVisibleItem == 0) {
+            // check if we reached the top or bottom of the list
+            View v = list.getChildAt(0);
+            int offset = (v == null) ? 0 : v.getTop();
+            if (offset == 0) {
+                return;
+            }
+        }
+
+        if (list.getLastVisiblePosition() == list.getAdapter().getCount() - 1
+                && list.getChildAt(list.getChildCount() - 1).getBottom() <= list.getHeight()) {
+            System.out.println("bottom in ListView ");
+            //getCaseList("");
+            return;
         }
     }
 }

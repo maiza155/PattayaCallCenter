@@ -636,18 +636,18 @@ public class CaseChatMemberActivity extends ActionBarActivity implements View.On
 
         if (v == btnCamera) {
             cameraMange.captureImage();
-            mSlideMenuManage.stateShowMenu(mSlideMenuManage.SETTING_MENU_HIDE);
+            // mSlideMenuManage.stateShowMenu( mSlideMenuManageImage .SETTING_MENU_HIDE);
 
         } else if (v == btnImage) {
             Intent intent = new Intent(this, CustomGalleryActivity.class);
             startActivityForResult(intent, MasterData.PICK_IMAGE_MULTIPLE);
-            mSlideMenuManage.stateShowMenu(mSlideMenuManage.SETTING_MENU_HIDE);
+            // mSlideMenuManage.stateShowMenu( mSlideMenuManageImage .SETTING_MENU_HIDE);
         } else if (v == btnAdd) {
             mSlideMenuManageImage.eventShow();
-            mSlideMenuManageSticker.stateShowMenu(mSlideMenuManage.SETTING_MENU_HIDE);
+            mSlideMenuManageSticker.stateShowMenu(mSlideMenuManageImage.SETTING_MENU_HIDE);
 
         } else if (v == btnSticker) {
-            mSlideMenuManageImage.stateShowMenu(mSlideMenuManage.SETTING_MENU_HIDE);
+            mSlideMenuManageImage.stateShowMenu(mSlideMenuManageImage.SETTING_MENU_HIDE);
             mSlideMenuManageSticker.eventShow();
             if (!isMyServiceRunning(StrickLoaderService.class)) {
                 txtempty.setVisibility(View.GONE);

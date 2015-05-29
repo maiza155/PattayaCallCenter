@@ -70,6 +70,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
+import java.util.UUID;
 import java.util.concurrent.ExecutionException;
 
 import retrofit.Callback;
@@ -672,8 +673,9 @@ public class CaseAddAndEditActivity extends ActionBarActivity implements View.On
                 for (ImageData e : mGridAdapter.getData()) {
                     if (e.getTag() == 1) {
                         imageCount++;
+                        String uuid = UUID.randomUUID().toString();
                         int randomNum = 500 + (int) ((Math.random() * 1204006080) / Math.random());
-                        File file = new File(getCacheDir(), "pattaya-complain" + randomNum);
+                        File file = new File(getCacheDir(), "pattaya-complain" + randomNum + uuid);
                         try {
                             file.createNewFile();
                         } catch (IOException error) {

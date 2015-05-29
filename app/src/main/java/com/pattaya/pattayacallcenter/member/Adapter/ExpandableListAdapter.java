@@ -16,7 +16,9 @@ import com.bumptech.glide.Glide;
 import com.pattaya.pattayacallcenter.Application;
 import com.pattaya.pattayacallcenter.BusProvider;
 import com.pattaya.pattayacallcenter.Data.MasterData;
+import com.pattaya.pattayacallcenter.Data.Users;
 import com.pattaya.pattayacallcenter.R;
+import com.pattaya.pattayacallcenter.chat.DatabaseChatHelper;
 import com.pattaya.pattayacallcenter.chat.XMPPManage;
 import com.pattaya.pattayacallcenter.chat.restadatper.OpenfireQueary;
 import com.pattaya.pattayacallcenter.chat.restadatper.RestAdapterOpenFire;
@@ -164,13 +166,17 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
                     }
 
                 } else if (groupPosition == 1) {
-                    openfireQueary.updateChatRoom(laptop.getJid().split("@")[0], "members", jid, new Callback<Response>() {
+                    openfireQueary.updateChatRoom(laptop.getJid().split("@")[0], "members", jid, "", new Callback<Response>() {
                         @Override
                         public void success(Response response, Response response2) {
                             System.out.println("response = [" + response + "], response2 = [" + response2 + "]");
                             removeAt(groupPosition, childPosition);
                             XMPPManage.getInstance().setJoinRoom(laptop.getJid());
                             BusProvider.getInstance().post("add_roster_complete");
+
+                            final Users mUser = new Users(laptop.getJid(), laptop.getName(), null, Users.TYPE_GROUP);
+                            mUser.setPic(laptop.getImage());
+                            DatabaseChatHelper.init().addUsers(mUser);
                         }
 
                         @Override

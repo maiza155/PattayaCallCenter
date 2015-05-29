@@ -428,20 +428,22 @@ ADDED from AndroidManifest.xml:206:9
 		ADDED from AndroidManifest.xml:207:13
 service#com.pattaya.pattayacallcenter.chat.XMPPService
 ADDED from AndroidManifest.xml:210:9
-	android:name
-		ADDED from AndroidManifest.xml:210:18
-service#com.pattaya.pattayacallcenter.chat.XMPPServiceOfficial
-ADDED from AndroidManifest.xml:211:9
-	android:name
-		ADDED from AndroidManifest.xml:211:18
-service#com.pattaya.pattayacallcenter.chat.StrickLoaderService
-ADDED from AndroidManifest.xml:212:9
 	android:exported
-		ADDED from AndroidManifest.xml:215:13
-	android:enabled
-		ADDED from AndroidManifest.xml:214:13
+		ADDED from AndroidManifest.xml:212:13
 	android:name
-		ADDED from AndroidManifest.xml:213:13
+		ADDED from AndroidManifest.xml:211:13
+service#com.pattaya.pattayacallcenter.chat.XMPPServiceOfficial
+ADDED from AndroidManifest.xml:215:9
+	android:exported
+		ADDED from AndroidManifest.xml:217:13
+	android:name
+		ADDED from AndroidManifest.xml:216:13
+service#com.pattaya.pattayacallcenter.chat.StrickLoaderService
+ADDED from AndroidManifest.xml:219:9
+	android:exported
+		ADDED from AndroidManifest.xml:221:13
+	android:name
+		ADDED from AndroidManifest.xml:220:13
 uses-sdk
 INJECTED from AndroidManifest.xml:0:0 reason: use-sdk injection requested
 MERGED from com.android.support:appcompat-v7:21.0.3:15:5
@@ -463,6 +465,8 @@ MERGED from com.android.support:support-v4:22.0.0:20:5
 MERGED from PattayaCallCenter:switch:unspecified:7:5
 MERGED from com.android.support:appcompat-v7:21.0.3:15:5
 MERGED from com.android.support:support-v4:22.0.0:20:5
+MERGED from jp.wasabeef:glide-transformations:1.0.6:8:5
+MERGED from jp.co.cyberagent.android.gpuimage:gpuimage-library:1.2.3:8:5
 	android:targetSdkVersion
 		INJECTED from AndroidManifest.xml:0:0
 		INJECTED from AndroidManifest.xml:0:0

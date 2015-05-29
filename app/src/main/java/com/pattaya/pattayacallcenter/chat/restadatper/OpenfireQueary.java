@@ -70,7 +70,7 @@ public interface OpenfireQueary {
 
     @Headers("Authorization : hello")
     @POST("/chatrooms/{roomName}/{roles}/{name}")
-    void updateChatRoom(@Path("roomName") String roomName,@Path("roles") String roles,@Path("name") String name,Callback<Response> callback);
+    void updateChatRoom(@Path("roomName") String roomName, @Path("roles") String roles, @Path("name") String name, @Body String c, Callback<Response> callback);
 
 
     @Headers("Authorization : hello")

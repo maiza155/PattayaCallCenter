@@ -708,8 +708,8 @@ public class CaseAddAndEditActivity extends ActionBarActivity implements View.On
 
                                             }
                                         });
-                                        System.out.println("error = [" + error.getResponse() + "]");
-                                        Toast.makeText(getApplication(), "Webservice Unable connect server. Please try again", Toast.LENGTH_SHORT).show();
+                                        System.out.println("Webservice Opencase error = [" + error.getResponse() + "]");
+                                        Toast.makeText(getApplication(), "Webservice Opencase Unable connect server. Please try again", Toast.LENGTH_SHORT).show();
                                     }
                                 });
 
@@ -719,6 +719,7 @@ public class CaseAddAndEditActivity extends ActionBarActivity implements View.On
 
                         @Override
                         public void failure(RetrofitError error) {
+
                             runOnUiThread(new Runnable() {
                                 @Override
                                 public void run() {
@@ -730,7 +731,7 @@ public class CaseAddAndEditActivity extends ActionBarActivity implements View.On
                                 }
                             });
 
-                            System.out.println("error get user data = [" + error + "]");
+                            System.out.println("error get user data = [" + error.getLocalizedMessage() + "]");
                             Toast.makeText(getApplication(), "Webservice Unable connect server. Please try again", Toast.LENGTH_SHORT).show();
 
                         }

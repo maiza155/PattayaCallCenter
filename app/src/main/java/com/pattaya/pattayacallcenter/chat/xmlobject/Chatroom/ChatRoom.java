@@ -17,7 +17,7 @@ public class ChatRoom {
     @Element
     String roomName;
 
-    @Element
+    @Element(required = false)
     String naturalName;
 
     @ElementList(inline = true)

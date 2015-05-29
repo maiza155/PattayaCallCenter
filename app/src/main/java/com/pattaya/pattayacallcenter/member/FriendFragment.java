@@ -127,7 +127,8 @@ public class FriendFragment extends Fragment implements SwipeRefreshLayout.OnRef
             if (event.matches("friendfragment")) {
                 new queryTask().execute();
             } else if (event.matches("add_roster_complete")) {
-                new TaskGetFriend(getActivity()).execute();
+                // new TaskGetFriend(getActivity()).execute();
+                new queryTask().execute();
             } else if (event.matches("invited_update")) {
                 if (badge != null) {
                     int oldBadge = (badge.getText().toString().isEmpty()) ? 0 : Integer.parseInt(badge.getText().toString());

@@ -435,7 +435,8 @@ public class PostActivity extends ActionBarActivity implements View.OnClickListe
                                 runOnUiThread(new Thread(new Runnable() {
                                     public void run() {
                                         if (count[0] == 100) {
-                                            ringProgressDialog.setMessage(fileID);
+                                            if (ringProgressDialog != null)
+                                                ringProgressDialog.setMessage(fileID);
                                         }
                                     }
                                 }));
@@ -480,7 +481,8 @@ public class PostActivity extends ActionBarActivity implements View.OnClickListe
                                             @Override
                                             public void run() {
                                                 savePostObject.setPostImageList(listImageURL);
-                                                ringProgressDialog.dismiss();
+                                                if (ringProgressDialog != null)
+                                                    ringProgressDialog.dismiss();
                                                 savePost();
                                             }
                                         });
@@ -501,7 +503,8 @@ public class PostActivity extends ActionBarActivity implements View.OnClickListe
                                         @Override
                                         public void run() {
                                             alertDialogFailtoServer();
-                                            ringProgressDialog.dismiss();
+                                            if (ringProgressDialog != null)
+                                                ringProgressDialog.dismiss();
                                         }
                                     });
 
@@ -522,7 +525,8 @@ public class PostActivity extends ActionBarActivity implements View.OnClickListe
                                     Activity activity = PostActivity.this;
                                     if (activity != null) {
                                         savePostObject.setPostImageList(listImageURL);
-                                        ringProgressDialog.dismiss();
+                                        if (ringProgressDialog != null)
+                                            ringProgressDialog.dismiss();
                                         savePost();
                                     }
 

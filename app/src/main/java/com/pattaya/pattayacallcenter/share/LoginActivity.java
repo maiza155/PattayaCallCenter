@@ -175,7 +175,7 @@ public class LoginActivity extends Activity {
         btnLogin.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                final ProgressDialog ringProgressDialog = ProgressDialog.show(context, getResources().getString(R.string.login), getResources().getString(R.string.please_wait), true);
+                final ProgressDialog ringProgressDialog = ProgressDialog.show(context, null, getResources().getString(R.string.please_wait), true);
                 ringProgressDialog.setCancelable(true);
 
                 if (userName.getText().toString().matches("")) {
@@ -677,13 +677,15 @@ public class LoginActivity extends Activity {
                         }// ไม่มี group
                         else {
                             final Users mUser = new Users(e.getJid(), e.getNickname(), null, Users.TYPE_NOT_FRIEND);
-                            System.out.println("No Group >>" + e.getJid());
+                            // System.out.println("No Group >>" + e.getJid());
                             openfireQueary.getUser(e.getJid().split("@")[0], new Callback<User>() {
                                 @Override
                                 public void success(User user, retrofit.client.Response response) {
                                     mUser.setName(user.getName());
                                     mUser.setPic(user.getProperty().get("userImage"));
-                                    DatabaseChatHelper.init().addUsers(mUser);
+                                    if (!e.getJid().matches(userDataObject.getjId())) {
+                                        DatabaseChatHelper.init().addUsers(mUser);
+                                    }
                                     tempArr.add(mUser.getJid());
                                     if (tempArr.size() == roster.getRosterItem().size()) {
 
@@ -783,7 +785,7 @@ public class LoginActivity extends Activity {
                         }
                         if (e.getMembers().getListMember() != null) {
                             for (Member member : e.getMembers().getListMember()) {
-                                System.out.println(member.getText());
+                                //System.out.println(member.getText());
                                 if (member.getText().matches(jid)) {
                                     final Users mUser = new Users(room, e.getNaturalName(), null, Users.TYPE_GROUP);
                                     arrUser.add(mUser);
