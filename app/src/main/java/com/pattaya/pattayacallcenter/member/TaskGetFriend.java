@@ -2,8 +2,6 @@ package com.pattaya.pattayacallcenter.member;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.os.AsyncTask;
-import android.os.Looper;
 import android.util.Log;
 
 import com.pattaya.pattayacallcenter.BusProvider;
@@ -32,7 +30,7 @@ import retrofit.client.Response;
 /**
  * Created by SWF on 4/28/2015.
  */
-public class TaskGetFriend extends AsyncTask<Void, Void, Boolean> {
+public class TaskGetFriend {
     final RestAdapter restAdapterOpenFire = RestAdapterOpenFire.getInstance();
     final OpenfireQueary openfireQueary = restAdapterOpenFire.create(OpenfireQueary.class);
     Boolean checkGroup = true;
@@ -50,76 +48,76 @@ public class TaskGetFriend extends AsyncTask<Void, Void, Boolean> {
         SharedPreferences sp = context.getSharedPreferences(MasterData.SHARED_NAME_USER_FILE, Context.MODE_PRIVATE);
         jid = sp.getString(MasterData.SHARED_USER_JID, null);
         childListGroup = new ArrayList<>();
-    }
-
-    @Override
-    protected Boolean doInBackground(Void... params) {
         getRosterFromServer();
-        return null;
+        getGroupFromServer();
     }
-
 
     void getGroupFromServer() {
         checkGroup = false;
         openfireQueary.getChatRoom(new Callback<ChatRooms>() {
             @Override
-            public void success(ChatRooms chatRooms, Response response) {
-                final ArrayList<Users> arrUser = new ArrayList<>();
-                countInviteGroup = 0;
-                if (chatRooms.getChatRoom() != null) {
-                    for (ChatRoom e : chatRooms.getChatRoom()) {
-                        final String room = e.getRoomName() + "@conference.pattaya-data";
-                        /*
-                        for (Owners owners : e.getOwners()) {
-                            if (!owners.getOwner().matches(jid)) {
-                                final Users mUser = new Users(room, e.getNaturalName(), null, Users.TYPE_GROUP);
-                                mUser.setPic(e.getDescription());
-                                arrUser.add(mUser);
-                                DatabaseChatHelper.init().addUsers(mUser);
-                            }
-                        }*/
-                        if (e.getOutcasts().getListMember() != null) {
-                            for (Member member : e.getOutcasts().getListMember()) {
-                                if (member.getText().matches(jid)) {
-                                    countInviteGroup++;
-                                    Log.e("countInviteGroup", "" + countInviteGroup);
-                                    childListGroup.add(new InviteFriendObject(room, e.getNaturalName(), e.getDescription()));
+            public void success(final ChatRooms chatRooms, Response response) {
+                Log.e("countInviteGroup", "start");
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        final ArrayList<Users> arrUser = new ArrayList<>();
+                        countInviteGroup = 0;
+                        if (chatRooms.getChatRoom() != null) {
+                            for (ChatRoom e : chatRooms.getChatRoom()) {
+                                final String room = e.getRoomName() + "@conference.pattaya-data";
 
-
-                                }
-                            }
-                        }
-
-                        if (e.getMembers().getListMember() != null) {
-                            for (Member member : e.getMembers().getListMember()) {
-                                if (member.getText().matches(jid)) {
-                                    final Users mUser = new Users(room, e.getNaturalName(), null, Users.TYPE_GROUP);
-                                    mUser.setPic(e.getDescription());
-                                    arrUser.add(mUser);
-                                    if (Looper.myLooper() == Looper.getMainLooper()) {
-                                        Log.e("RUN_ON_UI_THREAD", "GOOOO");
+////                        for (Owners owners : e.getOwners()) {
+////                            if (!owners.getOwner().matches(jid)) {
+////                                final Users mUser = new Users(room, e.getNaturalName(), null, Users.TYPE_GROUP);
+////                                mUser.setPic(e.getDescription());
+////                                arrUser.add(mUser);
+////                                DatabaseChatHelper.init().addUsers(mUser);
+////                            }
+////                        }
+                                if (e.getOutcasts().getListMember() != null) {
+                                    for (Member member : e.getOutcasts().getListMember()) {
+                                        if (member.getText().matches(jid)) {
+                                            countInviteGroup++;
+                                            Log.e("countInviteGroup", "" + countInviteGroup);
+                                            childListGroup.add(new InviteFriendObject(room, e.getNaturalName(), e.getDescription()));
+                                            final Users mUser = new Users(room, e.getNaturalName(), null, Users.TYPE_INVITE_GROUP);
+                                            mUser.setPic(e.getDescription());
+                                            DatabaseChatHelper.init().addUsers(mUser);
+                                        }
                                     }
-                                    DatabaseChatHelper.init().addUsers(mUser);
                                 }
 
+                                if (e.getMembers().getListMember() != null) {
+                                    for (Member member : e.getMembers().getListMember()) {
+                                        if (member.getText().matches(jid)) {
+                                            final Users mUser = new Users(room, e.getNaturalName(), null, Users.TYPE_GROUP);
+                                            mUser.setPic(e.getDescription());
+                                            arrUser.add(mUser);
+                                            DatabaseChatHelper.init().addUsers(mUser);
+                                        }
+
+                                    }
+
+                                }
+
+
+                            }
+                            checkGroup = true;
+                            if (checkGroup && checkUser) {
+                                //new queryTask().execute();
+
+                                busGetFriendObject.setListGroupData(childListGroup);
+                                busGetFriendObject.setCount(countInviteFriend + countInviteGroup);
+                                BusProvider.getInstance().post(busGetFriendObject);
+                                BusProvider.getInstance().post("update_last_message");
                             }
 
+
                         }
-
-
                     }
-                    checkGroup = true;
-                    if (checkGroup && checkUser) {
-                        //new queryTask().execute();
+                }).start();
 
-                        busGetFriendObject.setListGroupData(childListGroup);
-                        busGetFriendObject.setCount(countInviteFriend + countInviteGroup);
-                        BusProvider.getInstance().post(busGetFriendObject);
-                        BusProvider.getInstance().post("update_last_message");
-                    }
-
-
-                }
 
             }
 
@@ -137,28 +135,81 @@ public class TaskGetFriend extends AsyncTask<Void, Void, Boolean> {
         openfireQueary.getRoster(jid.split("@")[0], new Callback<Roster>() {
             @Override
             public void success(final Roster roster, retrofit.client.Response response) {
-                final ArrayList<String> tempArr = new ArrayList<>();
-                //DatabaseChatHelper.init().clearUserTable();
-                getGroupFromServer();
 
-                if (roster.getRosterItem() != null) {
-                    countInviteFriend = 0;
-                    for (final RosterItem e : roster.getRosterItem()) {
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        final ArrayList<String> tempArr = new ArrayList<>();
+                        //DatabaseChatHelper.init().clearUserTable();
+                        if (roster.getRosterItem() != null) {
+                            countInviteFriend = 0;
+                            for (final RosterItem e : roster.getRosterItem()) {
 
-                        // มี Group ใน Rooster
-                        if (e.getGroups().getGroup() != null) {
-                            //Friend
-                            if (e.getGroups().getGroup().size() == 1) {
-                                final Users mUser = new Users(e.getJid(), e.getNickname(), null, Users.TYPE_FRIEND);
-                                openfireQueary.getUser(e.getJid().split("@")[0], new Callback<User>() {
-                                    @Override
-                                    public void success(User user, retrofit.client.Response response) {
+                                // มี Group ใน Rooster
+                                if (e.getGroups().getGroup() != null) {
+                                    //Friend
+                                    if (e.getGroups().getGroup().size() == 1) {
+                                        final Users mUser = new Users(e.getJid(), e.getNickname(), null, Users.TYPE_FRIEND);
+                                        User user = openfireQueary.getUserInTask(e.getJid().split("@")[0]);
+                                        if (user != null) {
+                                            mUser.setName(user.getName());
+                                            mUser.setPic(user.getProperty().get("userImage"));
+                                            DatabaseChatHelper.init().addUsers(mUser);
+                                            tempArr.add(mUser.getJid());
+                                            System.out.println(countInviteFriend);
+                                            if (tempArr.size() == roster.getRosterItem().size()) {
+                                                checkUser = true;
+                                                if (checkUser && checkGroup) {
+                                                    //new queryTask().execute();
+                                                    busGetFriendObject.setCount(countInviteFriend + countInviteGroup);
+                                                    BusProvider.getInstance().post(busGetFriendObject);
+                                                    BusProvider.getInstance().post("update_last_message");
+                                                }
+                                            }
+                                        }
+                                    }
+                                    // Friend & Favorite
+                                    else if (e.getGroups().getGroup().size() == 2) {
+
+                                        final Users mUser = new Users(e.getJid(), e.getNickname(), null, Users.TYPE_FRIEND);
+                                        mUser.setFavorite(true);
+                                        User user = openfireQueary.getUserInTask(e.getJid().split("@")[0]);
+                                        if (user != null) {
+                                            mUser.setName(user.getName());
+                                            mUser.setPic(user.getProperty().get("userImage"));
+                                            DatabaseChatHelper.init().addUsers(mUser);
+                                            tempArr.add(mUser.getJid());
+                                            System.out.println("F" + countInviteFriend);
+
+                                            if (tempArr.size() == roster.getRosterItem().size()) {
+                                                checkUser = true;
+                                                if (checkUser && checkGroup) {
+                                                    // new queryTask().execute();
+                                                    busGetFriendObject.setCount(countInviteFriend + countInviteGroup);
+                                                    BusProvider.getInstance().post(busGetFriendObject);
+                                                    BusProvider.getInstance().post("update_last_message");
+                                                }
+                                            }
+                                        }
+
+
+                                    }
+
+                                }// ไม่มี group
+                                else {
+                                    System.out.println(jid + "///////No Group " + e.getJid());
+                                    final Users mUser = new Users(e.getJid(), e.getNickname(), null, Users.TYPE_NOT_FRIEND);
+                                    User user = openfireQueary.getUserInTask(e.getJid().split("@")[0]);
+                                    if (user != null) {
                                         mUser.setName(user.getName());
                                         mUser.setPic(user.getProperty().get("userImage"));
-                                        DatabaseChatHelper.init().addUsers(mUser);
+                                        if (!e.getJid().matches(jid)) {
+                                            DatabaseChatHelper.init().addUsers(mUser);
+                                            countInviteFriend++;
+                                        }
+
                                         tempArr.add(mUser.getJid());
 
-                                        System.out.println(countInviteFriend);
                                         if (tempArr.size() == roster.getRosterItem().size()) {
                                             checkUser = true;
                                             if (checkUser && checkGroup) {
@@ -170,93 +221,22 @@ public class TaskGetFriend extends AsyncTask<Void, Void, Boolean> {
                                         }
                                     }
 
-                                    @Override
-                                    public void failure(RetrofitError error) {
-
-                                    }
-                                });
-
-
-                            }
-                            // Friend & Favorite
-                            else if (e.getGroups().getGroup().size() == 2) {
-
-                                final Users mUser = new Users(e.getJid(), e.getNickname(), null, Users.TYPE_FRIEND);
-                                mUser.setFavorite(true);
-                                openfireQueary.getUser(e.getJid().split("@")[0], new Callback<User>() {
-                                    @Override
-                                    public void success(User user, retrofit.client.Response response) {
-                                        mUser.setName(user.getName());
-                                        mUser.setPic(user.getProperty().get("userImage"));
-                                        DatabaseChatHelper.init().addUsers(mUser);
-                                        tempArr.add(mUser.getJid());
-                                        System.out.println("F" + countInviteFriend);
-
-                                        if (tempArr.size() == roster.getRosterItem().size()) {
-                                            checkUser = true;
-                                            if (checkUser && checkGroup) {
-                                                // new queryTask().execute();
-                                                busGetFriendObject.setCount(countInviteFriend + countInviteGroup);
-                                                BusProvider.getInstance().post(busGetFriendObject);
-                                                BusProvider.getInstance().post("update_last_message");
-                                            }
-                                        }
-                                    }
-
-                                    @Override
-                                    public void failure(RetrofitError error) {
-                                        //System.out.println("error = [" + error + "]");
-                                    }
-                                });
-
-
+                                }
                             }
 
-                        }// ไม่มี group
-                        else {
-                            System.out.println(jid + "///////No Group " + e.getJid());
-                            final Users mUser = new Users(e.getJid(), e.getNickname(), null, Users.TYPE_NOT_FRIEND);
-                            openfireQueary.getUser(e.getJid().split("@")[0], new Callback<User>() {
-                                @Override
-                                public void success(User user, retrofit.client.Response response) {
-                                    mUser.setName(user.getName());
-                                    mUser.setPic(user.getProperty().get("userImage"));
-                                    if (!e.getJid().matches(jid)) {
-                                        DatabaseChatHelper.init().addUsers(mUser);
-                                        countInviteFriend++;
-                                    }
-
-                                    tempArr.add(mUser.getJid());
-
-                                    if (tempArr.size() == roster.getRosterItem().size()) {
-                                        checkUser = true;
-                                        if (checkUser && checkGroup) {
-                                            //new queryTask().execute();
-                                            busGetFriendObject.setCount(countInviteFriend + countInviteGroup);
-                                            BusProvider.getInstance().post(busGetFriendObject);
-                                            BusProvider.getInstance().post("update_last_message");
-                                        }
-                                    }
-                                }
-
-                                @Override
-                                public void failure(RetrofitError error) {
-
-                                }
-                            });
+                        } else {
+                            //System.out.println("///////No Roster ");
+                            checkUser = true;
+                            if (checkUser && checkGroup) {
+                                //new queryTask().execute();
+                                busGetFriendObject.setCount(countInviteFriend + countInviteGroup);
+                                BusProvider.getInstance().post(busGetFriendObject);
+                                BusProvider.getInstance().post("update_last_message");
+                            }
                         }
-                    }
 
-                } else {
-                    //System.out.println("///////No Roster ");
-                    checkUser = true;
-                    if (checkUser && checkGroup) {
-                        //new queryTask().execute();
-                        busGetFriendObject.setCount(countInviteFriend + countInviteGroup);
-                        BusProvider.getInstance().post(busGetFriendObject);
-                        BusProvider.getInstance().post("update_last_message");
                     }
-                }
+                }).start();
 
             }
 

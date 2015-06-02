@@ -40,23 +40,21 @@ public class FriendRequestActivity extends ActionBarActivity implements SwipeRef
 
     private final RestAdapter restAdapterOpenFire = RestAdapterOpenFire.getInstance();
     private final OpenfireQueary openfireQueary = restAdapterOpenFire.create(OpenfireQueary.class);
-
+    public Button btn_addGroup;
+    public Button btn_addFriend;
+    // widget
+    ImageButton btn;
+    TextView titleTextView;
     private ExpandableListView expandableListView;
     private ExpandableListAdapter expandableListAdapter;
     private List<String> groupList;
     private List<InviteFriendObject> childListGroup;
     private List<InviteFriendObject> childListFriend;
     private Map<String, List<InviteFriendObject>> laptopCollection;
-
-    public Button btn_addGroup;
-    public Button btn_addFriend;
-
-
     private Intent intent;
     private SharedPreferences sp;
     private String jid;
     private SwipeRefreshLayout mSwipeRefreshLayout;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -120,11 +118,10 @@ public class FriendRequestActivity extends ActionBarActivity implements SwipeRef
             }
         });
         new asynTask().execute();
-        new TaskGetFriend(this).execute();
+        //new TaskGetFriend(this);
 
 
     }
-
 
     @Subscribe
     public void onSampleEvent(BusGetFriendObject busGetFriendObject) {
@@ -146,14 +143,12 @@ public class FriendRequestActivity extends ActionBarActivity implements SwipeRef
 
     }
 
-
     public int getDipsFromPixel(float pixels) {
 
         final float scale = getResources().getDisplayMetrics().density;
 
         return (int) (pixels * scale + 0.5f);
     }
-
 
     @Override
     protected void onDestroy() {
@@ -181,10 +176,6 @@ public class FriendRequestActivity extends ActionBarActivity implements SwipeRef
         });
     }
 
-    // widget
-    ImageButton btn;
-    TextView titleTextView;
-
     void setActionBar() {
         /** Set Title Center Actionbar */
         LayoutInflater inflater = LayoutInflater.from(this);
@@ -208,7 +199,7 @@ public class FriendRequestActivity extends ActionBarActivity implements SwipeRef
     @Override
     public void onRefresh() {
         mSwipeRefreshLayout.setRefreshing(true);
-        new TaskGetFriend(this).execute();
+        new TaskGetFriend(this);
 
     }
 
@@ -218,6 +209,7 @@ public class FriendRequestActivity extends ActionBarActivity implements SwipeRef
         protected void onPreExecute() {
             super.onPreExecute();
             childListFriend = new ArrayList<>();
+            childListGroup = new ArrayList<>();
         }
 
         @Override
@@ -226,6 +218,8 @@ public class FriendRequestActivity extends ActionBarActivity implements SwipeRef
             for (Users e : list) {
                 if (e.getType() == Users.TYPE_NOT_FRIEND) {
                     childListFriend.add(new InviteFriendObject(e.getJid(), e.getName(), e.getPic()));
+                } else if (e.getType() == Users.TYPE_INVITE_GROUP) {
+                    childListGroup.add(new InviteFriendObject(e.getJid(), e.getName(), e.getPic()));
                 }
             }
             return childListFriend;
@@ -234,8 +228,9 @@ public class FriendRequestActivity extends ActionBarActivity implements SwipeRef
         @Override
         protected void onPostExecute(List<InviteFriendObject> inviteFriendObjects) {
             super.onPostExecute(inviteFriendObjects);
-
+            mSwipeRefreshLayout.setRefreshing(false);
             expandableListAdapter.resetAdapter(groupList.get(0), inviteFriendObjects);
+            expandableListAdapter.resetAdapter(groupList.get(1), childListGroup);
             expandableListView.expandGroup(0);
         }
     }

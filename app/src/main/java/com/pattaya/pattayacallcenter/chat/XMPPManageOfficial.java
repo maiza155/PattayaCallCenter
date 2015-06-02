@@ -353,7 +353,7 @@ public class XMPPManageOfficial implements MessageListener {
             @Override
             public void processPacket(Packet packet) throws SmackException.NotConnectedException {
 
-                new TaskGetFriend(Application.getContext()).execute();
+                new TaskGetFriend(Application.getContext());
                 Log.d("TAG SET  Official>>>", "" + packet);
 
             }

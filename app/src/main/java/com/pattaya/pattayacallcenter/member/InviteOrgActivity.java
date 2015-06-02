@@ -3,7 +3,6 @@ package com.pattaya.pattayacallcenter.member;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.ActionBar;
@@ -134,66 +133,53 @@ public class InviteOrgActivity extends ActionBarActivity implements View.OnClick
                 mSwipeRefreshLayout.setRefreshing(true);
             }
         });
-        new AsyncTask<Void, Void, Boolean>() {
+
+
+        restqueary.getInviteUser(getInviteUserObject, new Callback<Response>() {
+            @Override
+            public void success(Response result, Response response2) {
+
+                BufferedReader reader = null;
+                StringBuilder sb = new StringBuilder();
+                try {
+
+                    reader = new BufferedReader(new InputStreamReader(result.getBody().in()));
+
+                    String line;
+
+                    try {
+                        while ((line = reader.readLine()) != null) {
+                            sb.append(line);
+                        }
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+
+
+                String JsonConvertData = "{data:" + sb.toString() + "}";
+                final OrgListData orgobject = new Gson().fromJson(JsonConvertData, OrgListData.class);
+
+                adapterListViewInviteOrg.resetAdapter(orgobject.getData());
+                mSwipeRefreshLayout.setRefreshing(false);
+
+
+            }
 
             @Override
-            protected Boolean doInBackground(Void... params) {
+            public void failure(RetrofitError error) {
 
-                restqueary.getInviteUser(getInviteUserObject, new Callback<Response>() {
-                    @Override
-                    public void success(Response result, Response response2) {
-
-                        BufferedReader reader = null;
-                        StringBuilder sb = new StringBuilder();
-                        try {
-
-                            reader = new BufferedReader(new InputStreamReader(result.getBody().in()));
-
-                            String line;
-
-                            try {
-                                while ((line = reader.readLine()) != null) {
-                                    sb.append(line);
-                                }
-                            } catch (IOException e) {
-                                e.printStackTrace();
-                            }
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        }
+                mSwipeRefreshLayout.setRefreshing(false);
 
 
-                        String JsonConvertData = "{data:" + sb.toString() + "}";
-                        final OrgListData orgobject = new Gson().fromJson(JsonConvertData, OrgListData.class);
-                        runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                adapterListViewInviteOrg.resetAdapter(orgobject.getData());
-                                mSwipeRefreshLayout.setRefreshing(false);
+                Toast.makeText(getApplicationContext(),
+                        getResources().getString(R.string.cant_connect_server), Toast.LENGTH_SHORT)
+                        .show();
 
-                            }
-                        });
-
-                    }
-
-                    @Override
-                    public void failure(RetrofitError error) {
-                        runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                mSwipeRefreshLayout.setRefreshing(false);
-                            }
-                        });
-
-                        Toast.makeText(getApplicationContext(),
-                                getResources().getString(R.string.cant_connect_server), Toast.LENGTH_SHORT)
-                                .show();
-
-                    }
-                });
-                return null;
             }
-        }.execute();
+        });
 
 
     }
@@ -207,20 +193,14 @@ public class InviteOrgActivity extends ActionBarActivity implements View.OnClick
         String json2 = gson.toJson(sendInviteObject);
         System.out.println(json2);
 
-        new AsyncTask<Void, Void, Boolean>() {
-
+        restqueary.sendInvite(sendInviteObject, new Callback<UpdateResult>() {
             @Override
-            protected Boolean doInBackground(Void... params) {
-                restqueary.sendInvite(sendInviteObject, new Callback<UpdateResult>() {
+            public void success(final UpdateResult updateResult, Response response) {
+                System.out.println("updateResult = [" + updateResult.getResult() + "], response = [" + response + "]");
+                ringProgressDialog.dismiss();
+                new Thread(new Runnable() {
                     @Override
-                    public void success(UpdateResult updateResult, Response response) {
-                        System.out.println("updateResult = [" + updateResult.getResult() + "], response = [" + response + "]");
-                        runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                ringProgressDialog.dismiss();
-                            }
-                        });
+                    public void run() {
                         if (updateResult.getResult()) {
                             for (String e : adapterListViewInviteOrg.getListSelectJid()) {
                                 if (!e.isEmpty()) {
@@ -230,9 +210,7 @@ public class InviteOrgActivity extends ActionBarActivity implements View.OnClick
                                     pub.setTitle("คำเชิญเข้ากลุ่ม");
                                     XMPPManage.getInstance().new TaskSendNotify(pub).execute();
                                 }
-
                             }
-
 
                             Toast.makeText(getApplicationContext(),
                                     getResources().getString(R.string.update_data_success), Toast.LENGTH_SHORT)
@@ -244,26 +222,25 @@ public class InviteOrgActivity extends ActionBarActivity implements View.OnClick
                                     .show();
                         }
                     }
+                }).start();
 
+            }
+
+            @Override
+            public void failure(RetrofitError error) {
+                System.out.println("error = [" + error + "]");
+                runOnUiThread(new Runnable() {
                     @Override
-                    public void failure(RetrofitError error) {
-                        System.out.println("error = [" + error + "]");
-                        runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                ringProgressDialog.dismiss();
-                            }
-                        });
-
-                        Toast.makeText(getApplicationContext(),
-                                getResources().getString(R.string.cant_connect_server), Toast.LENGTH_SHORT)
-                                .show();
+                    public void run() {
+                        ringProgressDialog.dismiss();
                     }
                 });
 
-                return null;
+                Toast.makeText(getApplicationContext(),
+                        getResources().getString(R.string.cant_connect_server), Toast.LENGTH_SHORT)
+                        .show();
             }
-        }.execute();
+        });
 
     }
 

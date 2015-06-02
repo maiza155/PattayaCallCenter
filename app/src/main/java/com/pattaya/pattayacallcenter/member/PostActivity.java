@@ -187,74 +187,61 @@ public class PostActivity extends ActionBarActivity implements View.OnClickListe
 
 
     void savePost() {
-        new AsyncTask<Void, Void, Boolean>() {
-            ProgressDialog ringProgressDialog;
-
+        final ProgressDialog ringProgressDialog = ProgressDialog.show(PostActivity.this, null, getResources().getString(R.string.please_wait), true);
+        ringProgressDialog.setCancelable(true);
+        restFulQuearyPost.savePost(savePostObject, new Callback<UpdateResult>() {
             @Override
-            protected void onPreExecute() {
-                super.onPreExecute();
-                ringProgressDialog = ProgressDialog.show(PostActivity.this, null, getResources().getString(R.string.please_wait), true);
-                ringProgressDialog.setCancelable(true);
+            public void success(UpdateResult updateResult, Response response) {
+                Toast.makeText(getApplication(),
+                        "success", Toast.LENGTH_SHORT)
+                        .show();
+                BusProvider.getInstance().post("post");
+                Activity activity = PostActivity.this;
+                if (activity != null) {
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            if (postId > 0) {
+                                Log.e("TAG", "Update Caassst");
+                                ArrayList<String> listOfStrings = new ArrayList<String>();
+                                if (savePostObject.getPostImageList() != null) {
+                                    listOfStrings.addAll(savePostObject.getPostImageList());
+                                }
+
+                                Intent intent = new Intent();
+                                intent.putExtra("detail", savePostObject.getDetail());
+                                intent.putExtra("postId", postId);
+                                intent.putStringArrayListExtra("image", listOfStrings);
+                                setResult(Activity.RESULT_OK, intent);
+                            }
+                            ringProgressDialog.dismiss();
+                            finish();
+                        }
+                    });
+
+
+                }
+
+
             }
 
             @Override
-            protected Boolean doInBackground(Void... params) {
-                restFulQuearyPost.savePost(savePostObject, new Callback<UpdateResult>() {
-                    @Override
-                    public void success(UpdateResult updateResult, Response response) {
-                        Toast.makeText(getApplication(),
-                                "success", Toast.LENGTH_SHORT)
-                                .show();
-                        BusProvider.getInstance().post("post");
-                        Activity activity = PostActivity.this;
-                        if (activity != null) {
-                            runOnUiThread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    if (postId > 0) {
-                                        Log.e("TAG", "Update Caassst");
-                                        ArrayList<String> listOfStrings = new ArrayList<String>();
-                                        if (savePostObject.getPostImageList() != null) {
-                                            listOfStrings.addAll(savePostObject.getPostImageList());
-                                        }
-
-                                        Intent intent = new Intent();
-                                        intent.putExtra("detail", savePostObject.getDetail());
-                                        intent.putExtra("postId", postId);
-                                        intent.putStringArrayListExtra("image", listOfStrings);
-                                        setResult(Activity.RESULT_OK, intent);
-                                    }
-                                    ringProgressDialog.dismiss();
-                                    finish();
-                                }
-                            });
-
-
+            public void failure(RetrofitError error) {
+                Activity activity = PostActivity.this;
+                if (activity != null) {
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            alertDialogFailtoServer();
+                            ringProgressDialog.dismiss();
                         }
+                    });
+
+                }
 
 
-                    }
-
-                    @Override
-                    public void failure(RetrofitError error) {
-                        Activity activity = PostActivity.this;
-                        if (activity != null) {
-                            runOnUiThread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    alertDialogFailtoServer();
-                                    ringProgressDialog.dismiss();
-                                }
-                            });
-
-                        }
-
-
-                    }
-                });
-                return null;
             }
-        }.execute();
+        });
 
 
     }

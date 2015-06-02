@@ -334,6 +334,7 @@ public class DatabaseChatHelper extends SQLiteOpenHelper {
      * Creating a todo
      */
     public long addLogs(Messages messages) {
+
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues values = new ContentValues();
 

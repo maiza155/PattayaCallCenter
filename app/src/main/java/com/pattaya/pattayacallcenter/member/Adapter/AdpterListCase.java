@@ -21,6 +21,7 @@ import com.pattaya.pattayacallcenter.member.CaseDetailMemberActivity;
 import com.pattaya.pattayacallcenter.webservice.object.casedata.CaseListMemberData;
 import com.readystatesoftware.viewbadger.BadgeView;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static com.pattaya.pattayacallcenter.R.drawable.asset_icon_status_flag;
@@ -56,6 +57,18 @@ public class AdpterListCase extends BaseAdapter {
         // this.data = caseListMemberDataList;
     }
 
+    public void addItemUpdate(ArrayList data) {
+        ArrayList tempList = new ArrayList();
+        tempList.addAll(data);
+        tempList.addAll(this.data);
+        this.data = tempList;
+        notifyDataSetChanged();
+//        for (PostObject e : this.data) {
+//           // mapPostId.put(e.getPostId(), listData.indexOf(e));
+//        }
+
+
+    }
 
     @Override
     public int getCount() {

@@ -68,10 +68,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
-import retrofit.Callback;
 import retrofit.RestAdapter;
-import retrofit.RetrofitError;
-import retrofit.client.Response;
 
 /**
  * Created by SWF on 2/17/2015.
@@ -169,7 +166,7 @@ public class XMPPManage implements MessageListener {
                     public void reconnectionSuccessful() {
                         Log.e("xmppadapter", "Successfully reconnected to the XMPP server. >>" + mConnection.isConnected());
                         Application.getContext().startService(new Intent(Application.getContext(), XMPPService.class));
-                        new TaskGetFriend(Application.getContext()).execute();
+                        new TaskGetFriend(Application.getContext());
                     }
 
                     @Override
@@ -440,7 +437,7 @@ public class XMPPManage implements MessageListener {
                     @Override
                     public void processPacket(Packet packet) throws SmackException.NotConnectedException {
 
-                        new TaskGetFriend(Application.getContext()).execute();
+                        new TaskGetFriend(Application.getContext());
                         Log.d("TAG SET >>>", "" + packet);
 
                     }
@@ -503,45 +500,39 @@ public class XMPPManage implements MessageListener {
 
                 } else {
                     // new TaskGetFriend(Application.getContext()).execute();
-                    openfireQueary.getUser(messages.getSender().split("@")[0], new Callback<User>() {
-                        @Override
-                        public void success(User user, Response response) {
-                            System.out.println("user = [" + user + "], response = [" + response + "]");
-                            System.out.println("   " + user.getName());
-                            messages.setSenderImage(user.getProperty().get("userImage"));
-                            messages.setSenderName(user.getName());
-                            databaseChatHelper.addLogs(messages);
-                            BusProvider.getInstance().post(messages);
-                            alert = spConfig.getBoolean(MasterData.SHARED_CONFIG_ALERT, true);
-                            if (!messages.getSender().equalsIgnoreCase(mConnection.getUser().split("/")[0])) {
-                                if (alert) {
+                    User user = openfireQueary.getUserInTask(messages.getSender().split("@")[0]);
+                    if (user != null) {
+
+                        System.out.println("user = [" + user + "]");
+                        System.out.println("   " + user.getName());
+                        messages.setSenderImage(user.getProperty().get("userImage"));
+                        messages.setSenderName(user.getName());
+                        databaseChatHelper.addLogs(messages);
+                        BusProvider.getInstance().post(messages);
+                        alert = spConfig.getBoolean(MasterData.SHARED_CONFIG_ALERT, true);
+                        if (!messages.getSender().equalsIgnoreCase(mConnection.getUser().split("/")[0])) {
+                            if (alert) {
                                     /*
                                     if (messages.getRoom().matches(messages.getSender())) {
                                         NotifyChat.setNotifyChat(user.getName(), user.getUsername() + "@pattaya-data", messages.getMessage());
                                     }*/
 
-                                    String checkCase = messages.getRoom().split("@")[0];
-                                    String[] room = checkCase.split("-");
-                                    System.out.println("in server " + checkCase);
+                                String checkCase = messages.getRoom().split("@")[0];
+                                String[] room = checkCase.split("-");
+                                System.out.println("in server " + checkCase);
 
-                                    if (room[0].matches("case") || room[0].matches("complaint")) {
-                                        NotifyCase.setNotifyChatCase(user.getName(), room[1], messages.getMessage());
-                                    } else {
-                                        NotifyChat.setNotifyChat(user.getName(), messages.getRoom(), messages.getMessage());
-                                    }
-
-
+                                if (room[0].matches("case") || room[0].matches("complaint")) {
+                                    NotifyCase.setNotifyChatCase(user.getName(), room[1], messages.getMessage());
+                                } else {
+                                    NotifyChat.setNotifyChat(user.getName(), messages.getRoom(), messages.getMessage());
                                 }
+
+
                             }
-
                         }
+                    }
 
-                        @Override
-                        public void failure(RetrofitError error) {
-                            System.out.println("error = [" + error + "]");
 
-                        }
-                    });
                 }
             }
         }.start();

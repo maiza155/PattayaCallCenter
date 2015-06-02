@@ -9,7 +9,6 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
@@ -373,103 +372,80 @@ public class CaseDetailMemberActivity extends ActionBarActivity {
     }
 
     void getTypeList() {
-        new AsyncTask<Void, Void, Boolean>() {
-            ProgressDialog ringProgressDialog;
+        final ProgressDialog ringProgressDialog = ProgressDialog.show(CaseDetailMemberActivity.this, null, getResources().getString(R.string.please_wait), true);
+        ringProgressDialog.setCancelable(true);
+        GetCaseListData getCaseListData = new GetCaseListData();
+        getCaseListData.setCasesId(caseId);
+        getCaseListData.setUserId(userId);
+        getCaseListData.setFilterType(2);
+        getCaseListData.setAccessToken(token);
+        getCaseListData.setClientId(clientId);
+        Gson gson = new Gson();
+        String json = gson.toJson(getCaseListData);
+        System.out.println(json);
 
+        adapterRest.getCaseList(getCaseListData, new Callback<Response>() {
             @Override
-            protected void onPreExecute() {
-                super.onPreExecute();
-                ringProgressDialog = ProgressDialog.show(CaseDetailMemberActivity.this, null, getResources().getString(R.string.please_wait), true);
-                ringProgressDialog.setCancelable(true);
+            public void success(Response result, Response response2) {
+                DatabaseChatHelper.init().clearCaseTable();
+                BufferedReader reader;
+                StringBuilder sb = new StringBuilder();
+                try {
+                    reader = new BufferedReader(new InputStreamReader(result.getBody().in()));
+                    String line;
+
+                    try {
+                        while ((line = reader.readLine()) != null) {
+                            sb.append(line);
+                        }
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                String JsonConvertData = "{data:" + sb.toString() + "}";
+                System.out.println(userId);
+                System.out.println(JsonConvertData);
+                CaseListMemberObject caseListObject = new Gson().fromJson(JsonConvertData, CaseListMemberObject.class);
+                if (!caseListObject.getData().isEmpty()) {
+                    String type = caseListObject.getData().get(0).getCasesType();
+                    String[] dataType = type.split(",");
+                    menu = new ArrayList<>();
+                    for (String e : dataType) {
+                        switch (e) {
+                            case "IsOper":
+                                menu.add(1);
+                                break;
+                            case "IsOwner":
+                                menu.add(2);
+                                break;
+                            case "IsNoti":
+                                menu.add(3);
+                                break;
+                            case "IsClose":
+                                menu.add(4);
+                                break;
+                        }
+
+                    }
+                }
+
+                adapterMenuCaseChat.resetAdapter(menu);
+                ringProgressDialog.dismiss();
+
+
             }
 
             @Override
-            protected Boolean doInBackground(Void... params) {
-                GetCaseListData getCaseListData = new GetCaseListData();
-                getCaseListData.setCasesId(caseId);
-                getCaseListData.setUserId(userId);
-                getCaseListData.setFilterType(2);
-                getCaseListData.setAccessToken(token);
-                getCaseListData.setClientId(clientId);
-                Gson gson = new Gson();
-                String json = gson.toJson(getCaseListData);
-                System.out.println(json);
+            public void failure(RetrofitError error) {
+                ringProgressDialog.dismiss();
+                Toast.makeText(getApplication(), "Unable connect server. Please try again", Toast.LENGTH_SHORT).show();
+                System.out.println("error = [" + error + "]");
 
-                adapterRest.getCaseList(getCaseListData, new Callback<Response>() {
-                    @Override
-                    public void success(Response result, Response response2) {
-                        DatabaseChatHelper.init().clearCaseTable();
-                        BufferedReader reader;
-                        StringBuilder sb = new StringBuilder();
-                        try {
-                            reader = new BufferedReader(new InputStreamReader(result.getBody().in()));
-                            String line;
-
-                            try {
-                                while ((line = reader.readLine()) != null) {
-                                    sb.append(line);
-                                }
-                            } catch (IOException e) {
-                                e.printStackTrace();
-                            }
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        }
-                        String JsonConvertData = "{data:" + sb.toString() + "}";
-                        System.out.println(userId);
-                        System.out.println(JsonConvertData);
-                        CaseListMemberObject caseListObject = new Gson().fromJson(JsonConvertData, CaseListMemberObject.class);
-                        if (!caseListObject.getData().isEmpty()) {
-                            String type = caseListObject.getData().get(0).getCasesType();
-                            String[] dataType = type.split(",");
-                            menu = new ArrayList<>();
-                            for (String e : dataType) {
-                                switch (e) {
-                                    case "IsOper":
-                                        menu.add(1);
-                                        break;
-                                    case "IsOwner":
-                                        menu.add(2);
-                                        break;
-                                    case "IsNoti":
-                                        menu.add(3);
-                                        break;
-                                    case "IsClose":
-                                        menu.add(4);
-                                        break;
-                                }
-
-                            }
-                        }
-
-                        runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                adapterMenuCaseChat.resetAdapter(menu);
-                                ringProgressDialog.dismiss();
-                            }
-                        });
-
-
-                    }
-
-                    @Override
-                    public void failure(RetrofitError error) {
-                        runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                ringProgressDialog.dismiss();
-                            }
-                        });
-
-                        Toast.makeText(getApplication(), "Unable connect server. Please try again", Toast.LENGTH_SHORT).show();
-                        System.out.println("error = [" + error + "]");
-
-                    }
-                });
-                return null;
             }
-        }.execute();
+        });
+
 
 
     }

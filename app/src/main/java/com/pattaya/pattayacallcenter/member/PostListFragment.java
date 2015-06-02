@@ -152,7 +152,6 @@ public class PostListFragment extends Fragment implements AbsListView.OnScrollLi
     }
 
     void loadPost() {
-
         final GetPostObject getPostObject = new GetPostObject();
         getPostObject.setPageNo(pagesLoader);
         int itemPerPage;
@@ -248,18 +247,22 @@ public class PostListFragment extends Fragment implements AbsListView.OnScrollLi
 
                         }
 
-                        getActivity().runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                progressBar.setVisibility(View.GONE);
-                                if (adapterListViewCaseResult.getCount() == 0) {
-                                    tv_empty.setVisibility(View.VISIBLE);
+                        Activity activity = getActivity();
+                        if (activity != null) {
+                            getActivity().runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    progressBar.setVisibility(View.GONE);
+                                    if (adapterListViewCaseResult.getCount() == 0) {
+                                        tv_empty.setVisibility(View.VISIBLE);
 
+                                    }
+                                    isFirst = false;
+                                    mSwipeRefreshLayout.setRefreshing(false);
                                 }
-                                isFirst = false;
-                                mSwipeRefreshLayout.setRefreshing(false);
-                            }
-                        });
+                            });
+                        }
+
 
 
                     }
@@ -267,20 +270,24 @@ public class PostListFragment extends Fragment implements AbsListView.OnScrollLi
                     @Override
                     public void failure(RetrofitError error) {
                         System.out.println("Post error = [" + error + "]");
-                        getActivity().runOnUiThread(new Runnable() {
+                        Activity activity = getActivity();
+                        if (activity != null) {
+                            getActivity().runOnUiThread(new Runnable() {
 
-                            @Override
-                            public void run() {
-                                if (adapterListViewCaseResult.getCount() == 0) {
-                                    tv_empty.setVisibility(View.VISIBLE);
+                                @Override
+                                public void run() {
+                                    if (adapterListViewCaseResult.getCount() == 0) {
+                                        tv_empty.setVisibility(View.VISIBLE);
 
+                                    }
+
+                                    progressBar.setVisibility(View.GONE);
+                                    isFirst = false;
+                                    mSwipeRefreshLayout.setRefreshing(false);
                                 }
+                            });
 
-                                progressBar.setVisibility(View.GONE);
-                                isFirst = false;
-                                mSwipeRefreshLayout.setRefreshing(false);
-                            }
-                        });
+                        }
 
 
                     }

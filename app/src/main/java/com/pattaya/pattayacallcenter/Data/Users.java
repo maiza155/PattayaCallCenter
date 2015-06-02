@@ -11,7 +11,16 @@ public class Users implements Parcelable {
     public static final int TYPE_GROUP = 1;
     public static final int TYPE_FRIEND = 0;
     public static final int TYPE_NOT_FRIEND = 5;
+    public static final int TYPE_INVITE_GROUP = 6;
+    public static final Parcelable.Creator CREATOR = new Parcelable.Creator() {
+        public Users createFromParcel(Parcel in) {
+            return new Users(in);
+        }
 
+        public Users[] newArray(int size) {
+            return new Users[size];
+        }
+    };
     String name;
     String jid;
     String pic;
@@ -19,7 +28,6 @@ public class Users implements Parcelable {
     String email;
     Boolean favorite = false;
     int type;
-
 
     public Users(String jid, String name, String pic, int type) {
         this.name = name;
@@ -128,14 +136,4 @@ public class Users implements Parcelable {
                 });
 
     }
-
-    public static final Parcelable.Creator CREATOR = new Parcelable.Creator() {
-        public Users createFromParcel(Parcel in) {
-            return new Users(in);
-        }
-
-        public Users[] newArray(int size) {
-            return new Users[size];
-        }
-    };
 }

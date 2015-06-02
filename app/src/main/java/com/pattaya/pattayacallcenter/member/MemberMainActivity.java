@@ -7,7 +7,6 @@ import android.os.Bundle;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBarActivity;
 import android.view.LayoutInflater;
-import android.view.View;
 import android.widget.ImageButton;
 import android.widget.TextView;
 
@@ -20,7 +19,7 @@ import com.pattaya.pattayacallcenter.member.Adapter.AdapterPager;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
-public class MemberMainActivity extends ActionBarActivity implements View.OnClickListener {
+public class MemberMainActivity extends ActionBarActivity {
 
 
     public static final String EXTRA_MESSAGE = "message";
@@ -57,85 +56,9 @@ public class MemberMainActivity extends ActionBarActivity implements View.OnClic
         viewPager = (ViewPager) findViewById(R.id.pager);
         viewPager.setAdapter(adapterPager);
         tabs.setViewPager(viewPager);
-        if (isOfficial) {
-            // startService(new Intent(this, XMPPServiceOfficial.class));
-        }
-//        if (checkPlayServices()) {
-//
-//            gcm = GoogleCloudMessaging.getInstance(this);
-//
-//
-//            if (regid == null) {
-//                registerInBackground();
-//            }
-//        } else {
-//            Log.i(TAG, "No valid Google Play Services APK found.");
-//        }
 
     }
 
 
-//    @Subscribe
-//    public void BusNetwork(NetworkObject networkObject) {
-//        Log.i(TAG, "Network is " + networkObject.getText());
-//        if (networkObject.isConect()) {
-//
-//        }
-//
-//    }
-
-    @Override
-    public void onClick(View v) {
-
-    }
-
-//    /**
-//     * Check the device to make sure it has the Google Play Services APK. If
-//     * it doesn't, display a dialog that allows users to download the APK from
-//     * the Google Play Store or enable it in the device's system settings.
-//     */
-//    private boolean checkPlayServices() {
-//        int resultCode = GooglePlayServicesUtil.isGooglePlayServicesAvailable(this);
-//        if (resultCode != ConnectionResult.SUCCESS) {
-//            if (GooglePlayServicesUtil.isUserRecoverableError(resultCode))
-//                GooglePlayServicesUtil.getErrorDialog(resultCode, this, PLAY_SERVICES_RESOLUTION_REQUEST).show();
-//            else {
-//                Log.i(TAG, "This device is not supported.");
-//
-//            }
-//            return false;
-//        }
-//        return true;
-//    }
-//
-//
-//    /**
-//     * Registers the application with GCM servers asynchronously.
-//     * <p/>
-//     * Stores the registration ID and app versionCode in the application's
-//     * shared preferences.
-//     */
-//    private void registerInBackground() {
-//        new AsyncTask() {
-//
-//            @Override
-//            protected Object doInBackground(Object[] params) {
-//                try {
-//                    if (gcm == null) {
-//                        gcm = GoogleCloudMessaging.getInstance(context);
-//                    }
-//
-//                    regid = gcm.register(SENDER_ID);
-//                } catch (IOException e) {
-//                    e.printStackTrace();
-//                }
-//                String msg = "Device registered, registration ID=" + regid;
-//                Log.e(TAG, msg);
-//                return null;
-//            }
-//        }.execute(null, null, null);
-//
-//    }
-//
 
 }

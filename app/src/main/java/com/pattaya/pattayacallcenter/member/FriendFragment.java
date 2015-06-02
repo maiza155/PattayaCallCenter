@@ -196,7 +196,7 @@ public class FriendFragment extends Fragment implements SwipeRefreshLayout.OnRef
             editor.putBoolean(MasterData.SHARED_CONFIG_IS_FIRST, false);
             editor.commit();
         }
-        new TaskGetFriend(getActivity()).execute();
+        new TaskGetFriend(getActivity());
 
 
     }
@@ -279,7 +279,7 @@ public class FriendFragment extends Fragment implements SwipeRefreshLayout.OnRef
     @Override
     public void onRefresh() {
         mSwipeRefreshLayout.setRefreshing(true);
-        new TaskGetFriend(getActivity()).execute();
+        new TaskGetFriend(getActivity());
     }
 
     @Override

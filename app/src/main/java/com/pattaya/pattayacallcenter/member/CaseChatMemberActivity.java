@@ -2,13 +2,10 @@ package com.pattaya.pattayacallcenter.member;
 
 import android.app.Activity;
 import android.app.ActivityManager;
-import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
@@ -17,7 +14,6 @@ import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.FrameLayout;
@@ -30,7 +26,6 @@ import android.widget.Toast;
 import com.github.ksoichiro.android.observablescrollview.ObservableListView;
 import com.github.ksoichiro.android.observablescrollview.ObservableScrollViewCallbacks;
 import com.github.ksoichiro.android.observablescrollview.ScrollState;
-import com.google.gson.Gson;
 import com.pattaya.pattayacallcenter.AdapterChat;
 import com.pattaya.pattayacallcenter.AdapterOfficial;
 import com.pattaya.pattayacallcenter.AdapterStricker;
@@ -54,16 +49,9 @@ import com.pattaya.pattayacallcenter.guest.CaseMapActivity;
 import com.pattaya.pattayacallcenter.member.Adapter.AdapterMenuCaseChat;
 import com.pattaya.pattayacallcenter.webservice.RestFulQueary;
 import com.pattaya.pattayacallcenter.webservice.WebserviceConnector;
-import com.pattaya.pattayacallcenter.webservice.object.UpdateResult;
-import com.pattaya.pattayacallcenter.webservice.object.casedata.CaseListMemberObject;
-import com.pattaya.pattayacallcenter.webservice.object.casedata.GetCaseListData;
-import com.pattaya.pattayacallcenter.webservice.object.casedata.GetComplainObject;
 import com.squareup.otto.Subscribe;
 
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.IOException;
-import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -274,40 +262,6 @@ public class CaseChatMemberActivity extends ActionBarActivity implements View.On
             System.out.println("name >>" + caseName);
             System.out.println("complainId >>" + complainId);
 
-//            String type = data.getString("type");
-//            if (isOfficial) {
-//                menu = new ArrayList<>();
-//                menu.add(5);
-//                adapterMenuCaseChat.resetAdapter(menu);
-//            } else {
-//                if (type != null) {
-//                    System.out.println("Type : " + type);
-//                    String[] dataType = type.split(",");
-//                    menu = new ArrayList<>();
-//                    for (String e : dataType) {
-//                        switch (e) {
-//                            case "IsOper":
-//                                menu.add(1);
-//                                break;
-//                            case "IsOwner":
-//                                menu.add(2);
-//                                break;
-//                            case "IsNoti":
-//                                menu.add(3);
-//                                break;
-//                            case "IsClose":
-//                                menu.add(4);
-//                                break;
-//                        }
-//
-//                    }
-//                    adapterMenuCaseChat.resetAdapter(menu);
-//                } else {
-//                    getTypeList();
-//                }
-//            }
-
-
         }
         SharedPreferences settings = Application.getContext().getSharedPreferences(MasterData.SHARED_CASE_COUNT, Context.MODE_PRIVATE);
         String caseStr = "id_" + complainId;
@@ -331,122 +285,7 @@ public class CaseChatMemberActivity extends ActionBarActivity implements View.On
         getSupportActionBar().setDisplayShowHomeEnabled(false);
     }
 
-//    void setClickCaseMenu() {
-//        adapterMenuCaseChat.SetOnItemClickListener(new AdapterMenuCaseChat.OnItemClickListener() {
-//            @Override
-//            public void onItemClick(int id) {
-//                Intent intent;
-//                switch (id) {
-//                    case 1:
-//                        intent = new Intent(getApplicationContext(), CaseDetailMemberActivity.class);
-//                        intent.putExtra("id", idCase);
-//                        startActivity(intent);
-//                        break;
-//                    case 2:
-//                        intent = new Intent(getApplicationContext(), CaseAddAndEditActivity.class);
-//                        intent.putExtra("id", idCase);
-//                        intent.putExtra("complainid", complainId);
-//                        startActivityForResult(intent, EDIT_ACTIVITY);
-//                        break;
-//                    case 3:
-//                        intent = new Intent(getApplicationContext(), CaseResultMemberActivity.class);
-//                        intent.putExtra("id", idCase);
-//                        intent.putExtra("complainid", complainId);
-//
-//                        startActivity(intent);
-//                        break;
-//                    case 4:
-//                        deleteCase();
-//                        break;
-//                    case 5:
-//                        intent = new Intent(getApplicationContext(), CaseForwardActivity.class);
-//                        intent.putExtra("id", idCase);
-//                        intent.putExtra("complainid", complainId);
-//                        intent.putExtra("casename", caseName);
-//                        startActivityForResult(intent, TAG_INTENT_FORWARD);
-//                        break;
-//                    case 6:
-//                        intent = new Intent(getApplicationContext(), CaseWorkDateActivity.class);
-//                        intent.putExtra("id", idCase);
-//                        startActivity(intent);
-//                        break;
-//                    case 7:
-//                        intent = new Intent(getApplicationContext(), CloseCaseActivity.class);
-//                        intent.putExtra("id", idCase);
-//                        intent.putExtra("complainid", complainId);
-//                        intent.putExtra("casename", caseName);
-//                        startActivityForResult(intent, TAG_INTENT_CLOSE);
-//                        break;
-//
-//
-//                }
-//                mSlideMenuManage.stateShowMenu(mSlideMenuManage.SETTING_MENU_HIDE);
-//            }
-//        });
-//    }
 
-
-    void deleteCase() {
-
-        AlertDialog.Builder alert = new AlertDialog.Builder(this);
-
-        alert.setTitle(getResources().getString(R.string.confirm_delete));
-        alert.setMessage(caseName);
-
-        alert.setNegativeButton(getResources().getString(R.string.cancel), new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int whichButton) {
-                dialog.cancel();
-            }
-        });
-
-        alert.setPositiveButton(getResources().getString(R.string.ok), new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int whichButton) {
-                GetComplainObject data = new GetComplainObject();
-                data.setAccessToken(token);
-                data.setClientId(clientId);
-                data.setPrimaryKeyId(idCase);
-                data.setUpdateBy(userId);
-                if (userId != 0) {
-                    final ProgressDialog ringProgressDialog = ProgressDialog.show(CaseChatMemberActivity.this, getResources().getString(R.string.load_data), getResources().getString(R.string.please_wait), true);
-                    ringProgressDialog.setCancelable(false);
-                    adapterRest.deleteCases(data, new Callback<UpdateResult>() {
-                        @Override
-                        public void success(UpdateResult updateResult, Response response) {
-                            System.out.println("updateResult = [" + updateResult.getResult() + "], response = [" + response + "]");
-                            ringProgressDialog.dismiss();
-                            if (updateResult.getResult()) {
-                                Toast.makeText(getApplication(),
-                                        "success", Toast.LENGTH_SHORT)
-                                        .show();
-                                BusProvider.getInstance().post("update_case_list");
-                                finish();
-                            } else {
-                                Toast.makeText(getApplication(),
-                                        "Please try again.", Toast.LENGTH_SHORT)
-                                        .show();
-                            }
-                        }
-
-                        @Override
-                        public void failure(RetrofitError error) {
-                            ringProgressDialog.dismiss();
-                            System.out.println("error = [" + error + "]");
-                            Toast.makeText(getApplication(),
-                                    "Please check your internet connection.", Toast.LENGTH_SHORT)
-                                    .show();
-                        }
-                    });
-                } else {
-                    finish();
-                }
-
-
-            }
-        });
-
-        AlertDialog alertDialog = alert.create();
-        alertDialog.show();
-    }
 
     @Subscribe
     public void onBusReciver(String event) {
@@ -512,81 +351,64 @@ public class CaseChatMemberActivity extends ActionBarActivity implements View.On
     }
 
     void setRoom() {
-        new AsyncTask<Void, Void, Boolean>() {
+        final String roomName = "case-" + complainId;
+        openfireQueary.getChatRoomDetail(roomName, new Callback<ChatRoom>() {
+            @Override
+            public void success(ChatRoom chatRoom, Response response) {
+                System.out.println("chatRoom = [" + chatRoom.getRoomName() + "], response = [" + response + "]");
+                roomIsCreated = true;
+                otherUser = new Users();
+                otherUser.setJid(chatRoom.getRoomName() + "@" + "conference.pattaya-data");
+                otherUser.setName(chatRoom.getRoomName());
+                otherUser.setType(Users.TYPE_GROUP);
+                initAdapter();
+
+            }
 
             @Override
-            protected Boolean doInBackground(Void... params) {
-                final String roomName = "case-" + complainId;
-                openfireQueary.getChatRoomDetail(roomName, new Callback<ChatRoom>() {
-                    @Override
-                    public void success(ChatRoom chatRoom, Response response) {
-                        System.out.println("chatRoom = [" + chatRoom.getRoomName() + "], response = [" + response + "]");
-                        roomIsCreated = true;
-                        otherUser = new Users();
-                        otherUser.setJid(chatRoom.getRoomName() + "@" + "conference.pattaya-data");
-                        otherUser.setName(chatRoom.getRoomName());
-                        otherUser.setType(Users.TYPE_GROUP);
-                        runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                initAdapter();
-                            }
-                        });
+            public void failure(RetrofitError error) {
+                if (error.getResponse() != null) {
+                    if (error.getResponse().getStatus() == 404) {
+                        final ChatRoomObject chatRoomObject = new ChatRoomObject();
+                        chatRoomObject.setRoomName(roomName);
+                        chatRoomObject.setNaturalName(roomName);
+                        chatRoomObject.setDescription(roomName);
 
+                        if (chatRoomObject != null) {
+                            //chatRoomObject.setDescription(img);
+                            openfireQuearyJson.createChatRoom(chatRoomObject, new Callback<Response>() {
+                                @Override
+                                public void success(Response response, Response response2) {
+                                    //System.out.println("response = [" + response + "], response2 = [" + response2 + "]");
 
-                    }
+                                    roomIsCreated = true;
+                                    otherUser = new Users();
+                                    otherUser.setJid(chatRoomObject.getRoomName() + "@" + "conference.pattaya-data");
+                                    otherUser.setName(chatRoomObject.getRoomName());
+                                    otherUser.setType(Users.TYPE_GROUP);
+                                    initAdapter();
 
-                    @Override
-                    public void failure(RetrofitError error) {
-                        if (error.getResponse() != null) {
-                            if (error.getResponse().getStatus() == 404) {
-                                final ChatRoomObject chatRoomObject = new ChatRoomObject();
-                                chatRoomObject.setRoomName(roomName);
-                                chatRoomObject.setNaturalName(roomName);
-                                chatRoomObject.setDescription(roomName);
-
-                                if (chatRoomObject != null) {
-                                    //chatRoomObject.setDescription(img);
-                                    openfireQuearyJson.createChatRoom(chatRoomObject, new Callback<Response>() {
-                                        @Override
-                                        public void success(Response response, Response response2) {
-                                            //System.out.println("response = [" + response + "], response2 = [" + response2 + "]");
-
-                                            roomIsCreated = true;
-                                            otherUser = new Users();
-                                            otherUser.setJid(chatRoomObject.getRoomName() + "@" + "conference.pattaya-data");
-                                            otherUser.setName(chatRoomObject.getRoomName());
-                                            otherUser.setType(Users.TYPE_GROUP);
-                                            runOnUiThread(new Runnable() {
-                                                @Override
-                                                public void run() {
-                                                    initAdapter();
-                                                }
-                                            });
-                                        }
-
-                                        @Override
-                                        public void failure(RetrofitError error) {
-                                            // System.out.println("error = [" + error + "]");
-                                        }
-                                    });
                                 }
 
-
-                            }
-
-                        } else {
-                            Toast.makeText(getApplication(),
-                                    "Please check your internet connection", Toast.LENGTH_SHORT)
-                                    .show();
+                                @Override
+                                public void failure(RetrofitError error) {
+                                    // System.out.println("error = [" + error + "]");
+                                }
+                            });
                         }
 
 
                     }
-                });
-                return null;
+
+                } else {
+                    Toast.makeText(getApplication(),
+                            "Please check your internet connection", Toast.LENGTH_SHORT)
+                            .show();
+                }
+
+
             }
-        }.execute();
+        });
 
     }
 
@@ -699,114 +521,13 @@ public class CaseChatMemberActivity extends ActionBarActivity implements View.On
 
     private void hideKeyboard() {
         // Check if no view has focus:
-        View view = this.getCurrentFocus();
-        if (view != null) {
-            InputMethodManager inputManager = (InputMethodManager) this.getSystemService(Context.INPUT_METHOD_SERVICE);
-            inputManager.hideSoftInputFromWindow(view.getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
-        }
+//        View view = this.getCurrentFocus();
+//        if (view != null) {
+//            InputMethodManager inputManager = (InputMethodManager) this.getSystemService(Context.INPUT_METHOD_SERVICE);
+//            inputManager.hideSoftInputFromWindow(view.getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
+//        }
     }
 
-
-    void getTypeList() {
-        new AsyncTask<Void, Void, Boolean>() {
-
-            @Override
-            protected void onPreExecute() {
-                super.onPreExecute();
-                ringProgressDialog = ProgressDialog.show(CaseChatMemberActivity.this, null, getResources().getString(R.string.please_wait), true);
-                ringProgressDialog.setCancelable(true);
-            }
-
-            @Override
-            protected Boolean doInBackground(Void... params) {
-                GetCaseListData getCaseListData = new GetCaseListData();
-                getCaseListData.setCasesId(idCase);
-                getCaseListData.setUserId(userId);
-                getCaseListData.setFilterType(2);
-                getCaseListData.setAccessToken(token);
-                getCaseListData.setClientId(clientId);
-                Gson gson = new Gson();
-                String json = gson.toJson(getCaseListData);
-                System.out.println(json);
-
-                adapterRest.getCaseList(getCaseListData, new Callback<Response>() {
-                    @Override
-                    public void success(Response result, Response response2) {
-                        DatabaseChatHelper.init().clearCaseTable();
-                        BufferedReader reader;
-                        StringBuilder sb = new StringBuilder();
-                        try {
-                            reader = new BufferedReader(new InputStreamReader(result.getBody().in()));
-                            String line;
-
-                            try {
-                                while ((line = reader.readLine()) != null) {
-                                    sb.append(line);
-                                }
-                            } catch (IOException e) {
-                                e.printStackTrace();
-                            }
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        }
-                        String JsonConvertData = "{data:" + sb.toString() + "}";
-                        System.out.println(userId);
-                        System.out.println(JsonConvertData);
-                        CaseListMemberObject caseListObject = new Gson().fromJson(JsonConvertData, CaseListMemberObject.class);
-                        if (!caseListObject.getData().isEmpty()) {
-                            String type = caseListObject.getData().get(0).getCasesType();
-                            String[] dataType = type.split(",");
-                            menu = new ArrayList<>();
-                            for (String e : dataType) {
-                                switch (e) {
-                                    case "IsOper":
-                                        menu.add(1);
-                                        break;
-                                    case "IsOwner":
-                                        menu.add(2);
-                                        break;
-                                    case "IsNoti":
-                                        menu.add(3);
-                                        break;
-                                    case "IsClose":
-                                        menu.add(4);
-                                        break;
-                                }
-
-                            }
-                        }
-
-                        runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                adapterMenuCaseChat.resetAdapter(menu);
-                                ringProgressDialog.dismiss();
-                            }
-                        });
-
-
-                    }
-
-                    @Override
-                    public void failure(RetrofitError error) {
-                        runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                ringProgressDialog.dismiss();
-                            }
-                        });
-
-                        Toast.makeText(getApplication(), "Unable connect server. Please try again", Toast.LENGTH_SHORT).show();
-                        System.out.println("error = [" + error + "]");
-
-                    }
-                });
-                return null;
-            }
-        }.execute();
-
-
-    }
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {

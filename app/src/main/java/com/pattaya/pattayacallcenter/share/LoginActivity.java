@@ -40,10 +40,6 @@ import com.pattaya.pattayacallcenter.chat.DatabaseChatHelper;
 import com.pattaya.pattayacallcenter.chat.XMPPService;
 import com.pattaya.pattayacallcenter.chat.restadatper.OpenfireQueary;
 import com.pattaya.pattayacallcenter.chat.restadatper.RestAdapterOpenFire;
-import com.pattaya.pattayacallcenter.chat.xmlobject.Chatroom.ChatRoom;
-import com.pattaya.pattayacallcenter.chat.xmlobject.Chatroom.ChatRooms;
-import com.pattaya.pattayacallcenter.chat.xmlobject.Chatroom.Member;
-import com.pattaya.pattayacallcenter.chat.xmlobject.Chatroom.Owners;
 import com.pattaya.pattayacallcenter.chat.xmlobject.Roster.Roster;
 import com.pattaya.pattayacallcenter.chat.xmlobject.Roster.RosterItem;
 import com.pattaya.pattayacallcenter.chat.xmlobject.User;
@@ -389,6 +385,7 @@ public class LoginActivity extends Activity {
                                     if (boolprofile[0] && boolprofile[1]) {
                                         seveFacebook(facebookData);
                                         ringProgressDialog.dismiss();
+                                        LoginManager.getInstance().logOut();
                                     }
 
                                     mProfileTracker.stopTracking();
@@ -416,11 +413,13 @@ public class LoginActivity extends Activity {
                                             if (boolprofile[0] && boolprofile[1]) {
                                                 seveFacebook(facebookData);
                                                 ringProgressDialog.dismiss();
+                                                LoginManager.getInstance().logOut();
                                             }
 
                                             // Log.d("Shreks Fragment onSuccess", "" + profile.getProfilePictureUri(100, 100));
                                         } catch (JSONException e) {
                                             e.printStackTrace();
+                                            LoginManager.getInstance().logOut();
                                         }
                                     }
                                 }
@@ -553,7 +552,7 @@ public class LoginActivity extends Activity {
         ringProgressDialog.setMessage("Download chat data");
         final Boolean[] bool = {false, false};
 
-
+        bool[1] = true;
         final String jid = userDataObject.getjId();
         //final String name = jid.split("@")[0];
         final RestAdapter restAdapterOpenFire = RestAdapterOpenFire.getInstance();
@@ -769,66 +768,66 @@ public class LoginActivity extends Activity {
         });
 
 
-        openfireQueary.getChatRoom(new Callback<ChatRooms>() {
-            @Override
-            public void success(ChatRooms chatRooms, retrofit.client.Response response) {
-                if (chatRooms.getChatRoom() != null) {
-                    final ArrayList<Users> arrUser = new ArrayList<>();
-                    for (ChatRoom e : chatRooms.getChatRoom()) {
-                        final String room = e.getRoomName() + "@conference.pattaya-data";
-                        for (Owners owners : e.getOwners()) {
-                            if (owners.getOwner().matches(jid)) {
-                                final Users mUser = new Users(room, e.getNaturalName(), null, Users.TYPE_GROUP);
-                                arrUser.add(mUser);
-                                DatabaseChatHelper.init().addUsers(mUser);
-                            }
-                        }
-                        if (e.getMembers().getListMember() != null) {
-                            for (Member member : e.getMembers().getListMember()) {
-                                //System.out.println(member.getText());
-                                if (member.getText().matches(jid)) {
-                                    final Users mUser = new Users(room, e.getNaturalName(), null, Users.TYPE_GROUP);
-                                    arrUser.add(mUser);
-                                    DatabaseChatHelper.init().addUsers(mUser);
-                                }
-
-                            }
-                        }
-
-                    }
-                }
-
-                System.out.println(bool[0] + "------------------" + bool[1]);
-                bool[1] = true;
-                if (bool[0] && bool[1]) {
-                    editor = sp.edit();
-                    editor.putInt("USER_ID", userDataObject.getUserId());
-                    editor.putString("USERNAME", userDataObject.getUsername());
-                    editor.putString("IMAGE", userDataObject.getUserImage());
-                    editor.putString("NAME", userDataObject.getDisplayName());
-                    editor.putString("ORGANIZE", userDataObject.getOrgId());
-                    editor.putString("USER_TYPE", userDataObject.getUserTypeEN());
-                    editor.putString("JID", userDataObject.getjId());
-                    editor.commit();
-
-                    editor = spConfig.edit();
-                    editor.putString("TOKEN", token);
-                    editor.putString("CLIENT_ID", "android");
-                    editor.putBoolean("IS_FIRST", true);
-                    editor.commit();
-                    showIntent(userDataObject.getUserTypeEN());
-                    ringProgressDialog.dismiss();
-                }
-            }
-
-            @Override
-            public void failure(RetrofitError error) {
-                System.out.println(error);
-                ringProgressDialog.dismiss();
-                alertDialogFailtoServer("Cannot connect to Server");
-            }
-
-        });
+//        openfireQueary.getChatRoom(new Callback<ChatRooms>() {
+//            @Override
+//            public void success(ChatRooms chatRooms, retrofit.client.Response response) {
+//                if (chatRooms.getChatRoom() != null) {
+//                    final ArrayList<Users> arrUser = new ArrayList<>();
+//                    for (ChatRoom e : chatRooms.getChatRoom()) {
+//                        final String room = e.getRoomName() + "@conference.pattaya-data";
+//                        for (Owners owners : e.getOwners()) {
+//                            if (owners.getOwner().matches(jid)) {
+//                                final Users mUser = new Users(room, e.getNaturalName(), null, Users.TYPE_GROUP);
+//                                arrUser.add(mUser);
+//                                DatabaseChatHelper.init().addUsers(mUser);
+//                            }
+//                        }
+//                        if (e.getMembers().getListMember() != null) {
+//                            for (Member member : e.getMembers().getListMember()) {
+//                                //System.out.println(member.getText());
+//                                if (member.getText().matches(jid)) {
+//                                    final Users mUser = new Users(room, e.getNaturalName(), null, Users.TYPE_GROUP);
+//                                    arrUser.add(mUser);
+//                                    DatabaseChatHelper.init().addUsers(mUser);
+//                                }
+//
+//                            }
+//                        }
+//
+//                    }
+//                }
+//
+//                System.out.println(bool[0] + "------------------" + bool[1]);
+//                bool[1] = true;
+//                if (bool[0] && bool[1]) {
+//                    editor = sp.edit();
+//                    editor.putInt("USER_ID", userDataObject.getUserId());
+//                    editor.putString("USERNAME", userDataObject.getUsername());
+//                    editor.putString("IMAGE", userDataObject.getUserImage());
+//                    editor.putString("NAME", userDataObject.getDisplayName());
+//                    editor.putString("ORGANIZE", userDataObject.getOrgId());
+//                    editor.putString("USER_TYPE", userDataObject.getUserTypeEN());
+//                    editor.putString("JID", userDataObject.getjId());
+//                    editor.commit();
+//
+//                    editor = spConfig.edit();
+//                    editor.putString("TOKEN", token);
+//                    editor.putString("CLIENT_ID", "android");
+//                    editor.putBoolean("IS_FIRST", true);
+//                    editor.commit();
+//                    showIntent(userDataObject.getUserTypeEN());
+//                    ringProgressDialog.dismiss();
+//                }
+//            }
+//
+//            @Override
+//            public void failure(RetrofitError error) {
+//                System.out.println(error);
+//                ringProgressDialog.dismiss();
+//                alertDialogFailtoServer("Cannot connect to Server");
+//            }
+//
+//        });
 
 
     }

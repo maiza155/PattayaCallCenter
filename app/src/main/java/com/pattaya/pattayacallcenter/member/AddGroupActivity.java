@@ -407,7 +407,6 @@ public class AddGroupActivity extends ActionBarActivity implements View.OnClickL
                         super.onPreExecute();
                         progressDialog = ProgressDialog.show(AddGroupActivity.this, null, getResources().getString(R.string.please_wait), true);
                         progressDialog.setCancelable(true);
-
                     }
 
                     @Override

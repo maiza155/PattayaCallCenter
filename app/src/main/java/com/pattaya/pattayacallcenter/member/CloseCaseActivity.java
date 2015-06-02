@@ -214,51 +214,61 @@ public class CloseCaseActivity extends ActionBarActivity implements View.OnClick
                     //get JidList for notify and Recreate chat room
                     adapterRest.getUserListJid(complainId, new Callback<Response>() {
                         @Override
-                        public void success(Response result, Response response2) {
-                            DatabaseChatHelper.init().clearCaseTable();
-                            BufferedReader reader;
-                            StringBuilder sb = new StringBuilder();
-                            try {
-                                reader = new BufferedReader(new InputStreamReader(result.getBody().in()));
-                                String line;
+                        public void success(final Response result, Response response2) {
+                            new Thread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    DatabaseChatHelper.init().clearCaseTable();
+                                    BufferedReader reader;
+                                    StringBuilder sb = new StringBuilder();
+                                    try {
+                                        reader = new BufferedReader(new InputStreamReader(result.getBody().in()));
+                                        String line;
 
-                                try {
-                                    while ((line = reader.readLine()) != null) {
-                                        sb.append(line);
+                                        try {
+                                            while ((line = reader.readLine()) != null) {
+                                                sb.append(line);
+                                            }
+                                        } catch (IOException e) {
+                                            e.printStackTrace();
+                                        }
+                                    } catch (IOException e) {
+                                        e.printStackTrace();
                                     }
-                                } catch (IOException e) {
-                                    e.printStackTrace();
+                                    String JsonConvertData = "{data:" + sb.toString() + "}";
+
+                                    CaseListJidObject listObject = new Gson().fromJson(JsonConvertData, CaseListJidObject.class);
+
+                                    Calendar c = Calendar.getInstance();
+                                    for (JidData e : listObject.getData()) {
+                                        PubsubObject pub = new PubsubObject();
+                                        pub.setUsername(e.getJid().split("@")[0]);
+                                        pub.setImage(displayImage);
+                                        pub.setAction("ปิดเคส");
+                                        pub.setDisplayData(c.getTime().toString());
+                                        pub.setPrimarykey(complainId);
+                                        pub.setName(displayName);
+                                        pub.setTitle(caseName);
+                                        if (!e.getJid().matches(jid)) {
+                                            XMPPManage.getInstance().new TaskSendNotify(pub).execute();
+                                        }
+
+
+                                    }
+                                    runOnUiThread(new Runnable() {
+                                        public void run() {
+                                            ringProgressDialog.dismiss();
+                                        }
+                                    });
+
+
+                                    BusProvider.getInstance().post("update_case_list");
+                                    Intent i = new Intent();
+                                    setResult(Activity.RESULT_OK, i);
+                                    finish();
                                 }
-                            } catch (IOException e) {
-                                e.printStackTrace();
-                            }
-                            String JsonConvertData = "{data:" + sb.toString() + "}";
+                            }).start();
 
-                            CaseListJidObject listObject = new Gson().fromJson(JsonConvertData, CaseListJidObject.class);
-
-                            Calendar c = Calendar.getInstance();
-                            for (JidData e : listObject.getData()) {
-                                PubsubObject pub = new PubsubObject();
-                                pub.setUsername(e.getJid().split("@")[0]);
-                                pub.setImage(displayImage);
-                                pub.setAction("ปิดเคส");
-                                pub.setDisplayData(c.getTime().toString());
-                                pub.setPrimarykey(complainId);
-                                pub.setName(displayName);
-                                pub.setTitle(caseName);
-                                if (!e.getJid().matches(jid)) {
-                                    XMPPManage.getInstance().new TaskSendNotify(pub).execute();
-                                }
-
-
-                            }
-
-                            ringProgressDialog.dismiss();
-                            BusProvider.getInstance().post("update_case_list");
-                            Intent i = new Intent();
-                            setResult(Activity.RESULT_OK, i);
-
-                            finish();
 
                         }
 

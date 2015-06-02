@@ -226,7 +226,8 @@ public class CreateGroupActivity extends ActionBarActivity implements View.OnCli
                 if (isUpdate) {
                     inviteUser.addAll(outcastlist);
                 }
-                //inviteUser.add(jid);
+                //inviteUser.add\
+                // `    .jid);
                 for (InviteFriendObject e : adapterListCreateGroup.getListData()) {
                     inviteUser.add(e.getJid());
                 }

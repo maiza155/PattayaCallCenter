@@ -764,145 +764,124 @@ public class CaseAddAndEditActivity extends ActionBarActivity implements View.On
         getComplainObject.setAccessToken(token);
         getComplainObject.setClientId(clientId);
         getComplainObject.setPrimaryKeyId(caseId);
-        new AsyncTask<Void, Void, Boolean>() {
+        adapterRest.getCaseData(getComplainObject, new Callback<CaseDataMemberObject>() {
+            @Override
+            public void success(final CaseDataMemberObject caseDataMemberObject, Response response) {
+                System.out.println("caseDataMemberObject = [" + caseDataMemberObject + "], response = [" + response + "]");
+                STATE_FORWARD = caseDataMemberObject.getTypeCaseAssign();
+
+                ////////////////////////////////////////////////////////////////////////////////////
+                if (caseDataMemberObject.getCaseAssignList() != null) {
+                    for (CaseAssignObject e : caseDataMemberObject.getCaseAssignList()) {
+                        ForwardObject object = new ForwardObject();
+                        if (STATE_FORWARD == 1) {
+                            object.setId(e.getOrganizeId());
+                            object.setImage(e.getUserImage());
+                            object.setName(e.getOrganizeName());
+                            arrayList.add(object);
+
+                        } else if (STATE_FORWARD == 2) {
+                            object.setId(e.getUserId());
+                            object.setImage(e.getUserImage());
+                            object.setName(e.getUserName());
+                            arrayList.add(object);
+                        }
+
+                    }
+
+                    //set text in AssignText
+                    setTextTO();
+                }
+                ////////////////////////////////////////////////////////////////////////////////////
+
+
+                ////////////////////////////////////////////////////////////////////////////////////
+                if (caseDataMemberObject.getContactInfo() != null) {
+                    dataPlace = caseDataMemberObject.getContactInfo();
+
+                    checkAnonymous.setChecked(dataPlace.getIsAnonymousString());
+
+                    //////////// Set Address /////////////
+                    String houseNumber = dataPlace.getHouseNumber();
+                    houseNumber = (houseNumber == null || houseNumber.isEmpty()) ? "" : houseNumber + " ";
+
+                    String village = dataPlace.getVillage();
+                    village = (village == null || village.isEmpty()) ? "" : village + " ";
+
+                    String soi = dataPlace.getSoi();
+                    soi = (soi == null || soi.isEmpty()) ? "" : soi + " ";
+
+                    String road = dataPlace.getRoad();
+                    road = (road == null || road.isEmpty()) ? "" : road + "\n";
+
+                    String more = dataPlace.getMoreInformation();
+                    more = (more == null || more.matches("")) ? "" : "(" + more + ")";
+
+
+                    String address = houseNumber + village + soi + road + more;
+                    if (address.matches("")) {
+                        address = "ไม่มีข้อมูล";
+                    }
+
+                    final String finalAddress = address;
+
+                    Activity activity = CaseAddAndEditActivity.this;
+                    if (activity != null) {
+                        txtDetail.setText(caseDataMemberObject.getCasesName());
+                        txtPlace.setText(finalAddress);
+                        txtName.setText(dataPlace.getNameContact());
+                        txtPhone.setText(dataPlace.getTelephone());
+                    }
+
+
+                    ////////////////////////Image View///////////////////////////
+                    listOldImageUrl = new ArrayList();
+                    if (dataPlace.getInfoImageList().size() > 0) {
+                        System.out.println("Have  data");
+                        //mGridAdapter.resetAdapter(caseMainObject.getContactInfo().getInfoImageList());
+                        listOldImageUrl = dataPlace.getInfoImageList();
+                        for (final ImageObject e : listOldImageUrl) {
+                            System.out.println("Have  data" + e.getInfoImage());
+
+
+                            if (activity != null) {
+                                mGridAdapter.addItemUpdate(e.getInfoImage());
+                            }
+
+
+                        }
+                    } else {
+                        System.out.println("no data");
+                    }
+                }
+
+                Activity activity = CaseAddAndEditActivity.this;
+                if (activity != null) {
+                    ringProgressDialog.dismiss();
+                }
+
+
+            }
 
             @Override
-            protected Boolean doInBackground(Void... params) {
-                adapterRest.getCaseData(getComplainObject, new Callback<CaseDataMemberObject>() {
+            public void failure(RetrofitError error) {
+                System.out.println("error = [" + error + "]");
+                runOnUiThread(new Runnable() {
                     @Override
-                    public void success(final CaseDataMemberObject caseDataMemberObject, Response response) {
-                        System.out.println("caseDataMemberObject = [" + caseDataMemberObject + "], response = [" + response + "]");
-                        STATE_FORWARD = caseDataMemberObject.getTypeCaseAssign();
-
-                        ////////////////////////////////////////////////////////////////////////////////////
-                        if (caseDataMemberObject.getCaseAssignList() != null) {
-                            for (CaseAssignObject e : caseDataMemberObject.getCaseAssignList()) {
-                                ForwardObject object = new ForwardObject();
-                                if (STATE_FORWARD == 1) {
-                                    object.setId(e.getOrganizeId());
-                                    object.setImage(e.getUserImage());
-                                    object.setName(e.getOrganizeName());
-                                    arrayList.add(object);
-
-                                } else if (STATE_FORWARD == 2) {
-                                    object.setId(e.getUserId());
-                                    object.setImage(e.getUserImage());
-                                    object.setName(e.getUserName());
-                                    arrayList.add(object);
-                                }
-
-                            }
-
-                            //set text in AssignText
-                            setTextTO();
+                    public void run() {
+                        Activity activity = CaseAddAndEditActivity.this;
+                        if (activity != null) {
+                            ringProgressDialog.dismiss();
                         }
-                        ////////////////////////////////////////////////////////////////////////////////////
 
-
-                        ////////////////////////////////////////////////////////////////////////////////////
-                        if (caseDataMemberObject.getContactInfo() != null) {
-                            dataPlace = caseDataMemberObject.getContactInfo();
-
-                            checkAnonymous.setChecked(dataPlace.getIsAnonymousString());
-
-                            //////////// Set Address /////////////
-                            String houseNumber = dataPlace.getHouseNumber();
-                            houseNumber = (houseNumber == null || houseNumber.isEmpty()) ? "" : houseNumber + " ";
-
-                            String village = dataPlace.getVillage();
-                            village = (village == null || village.isEmpty()) ? "" : village + " ";
-
-                            String soi = dataPlace.getSoi();
-                            soi = (soi == null || soi.isEmpty()) ? "" : soi + " ";
-
-                            String road = dataPlace.getRoad();
-                            road = (road == null || road.isEmpty()) ? "" : road + "\n";
-
-                            String more = dataPlace.getMoreInformation();
-                            more = (more == null || more.matches("")) ? "" : "(" + more + ")";
-
-
-                            String address = houseNumber + village + soi + road + more;
-                            if (address.matches("")) {
-                                address = "ไม่มีข้อมูล";
-                            }
-
-                            final String finalAddress = address;
-                            runOnUiThread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    Activity activity = CaseAddAndEditActivity.this;
-                                    if (activity != null) {
-                                        txtDetail.setText(caseDataMemberObject.getCasesName());
-                                        txtPlace.setText(finalAddress);
-                                        txtName.setText(dataPlace.getNameContact());
-                                        txtPhone.setText(dataPlace.getTelephone());
-                                    }
-
-                                }
-                            });
-
-
-                            ////////////////////////Image View///////////////////////////
-                            listOldImageUrl = new ArrayList();
-                            if (dataPlace.getInfoImageList().size() > 0) {
-                                System.out.println("Have  data");
-                                //mGridAdapter.resetAdapter(caseMainObject.getContactInfo().getInfoImageList());
-                                listOldImageUrl = dataPlace.getInfoImageList();
-                                for (final ImageObject e : listOldImageUrl) {
-                                    System.out.println("Have  data" + e.getInfoImage());
-                                    runOnUiThread(new Runnable() {
-                                        @Override
-                                        public void run() {
-                                            Activity activity = CaseAddAndEditActivity.this;
-                                            if (activity != null) {
-                                                mGridAdapter.addItemUpdate(e.getInfoImage());
-                                            }
-
-                                        }
-                                    });
-
-                                }
-                            } else {
-                                System.out.println("no data");
-                            }
-                        }
-                        runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                Activity activity = CaseAddAndEditActivity.this;
-                                if (activity != null) {
-
-                                }
-                                ringProgressDialog.dismiss();
-                            }
-                        });
-
-                    }
-
-                    @Override
-                    public void failure(RetrofitError error) {
-                        System.out.println("error = [" + error + "]");
-                        runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                Activity activity = CaseAddAndEditActivity.this;
-                                if (activity != null) {
-                                    ringProgressDialog.dismiss();
-                                }
-
-                            }
-                        });
-                        Toast.makeText(getApplication(),
-                                "Please check your internet connection.", Toast.LENGTH_SHORT)
-                                .show();
-                        finish();
                     }
                 });
-
-                return null;
+                Toast.makeText(getApplication(),
+                        "Please check your internet connection.", Toast.LENGTH_SHORT)
+                        .show();
+                finish();
             }
-        }.execute();
+        });
 
 
     }

@@ -105,6 +105,7 @@ public class CaseFragment extends Fragment implements View.OnClickListener
     View btn;
     TextView titleTextView;
     int pagesLoader = 1;
+    private ArrayList<Integer> arrComplaintId = new ArrayList<>();
     private SwipeRefreshLayout mSwipeRefreshLayout;
 
     public CaseFragment() {
@@ -204,7 +205,7 @@ public class CaseFragment extends Fragment implements View.OnClickListener
         Activity activity = getActivity();
         if (activity != null) {
             if (s.matches("update_case_list")) {
-                getCaseList("");
+                updateCaseList();
 
             } else if (s.matches("case_count")) {
                 if (adpterListCase != null) {
@@ -500,10 +501,11 @@ public class CaseFragment extends Fragment implements View.OnClickListener
                 if (dataList.size() == 0) {
                     System.out.println("first page");
                     dataList = new ArrayList<>();
+                    arrComplaintId = new ArrayList<>();
                     pagesLoader = 1;
                     itemPerPage = 10;
-                    //getCaseListData.setPageNo(pagesLoader);
-                    //getCaseListData.setItemPerPage(itemPerPage);
+                    getCaseListData.setPageNo(pagesLoader);
+                    getCaseListData.setItemPerPage(itemPerPage);
                 } else {
                     if ((dataList.size() % 5) == 0) {
                         System.out.println("sub page mod 5");
@@ -530,52 +532,67 @@ public class CaseFragment extends Fragment implements View.OnClickListener
                         pagesLoader = 2;
                         itemPerPage = dataList.size();
                     }
+                    Log.e("TAG", "Page " + pagesLoader + " item " + itemPerPage);
 
-                    //getCaseListData.setPageNo(pagesLoader);
-                    ///getCaseListData.setItemPerPage(itemPerPage);
+                    getCaseListData.setPageNo(pagesLoader);
+                    getCaseListData.setItemPerPage(itemPerPage);
                 }
 
 
                 adapterRest.getCaseList(getCaseListData, new Callback<Response>() {
                     @Override
-                    public void success(Response result, Response response2) {
-                        DatabaseChatHelper.init().clearCaseTable();
-                        BufferedReader reader;
-                        StringBuilder sb = new StringBuilder();
-                        try {
-                            reader = new BufferedReader(new InputStreamReader(result.getBody().in()));
-                            String line;
-                            while ((line = reader.readLine()) != null) {
-                                sb.append(line);
-                            }
-
-                        } catch (IOException e) {
-                            System.out.println("result = [" + result + "], response2 = [" + response2 + "]");
-                            e.printStackTrace();
-                        }
-                        String JsonConvertData = "{data:" + sb.toString() + "}";
-                        System.out.println(JsonConvertData);
-                        final CaseListMemberObject caseListObject = new Gson().fromJson(JsonConvertData, CaseListMemberObject.class);
-
-                        if (caseListObject.getData().size() > 0) {
-                            //pagesLoader++;
-                            if (getActivity() != null) {
-                                getActivity().runOnUiThread(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        Activity activity = getActivity();
-                                        if (activity != null) {
-                                            progressBar.setVisibility(View.GONE);
-                                            txtEmpty.setVisibility(View.VISIBLE);
-                                            adpterListCase.resetAdpter(caseListObject.getData());
-                                            mSwipeRefreshLayout.setRefreshing(false);
-                                        }
-
+                    public void success(final Response result, final Response response2) {
+                        new Thread(new Runnable() {
+                            @Override
+                            public void run() {
+                                DatabaseChatHelper.init().clearCaseTable();
+                                BufferedReader reader;
+                                StringBuilder sb = new StringBuilder();
+                                try {
+                                    reader = new BufferedReader(new InputStreamReader(result.getBody().in()));
+                                    String line;
+                                    while ((line = reader.readLine()) != null) {
+                                        sb.append(line);
                                     }
-                                });
-                            }
-                        }
 
+                                } catch (IOException e) {
+                                    System.out.println("result = [" + result + "], response2 = [" + response2 + "]");
+                                    e.printStackTrace();
+                                }
+                                String JsonConvertData = "{data:" + sb.toString() + "}";
+                                System.out.println(JsonConvertData);
+                                final CaseListMemberObject caseListObject = new Gson().fromJson(JsonConvertData, CaseListMemberObject.class);
+
+                                if (caseListObject.getData().size() > 0) {
+                                    pagesLoader++;
+                                    final ArrayList tempList = new ArrayList();
+                                    for (CaseListMemberData e : caseListObject.getData()) {
+                                        if (!arrComplaintId.contains(e.getComplaintId())) {
+                                            arrComplaintId.add(e.getComplaintId());
+                                            tempList.add(e);
+                                        }
+                                    }
+
+
+                                    if (getActivity() != null) {
+                                        getActivity().runOnUiThread(new Runnable() {
+                                            @Override
+                                            public void run() {
+                                                Activity activity = getActivity();
+                                                if (activity != null) {
+                                                    progressBar.setVisibility(View.GONE);
+                                                    txtEmpty.setVisibility(View.VISIBLE);
+                                                    adpterListCase.addItem(tempList);
+                                                    dataList = adpterListCase.getListData();
+                                                    mSwipeRefreshLayout.setRefreshing(false);
+                                                }
+
+                                            }
+                                        });
+                                    }
+                                }
+                            }
+                        }).start();
 
 
 
@@ -609,53 +626,282 @@ public class CaseFragment extends Fragment implements View.OnClickListener
 
     }
 
-    void getUserOfficialData() {
-        new AsyncTask<Void, Void, Void>() {
+    void getCaseListSearch(final String s) {
+        new AsyncTask<Void, Void, Boolean>() {
             @Override
-            protected Void doInBackground(Void... params) {
-                adapterRestUser.getUserOfficialData(userId, new Callback<OfficialObject>() {
+            protected void onPreExecute() {
+                super.onPreExecute();
+                txtEmpty.setVisibility(View.GONE);
+            }
+
+            @Override
+            protected Boolean doInBackground(Void... params) {
+                GetCaseListData getCaseListData = new GetCaseListData();
+                if (isOfficial) {
+                    getCaseListData.setFilterType(3);
+                } else {
+                    getCaseListData.setFilterType(2);
+                    getCaseListData.setUserId(userId);
+                }
+
+                getCaseListData.setAccessToken(token);
+                getCaseListData.setTextSearch(s);
+                int itemPerPage;
+                if (dataList.size() == 0) {
+                    System.out.println("first page");
+                    dataList = new ArrayList<>();
+                    arrComplaintId = new ArrayList<>();
+                    pagesLoader = 1;
+                    itemPerPage = 40;
+                    getCaseListData.setPageNo(pagesLoader);
+                    getCaseListData.setItemPerPage(itemPerPage);
+                } else {
+                    if ((dataList.size() % 5) == 0) {
+                        System.out.println("sub page mod 5");
+                        pagesLoader = (dataList.size() / 5) + 1;
+                        itemPerPage = 5;
+                    } else if ((dataList.size() % 6) == 0) {
+                        System.out.println("sub page mod 6");
+                        pagesLoader = (dataList.size() / 6) + 1;
+                        itemPerPage = 6;
+                    } else if ((dataList.size() % 7) == 0) {
+                        System.out.println("sub page mod 7");
+                        pagesLoader = (dataList.size() / 7) + 1;
+                        itemPerPage = 7;
+                    } else if ((dataList.size() % 8) == 0) {
+                        System.out.println("sub page mod 8");
+                        pagesLoader = (dataList.size() / 8) + 1;
+                        itemPerPage = 8;
+                    } else if ((dataList.size() % 9) == 0) {
+                        System.out.println("sub page mod 9");
+                        pagesLoader = (dataList.size() / 9) + 1;
+                        itemPerPage = 9;
+                    } else {
+                        System.out.println("sub page mod other");
+                        pagesLoader = 2;
+                        itemPerPage = dataList.size();
+                    }
+                    Log.e("TAG", "Page " + pagesLoader + " item " + itemPerPage);
+
+                    getCaseListData.setPageNo(pagesLoader);
+                    getCaseListData.setItemPerPage(itemPerPage);
+                }
+
+
+                adapterRest.getCaseList(getCaseListData, new Callback<Response>() {
                     @Override
-                    public void success(OfficialObject officialObject, Response response) {
-                        if (officialObject.getId() > 0 && listUsers.size() == 1) {
-                            listUsers.add(new DataPopUp(officialObject.getUserImage(), officialObject.getDisplayname()));
-                            System.out.println("officialObject = [" + officialObject + "], response = [" + response + "]");
+                    public void success(final Response result, final Response response2) {
+                        new Thread(new Runnable() {
+                            @Override
+                            public void run() {
+                                DatabaseChatHelper.init().clearCaseTable();
+                                BufferedReader reader;
+                                StringBuilder sb = new StringBuilder();
+                                try {
+                                    reader = new BufferedReader(new InputStreamReader(result.getBody().in()));
+                                    String line;
+                                    while ((line = reader.readLine()) != null) {
+                                        sb.append(line);
+                                    }
 
-                            getActivity().runOnUiThread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    ImageView rootView = (ImageView) btn;
-                                    if (rootView != null && isOfficial) {
-                                        Glide.with(getActivity())
-                                                .load(listUsers.get(1).getImage())
-                                                .error(R.drawable.com_facebook_profile_picture_blank_portrait)
-                                                .override(300, 300)
-                                                .fitCenter()
-                                                .into(rootView);
+                                } catch (IOException e) {
+                                    System.out.println("result = [" + result + "], response2 = [" + response2 + "]");
+                                    e.printStackTrace();
+                                }
+                                String JsonConvertData = "{data:" + sb.toString() + "}";
+                                System.out.println(JsonConvertData);
+                                final CaseListMemberObject caseListObject = new Gson().fromJson(JsonConvertData, CaseListMemberObject.class);
 
+                                if (caseListObject.getData().size() > 0) {
+                                    pagesLoader++;
+                                    final ArrayList tempList = new ArrayList();
+                                    for (CaseListMemberData e : caseListObject.getData()) {
+                                        if (!arrComplaintId.contains(e.getComplaintId())) {
+                                            arrComplaintId.add(e.getComplaintId());
+                                            tempList.add(e);
+                                        }
+                                    }
+
+
+                                    if (getActivity() != null) {
+                                        getActivity().runOnUiThread(new Runnable() {
+                                            @Override
+                                            public void run() {
+                                                Activity activity = getActivity();
+                                                if (activity != null) {
+                                                    progressBar.setVisibility(View.GONE);
+                                                    txtEmpty.setVisibility(View.VISIBLE);
+                                                    adpterListCase.addItem(tempList);
+                                                    dataList = adpterListCase.getListData();
+                                                    mSwipeRefreshLayout.setRefreshing(false);
+                                                }
+
+                                            }
+                                        });
                                     }
                                 }
-                            });
+                            }
+                        }).start();
 
-                        }
+
 
                     }
 
                     @Override
                     public void failure(RetrofitError error) {
                         System.out.println("error = [" + error + "]");
+                        getActivity().runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                Activity activity = getActivity();
+                                if (activity != null) {
+                                    progressBar.setVisibility(View.GONE);
+                                    if (adpterListCase.getCount() == 0) {
+                                        txtEmpty.setVisibility(View.VISIBLE);
+                                    }
+                                    mSwipeRefreshLayout.setRefreshing(false);
+                                }
+
+
+                            }
+                        });
+
                     }
                 });
+
                 return null;
             }
         }.execute();
 
     }
 
+    void updateCaseList() {
+        if (dataList.size() == 0) {
+            arrComplaintId = new ArrayList<>();
+        }
+        GetCaseListData getCaseListData = new GetCaseListData();
+        if (isOfficial) {
+            getCaseListData.setFilterType(3);
+        } else {
+            getCaseListData.setFilterType(2);
+            getCaseListData.setUserId(userId);
+        }
+
+        getCaseListData.setAccessToken(token);
+        getCaseListData.setPageNo(1);
+        getCaseListData.setItemPerPage(10);
+
+        adapterRest.getCaseList(getCaseListData, new Callback<Response>() {
+            @Override
+            public void success(Response result, Response response2) {
+                DatabaseChatHelper.init().clearCaseTable();
+                BufferedReader reader;
+                StringBuilder sb = new StringBuilder();
+                try {
+                    reader = new BufferedReader(new InputStreamReader(result.getBody().in()));
+                    String line;
+                    while ((line = reader.readLine()) != null) {
+                        sb.append(line);
+                    }
+
+                } catch (IOException e) {
+                    System.out.println("result = [" + result + "], response2 = [" + response2 + "]");
+                    e.printStackTrace();
+                }
+                String JsonConvertData = "{data:" + sb.toString() + "}";
+                System.out.println(JsonConvertData);
+                final CaseListMemberObject caseListObject = new Gson().fromJson(JsonConvertData, CaseListMemberObject.class);
+
+                if (caseListObject.getData().size() > 0) {
+                    pagesLoader++;
+                    final ArrayList tempList = new ArrayList();
+                    for (CaseListMemberData e : caseListObject.getData()) {
+                        if (!arrComplaintId.contains(e.getComplaintId())) {
+                            arrComplaintId.add(e.getComplaintId());
+                            tempList.add(e);
+                        }
+                    }
+
+                    if (getActivity() != null) {
+                        getActivity().runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                Activity activity = getActivity();
+                                if (activity != null) {
+                                    progressBar.setVisibility(View.GONE);
+                                    txtEmpty.setVisibility(View.VISIBLE);
+                                    adpterListCase.addItemUpdate(tempList);
+                                    dataList = adpterListCase.getListData();
+                                    mSwipeRefreshLayout.setRefreshing(false);
+                                }
+
+                            }
+                        });
+                    }
+                }
+
+
+            }
+
+            @Override
+            public void failure(RetrofitError error) {
+                System.out.println("error = [" + error + "]");
+                getActivity().runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        Activity activity = getActivity();
+                        if (activity != null) {
+                            progressBar.setVisibility(View.GONE);
+                            if (adpterListCase.getCount() == 0) {
+                                txtEmpty.setVisibility(View.VISIBLE);
+                            }
+                            mSwipeRefreshLayout.setRefreshing(false);
+                        }
+
+
+                    }
+                });
+
+            }
+        });
+    }
+
+    void getUserOfficialData() {
+        adapterRestUser.getUserOfficialData(userId, new Callback<OfficialObject>() {
+            @Override
+            public void success(OfficialObject officialObject, Response response) {
+                if (officialObject.getId() > 0 && listUsers.size() == 1) {
+                    listUsers.add(new DataPopUp(officialObject.getUserImage(), officialObject.getDisplayname()));
+                    System.out.println("officialObject = [" + officialObject + "], response = [" + response + "]");
+
+                    ImageView rootView = (ImageView) btn;
+                    if (rootView != null && isOfficial) {
+                        Glide.with(getActivity())
+                                .load(listUsers.get(1).getImage())
+                                .error(R.drawable.com_facebook_profile_picture_blank_portrait)
+                                .override(300, 300)
+                                .fitCenter()
+                                .into(rootView);
+
+                    }
+
+
+                }
+
+            }
+
+            @Override
+            public void failure(RetrofitError error) {
+                System.out.println("error = [" + error + "]");
+            }
+        });
+    }
+
 
     @Override
     public void onRefresh() {
         mSwipeRefreshLayout.setRefreshing(true);
-        getCaseList("");
+        updateCaseList();
     }
 
     @Override
@@ -672,6 +918,8 @@ public class CaseFragment extends Fragment implements View.OnClickListener
     public void afterTextChanged(Editable s) {
         mSwipeRefreshLayout.setRefreshing(true);
         String text = s.toString();
+        dataList = new ArrayList<>();
+        adpterListCase.resetAdpter(new ArrayList<CaseListMemberData>());
         getCaseList(text);
 
     }
@@ -713,7 +961,11 @@ public class CaseFragment extends Fragment implements View.OnClickListener
         if (list.getLastVisiblePosition() == list.getAdapter().getCount() - 1
                 && list.getChildAt(list.getChildCount() - 1).getBottom() <= list.getHeight()) {
             System.out.println("bottom in ListView ");
-            //getCaseList("");
+            if (!mSwipeRefreshLayout.isRefreshing()) {
+                getCaseList("");
+            }
+            mSwipeRefreshLayout.setRefreshing(true);
+
             return;
         }
     }

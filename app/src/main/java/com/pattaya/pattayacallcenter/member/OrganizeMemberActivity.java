@@ -4,7 +4,6 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.ActionBar;
@@ -120,111 +119,102 @@ public class OrganizeMemberActivity extends ActionBarActivity implements SwipeRe
             getOrgObject.setClientId(clientId);
             getOrgObject.setOrgId(orgId);
 
-            new AsyncTask<Void, Void, Boolean>() {
+            restqueary.getUserOrg(getOrgObject, new Callback<Response>() {
+                @Override
+                public void success(Response result, Response response) {
+                    listDataOrganizeMember = new ArrayList();
+
+                    //Try to get response body
+                    BufferedReader reader = null;
+                    StringBuilder sb = new StringBuilder();
+                    try {
+
+                        reader = new BufferedReader(new InputStreamReader(result.getBody().in()));
+
+                        String line;
+
+                        try {
+                            while ((line = reader.readLine()) != null) {
+                                sb.append(line);
+                            }
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+
+
+                    String JsonConvertData = "{data:" + sb.toString() + "}";
+                    System.out.println(JsonConvertData);
+                    OrgListData orgobject = new Gson().fromJson(JsonConvertData, OrgListData.class);
+                    listDataOrganizeMember = orgobject.getData();
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            Activity activity = OrganizeMemberActivity.this;
+                            if (activity != null) {
+                                adapterListViewOrganizeMember.resetAdapter(listDataOrganizeMember);
+                                mSwipeRefreshLayout.setRefreshing(false);
+                            }
+
+                        }
+                    });
+
+                }
 
                 @Override
-                protected Boolean doInBackground(Void... params) {
-                    restqueary.getUserOrg(getOrgObject, new Callback<Response>() {
+                public void failure(RetrofitError error) {
+                    runOnUiThread(new Runnable() {
                         @Override
-                        public void success(Response result, Response response) {
-                            listDataOrganizeMember = new ArrayList();
+                        public void run() {
+                            Activity activity = OrganizeMemberActivity.this;
+                            if (activity != null) {
 
-                            //Try to get response body
-                            BufferedReader reader = null;
-                            StringBuilder sb = new StringBuilder();
-                            try {
-
-                                reader = new BufferedReader(new InputStreamReader(result.getBody().in()));
-
-                                String line;
-
-                                try {
-                                    while ((line = reader.readLine()) != null) {
-                                        sb.append(line);
-                                    }
-                                } catch (IOException e) {
-                                    e.printStackTrace();
-                                }
-                            } catch (IOException e) {
-                                e.printStackTrace();
+                                mSwipeRefreshLayout.setRefreshing(false);
                             }
-
-
-                            String JsonConvertData = "{data:" + sb.toString() + "}";
-                            System.out.println(JsonConvertData);
-                            OrgListData orgobject = new Gson().fromJson(JsonConvertData, OrgListData.class);
-                            listDataOrganizeMember = orgobject.getData();
-                            runOnUiThread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    Activity activity = OrganizeMemberActivity.this;
-                                    if (activity != null) {
-                                        adapterListViewOrganizeMember.resetAdapter(listDataOrganizeMember);
-                                        mSwipeRefreshLayout.setRefreshing(false);
-                                    }
-
-                                }
-                            });
-
-                        }
-
-                        @Override
-                        public void failure(RetrofitError error) {
-                            runOnUiThread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    Activity activity = OrganizeMemberActivity.this;
-                                    if (activity != null) {
-
-                                        mSwipeRefreshLayout.setRefreshing(false);
-                                    }
-
-                                }
-                            });
-                        }
-                    });
-
-                    restqueary.getOrganizeData(getOrgObject, new Callback<OrgData>() {
-                        @Override
-                        public void success(final OrgData orgData, Response response) {
-                            System.out.println(orgId);
-                            if (orgData.getDisplayname() != null && !orgData.getDisplayname().isEmpty()) {
-                                runOnUiThread(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        Activity activity = OrganizeMemberActivity.this;
-                                        if (activity != null) {
-                                            titleTextView.setText(orgData.getDisplayname());
-                                            mSwipeRefreshLayout.setRefreshing(false);
-                                        }
-
-                                    }
-                                });
-
-                            }
-                        }
-
-                        @Override
-                        public void failure(RetrofitError error) {
-                            runOnUiThread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    Activity activity = OrganizeMemberActivity.this;
-                                    if (activity != null) {
-
-                                        mSwipeRefreshLayout.setRefreshing(false);
-                                    }
-
-                                }
-                            });
 
                         }
                     });
-
-
-                    return null;
                 }
-            }.execute();
+            });
+
+            restqueary.getOrganizeData(getOrgObject, new Callback<OrgData>() {
+                @Override
+                public void success(final OrgData orgData, Response response) {
+                    System.out.println(orgId);
+                    if (orgData.getDisplayname() != null && !orgData.getDisplayname().isEmpty()) {
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                Activity activity = OrganizeMemberActivity.this;
+                                if (activity != null) {
+                                    titleTextView.setText(orgData.getDisplayname());
+                                    mSwipeRefreshLayout.setRefreshing(false);
+                                }
+
+                            }
+                        });
+
+                    }
+                }
+
+                @Override
+                public void failure(RetrofitError error) {
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            Activity activity = OrganizeMemberActivity.this;
+                            if (activity != null) {
+
+                                mSwipeRefreshLayout.setRefreshing(false);
+                            }
+
+                        }
+                    });
+
+                }
+            });
 
 
         }

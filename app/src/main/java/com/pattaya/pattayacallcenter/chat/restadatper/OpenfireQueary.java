@@ -35,6 +35,8 @@ public interface OpenfireQueary {
     void getUser(@Path("id") String id, Callback<User> callback);
 
 
+
+
     @Headers("Authorization : hello")
     @GET("/users/{id}")
     User  getUserInTask(@Path("id") String id);
