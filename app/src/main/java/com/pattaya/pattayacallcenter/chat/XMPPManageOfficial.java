@@ -254,11 +254,11 @@ public class XMPPManageOfficial implements MessageListener {
                         } else if (e.getVariable().matches("title")) {
                             pubsubObject.setTitle(e.getValues().get(0));
                         } else if (e.getVariable().matches("displayDate")) {
-                            pubsubObject.setDisplayData(String.valueOf(System.currentTimeMillis()));
+                            pubsubObject.setDisplayDate(String.valueOf(System.currentTimeMillis()));
                         } else if (e.getVariable().matches("action")) {
                             pubsubObject.setAction(e.getValues().get(0));
                         } else if (e.getVariable().matches("primaryKey")) {
-                            pubsubObject.setPrimarykey(Integer.parseInt(e.getValues().get(0)));
+                            //pubsubObject.setPrimarykey(Integer.parseInt(e.getValues().get(0)));
                         } else if (e.getVariable().matches("caseId")) {
                             pubsubObject.setCaseId(Integer.parseInt(e.getValues().get(0)));
                         } else if (e.getVariable().matches("complainId")) {
@@ -751,126 +751,126 @@ public class XMPPManageOfficial implements MessageListener {
 
     }
 
-    public void sendMessageNotify(PubsubObject pubsubObject) {
-        Log.e("AG", "/////////////////////////////////////////////////////////");
-
-        final String image = (pubsubObject.getImage() == null) ? "" : pubsubObject.getImage();
-        final String name = (pubsubObject.getName() == null) ? "" : pubsubObject.getName();
-        final String title = (pubsubObject.getTitle() == null) ? "" : pubsubObject.getTitle();
-        final String displayData = (pubsubObject.getDisplayData() == null) ? "" : pubsubObject.getDisplayData();
-        final String action = (pubsubObject.getAction() == null) ? "" : pubsubObject.getAction();
-        final Integer primarykey = pubsubObject.getPrimarykey();
-        final Integer caseId = pubsubObject.getCaseId();
-        final Integer complainId = pubsubObject.getComplainId();
-
-
-        ConnectionConfiguration config = new ConnectionConfiguration(HOST, PORT, SERVICE);
-        config.setSecurityMode(ConnectionConfiguration.SecurityMode.disabled);
-        config.setDebuggerEnabled(true);
-        admin = new XMPPTCPConnection(config);
-        manager = new PubSubManager(admin);
-        final String username = pubsubObject.getUsername() + "_notify";
-
-        try {
-            if (isNetworkConnected()) {
-                admin.connect();
-                admin.login("admin", "p@ssw0rd", "Android");
-
-                Log.e("XMPPManage", "Admin Connection is SendMessage : " + admin.isConnected());
-                ConfigureForm form = new ConfigureForm(FormType.submit);
-                form.setAccessModel(AccessModel.open);
-                form.setDeliverPayloads(true);
-                form.setNotifyRetract(true);
-                form.setNotifyDelete(true);
-                form.setPublishModel(PublishModel.open);
-                manager = new PubSubManager(admin);
-                LeafNode myNode = manager.getNode(username);
-
-                DataForm dataForm = new DataForm("result");
-
-                ///////////////  ownerImage ////////////////////
-                FormField formImage = new FormField("ownerImage");
-                formImage.addValue(image);
-
-                dataForm.addField(formImage);
-
-                ///////////////  ownerName ////////////////////
-                FormField formName = new FormField("ownerName");
-                formName.addValue(name);
-
-                dataForm.addField(formName);
-
-                ///////////////  Title ////////////////////
-                FormField formTitle = new FormField("title");
-                formTitle.addValue(title);
-
-
-                dataForm.addField(formTitle);
-
-
-                ///////////////  Action ////////////////////
-                FormField formAction = new FormField("action");
-                formAction.addValue(action);
-
-                dataForm.addField(formAction);
-
-
-                ///////////////  primaryKey ////////////////////
-                FormField formKey = new FormField("primaryKey");
-                formKey.addValue(String.valueOf(primarykey));
-
-                dataForm.addField(formKey);
-
-                ///////////////  primaryKey ////////////////////
-                FormField formCaseKey = new FormField("caseId");
-                formCaseKey.addValue(String.valueOf(caseId));
-
-                dataForm.addField(formCaseKey);
-
-                ///////////////  primaryKey ////////////////////
-                FormField formComplainKey = new FormField("complainId");
-                formComplainKey.addValue(String.valueOf(complainId));
-
-                dataForm.addField(formComplainKey);
-
-
-                ///////////////  displayDate ////////////////////
-                FormField formDate = new FormField("displayDate");
-                formDate.addValue(String.valueOf(System.currentTimeMillis()));
-
-                dataForm.addField(formDate);
-
-                SimplePayload payload = new SimplePayload(
-                        "x",
-                        "pubsub:" + username + ":x",
-                        dataForm.toXML().toString());
-
-
-                PayloadItem<SimplePayload> item = new PayloadItem(
-                        null, payload);
-                myNode.send(item);
-                //System.out.println("///////////////////////////////////////////////////////");
-
-            } else {
-
-            }
-
-        } catch (SmackException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (XMPPException e) {
-            //subscribePubSub();
-            e.printStackTrace();
-        }
-
-        try {
-
-            admin.disconnect();
-        } catch (SmackException.NotConnectedException e) {
-            e.printStackTrace();
-        }
-    }
+//    public void sendMessageNotify(PubsubObject pubsubObject) {
+//        Log.e("AG", "/////////////////////////////////////////////////////////");
+//
+//        final String image = (pubsubObject.getImage() == null) ? "" : pubsubObject.getImage();
+//        final String name = (pubsubObject.getName() == null) ? "" : pubsubObject.getName();
+//        final String title = (pubsubObject.getTitle() == null) ? "" : pubsubObject.getTitle();
+//        final String displayData = (pubsubObject.getDisplayDate() == null) ? "" : pubsubObject.getDisplayDate();
+//        final String action = (pubsubObject.getAction() == null) ? "" : pubsubObject.getAction();
+//        //final Integer primarykey = pubsubObject.getPrimarykey();
+//        final Integer caseId = pubsubObject.getCaseId();
+//        final Integer complainId = pubsubObject.getComplainId();
+//
+//
+//        ConnectionConfiguration config = new ConnectionConfiguration(HOST, PORT, SERVICE);
+//        config.setSecurityMode(ConnectionConfiguration.SecurityMode.disabled);
+//        config.setDebuggerEnabled(true);
+//        admin = new XMPPTCPConnection(config);
+//        manager = new PubSubManager(admin);
+//       // final String username = pubsubObject.getUsername() + "_notify";
+//
+//        try {
+//            if (isNetworkConnected()) {
+//                admin.connect();
+//                admin.login("admin", "p@ssw0rd", "Android");
+//
+//                Log.e("XMPPManage", "Admin Connection is SendMessage : " + admin.isConnected());
+//                ConfigureForm form = new ConfigureForm(FormType.submit);
+//                form.setAccessModel(AccessModel.open);
+//                form.setDeliverPayloads(true);
+//                form.setNotifyRetract(true);
+//                form.setNotifyDelete(true);
+//                form.setPublishModel(PublishModel.open);
+//                manager = new PubSubManager(admin);
+//                LeafNode myNode = manager.getNode(username);
+//
+//                DataForm dataForm = new DataForm("result");
+//
+//                ///////////////  ownerImage ////////////////////
+//                FormField formImage = new FormField("ownerImage");
+//                formImage.addValue(image);
+//
+//                dataForm.addField(formImage);
+//
+//                ///////////////  ownerName ////////////////////
+//                FormField formName = new FormField("ownerName");
+//                formName.addValue(name);
+//
+//                dataForm.addField(formName);
+//
+//                ///////////////  Title ////////////////////
+//                FormField formTitle = new FormField("title");
+//                formTitle.addValue(title);
+//
+//
+//                dataForm.addField(formTitle);
+//
+//
+//                ///////////////  Action ////////////////////
+//                FormField formAction = new FormField("action");
+//                formAction.addValue(action);
+//
+//                dataForm.addField(formAction);
+//
+//
+//                ///////////////  primaryKey ////////////////////
+//                FormField formKey = new FormField("primaryKey");
+//                formKey.addValue(String.valueOf(primarykey));
+//
+//                dataForm.addField(formKey);
+//
+//                ///////////////  primaryKey ////////////////////
+//                FormField formCaseKey = new FormField("caseId");
+//                formCaseKey.addValue(String.valueOf(caseId));
+//
+//                dataForm.addField(formCaseKey);
+//
+//                ///////////////  primaryKey ////////////////////
+//                FormField formComplainKey = new FormField("complainId");
+//                formComplainKey.addValue(String.valueOf(complainId));
+//
+//                dataForm.addField(formComplainKey);
+//
+//
+//                ///////////////  displayDate ////////////////////
+//                FormField formDate = new FormField("displayDate");
+//                formDate.addValue(String.valueOf(System.currentTimeMillis()));
+//
+//                dataForm.addField(formDate);
+//
+//                SimplePayload payload = new SimplePayload(
+//                        "x",
+//                        "pubsub:" + username + ":x",
+//                        dataForm.toXML().toString());
+//
+//
+//                PayloadItem<SimplePayload> item = new PayloadItem(
+//                        null, payload);
+//                myNode.send(item);
+//                //System.out.println("///////////////////////////////////////////////////////");
+//
+//            } else {
+//
+//            }
+//
+//        } catch (SmackException e) {
+//            e.printStackTrace();
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        } catch (XMPPException e) {
+//            //subscribePubSub();
+//            e.printStackTrace();
+//        }
+//
+//        try {
+//
+//            admin.disconnect();
+//        } catch (SmackException.NotConnectedException e) {
+//            e.printStackTrace();
+//        }
+//    }
 
     public class TaskJoin extends AsyncTask<Void, Void, Boolean> {
         String room;

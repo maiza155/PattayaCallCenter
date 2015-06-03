@@ -329,7 +329,7 @@ public class CaseForwardActivity extends ActionBarActivity implements View.OnCli
                                     pub.setUsername(e.getJid().split("@")[0]);
                                     pub.setImage(displayImage);
                                     pub.setAction("อัพเดทเคส");
-                                    pub.setDisplayData(c.getTime().toString());
+                                    pub.setDisplayDate(c.getTime().toString());
                                     // pub.setPrimarykey(complainId);
                                     pub.setComplainId(complainId);
                                     pub.setCaseId(caseId);

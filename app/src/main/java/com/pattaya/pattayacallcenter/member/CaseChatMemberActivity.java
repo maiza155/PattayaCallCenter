@@ -14,6 +14,7 @@ import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.FrameLayout;
@@ -183,6 +184,7 @@ public class CaseChatMemberActivity extends ActionBarActivity implements View.On
         btnSticker.setOnClickListener(this);
 
         btn.setOnClickListener(this);
+
         dataChat = new ArrayList();
         setRoom();
         initSticker();
@@ -459,14 +461,18 @@ public class CaseChatMemberActivity extends ActionBarActivity implements View.On
         if (v == btnCamera) {
             cameraMange.captureImage();
             // mSlideMenuManage.stateShowMenu( mSlideMenuManageImage .SETTING_MENU_HIDE);
+            hideKeyboard();
+
 
         } else if (v == btnImage) {
             Intent intent = new Intent(this, CustomGalleryActivity.class);
             startActivityForResult(intent, MasterData.PICK_IMAGE_MULTIPLE);
+            hideKeyboard();
             // mSlideMenuManage.stateShowMenu( mSlideMenuManageImage .SETTING_MENU_HIDE);
         } else if (v == btnAdd) {
             mSlideMenuManageImage.eventShow();
             mSlideMenuManageSticker.stateShowMenu(mSlideMenuManageImage.SETTING_MENU_HIDE);
+            hideKeyboard();
 
         } else if (v == btnSticker) {
             mSlideMenuManageImage.stateShowMenu(mSlideMenuManageImage.SETTING_MENU_HIDE);
@@ -475,16 +481,19 @@ public class CaseChatMemberActivity extends ActionBarActivity implements View.On
                 txtempty.setVisibility(View.GONE);
                 btnUpdateStricker.setVisibility(View.VISIBLE);
                 progressBar.setVisibility(View.GONE);
+                hideKeyboard();
             }
         } else if (v == btnPlace) {
             Intent intent = new Intent(this, CaseMapActivity.class);
             startActivityForResult(intent, TAG_INTENT_PLACE);
+            hideKeyboard();
         } else if (v == btnUpdateStricker) {
 
             startService(new Intent(this, StrickLoaderService.class));
             txtempty.setVisibility(View.GONE);
             btnUpdateStricker.setVisibility(View.GONE);
             progressBar.setVisibility(View.VISIBLE);
+            hideKeyboard();
         } else if (v == btn) {
             finish();
         } else if (v == btnCommit) {
@@ -497,14 +506,13 @@ public class CaseChatMemberActivity extends ActionBarActivity implements View.On
                     }
                     // setListViewInBtm();
                 }
-                hideKeyboard();
+                // hideKeyboard();
                 txtMsg.setText(null);
             }
 
 
         }
 
-        hideKeyboard();
 
     }
 
@@ -520,12 +528,13 @@ public class CaseChatMemberActivity extends ActionBarActivity implements View.On
 
 
     private void hideKeyboard() {
+
         // Check if no view has focus:
-//        View view = this.getCurrentFocus();
-//        if (view != null) {
-//            InputMethodManager inputManager = (InputMethodManager) this.getSystemService(Context.INPUT_METHOD_SERVICE);
-//            inputManager.hideSoftInputFromWindow(view.getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
-//        }
+        View view = this.getCurrentFocus();
+        if (view != null) {
+            InputMethodManager inputManager = (InputMethodManager) this.getSystemService(Context.INPUT_METHOD_SERVICE);
+            inputManager.hideSoftInputFromWindow(view.getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
+        }
     }
 
 

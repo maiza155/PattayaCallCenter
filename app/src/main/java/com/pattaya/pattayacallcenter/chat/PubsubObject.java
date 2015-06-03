@@ -4,41 +4,38 @@ package com.pattaya.pattayacallcenter.chat;
  * Created by SWF on 5/7/2015.
  */
 public class PubsubObject {
-    String image;
-    String name;
+    String ownerImage;
     String title;
-    String displayData;
+    String displayDate;
     String action;
-    int primarykey;
     int caseId;
     int complainId;
-
-    String username;
-
+    String ownerName;
+    String to;
 
 
     public String getUsername() {
-        return username;
+        return to;
     }
 
-    public void setUsername(String username) {
-        this.username = username;
+    public void setUsername(String to) {
+        this.to = to;
     }
 
     public String getImage() {
-        return image;
+        return ownerImage;
     }
 
     public void setImage(String image) {
-        this.image = image;
+        this.ownerImage = image;
     }
 
     public String getName() {
-        return name;
+        return ownerName;
     }
 
     public void setName(String name) {
-        this.name = name;
+        this.ownerName = name;
     }
 
     public String getTitle() {
@@ -49,12 +46,12 @@ public class PubsubObject {
         this.title = title;
     }
 
-    public String getDisplayData() {
-        return displayData;
+    public String getDisplayDate() {
+        return displayDate;
     }
 
-    public void setDisplayData(String displayData) {
-        this.displayData = displayData;
+    public void setDisplayDate(String displayDate) {
+        this.displayDate = displayDate;
     }
 
     public String getAction() {
@@ -65,13 +62,7 @@ public class PubsubObject {
         this.action = action;
     }
 
-    public int getPrimarykey() {
-        return primarykey;
-    }
 
-    public void setPrimarykey(int primarykey) {
-        this.primarykey = primarykey;
-    }
 
     public int getComplainId() {
         return complainId;

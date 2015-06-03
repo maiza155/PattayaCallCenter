@@ -11,6 +11,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
+import android.util.Log;
 import android.view.ContextMenu;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -245,11 +246,14 @@ public class CloseCaseActivity extends ActionBarActivity implements View.OnClick
                                         pub.setUsername(e.getJid().split("@")[0]);
                                         pub.setImage(displayImage);
                                         pub.setAction("ปิดเคส");
-                                        pub.setDisplayData(c.getTime().toString());
-                                        pub.setPrimarykey(complainId);
+                                        pub.setDisplayDate(c.getTime().toString());
+                                        // pub.setPrimarykey(complainId);
+                                        pub.setComplainId(complainId);
+                                        pub.setCaseId(caseId);
                                         pub.setName(displayName);
                                         pub.setTitle(caseName);
                                         if (!e.getJid().matches(jid)) {
+                                            Log.e("TAG", ">>>>" + pub.getUsername());
                                             XMPPManage.getInstance().new TaskSendNotify(pub).execute();
                                         }
 

@@ -69,6 +69,7 @@ public class CaseFragment extends Fragment implements View.OnClickListener
         , TextWatcher {
 
 
+    public static int ACTIVITY_DETAIL = 607;
     static CaseFragment fragment;
     int ACTIVITY_SEARCH = 605;
     View mSlideMenuImage;
@@ -438,7 +439,6 @@ public class CaseFragment extends Fragment implements View.OnClickListener
                                 if (activity != null) {
                                     progressBar.setVisibility(View.GONE);
                                     txtEmpty.setVisibility(View.VISIBLE);
-
                                     adpterListCase.resetAdpter(dataList);
                                     mSwipeRefreshLayout.setRefreshing(false);
                                 }
@@ -595,27 +595,19 @@ public class CaseFragment extends Fragment implements View.OnClickListener
                         }).start();
 
 
-
                     }
 
                     @Override
                     public void failure(RetrofitError error) {
                         System.out.println("error = [" + error + "]");
-                        getActivity().runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                Activity activity = getActivity();
-                                if (activity != null) {
-                                    progressBar.setVisibility(View.GONE);
-                                    if (adpterListCase.getCount() == 0) {
-                                        txtEmpty.setVisibility(View.VISIBLE);
-                                    }
-                                    mSwipeRefreshLayout.setRefreshing(false);
-                                }
-
-
+                        Activity activity = getActivity();
+                        if (activity != null) {
+                            progressBar.setVisibility(View.GONE);
+                            if (adpterListCase.getCount() == 0) {
+                                txtEmpty.setVisibility(View.VISIBLE);
                             }
-                        });
+                            mSwipeRefreshLayout.setRefreshing(false);
+                        }
 
                     }
                 });
@@ -742,7 +734,6 @@ public class CaseFragment extends Fragment implements View.OnClickListener
                                 }
                             }
                         }).start();
-
 
 
                     }
@@ -924,6 +915,10 @@ public class CaseFragment extends Fragment implements View.OnClickListener
 
     }
 
+    public void startCommentActivity(Intent i) {
+        startActivityForResult(i, ACTIVITY_DETAIL);
+    }
+
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -938,6 +933,18 @@ public class CaseFragment extends Fragment implements View.OnClickListener
                 getCaseListAdvanceSearch(text, action, completed);
 
             }
+
+        }
+        if (requestCode == ACTIVITY_DETAIL) {
+            if (resultCode == Activity.RESULT_OK) {
+                String detail = data.getStringExtra("detail");
+                int complainId = data.getIntExtra("complainId", 0);
+                adpterListCase.updateItem(complainId, detail);
+                Log.e("TAG", "detail >>" + detail + "    name " + detail);
+
+
+            }
+
 
         }
     }

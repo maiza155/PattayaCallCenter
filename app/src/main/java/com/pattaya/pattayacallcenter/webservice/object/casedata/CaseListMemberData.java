@@ -32,6 +32,10 @@ public class CaseListMemberData {
         return caseName;
     }
 
+    public void setCaseName(String caseName) {
+        this.caseName = caseName;
+    }
+
     public int getCasesId() {
         return casesId;
     }

@@ -306,18 +306,24 @@ public class CaseListActivity extends ActionBarActivity implements View.OnClickL
             startActivity(intent);
             mSliderMange.stateShowMenu(mSliderMange.SETTING_MENU_HIDE);
         } else if (btnExit == v) {
-            XMPPManage.getInstance().disConnect();
-            editor = sp.edit();
-            editor.putString("TOKEN", null);
-            editor.commit();
-            CaseListActivity.this.stopService(new Intent(CaseListActivity.this, XMPPService.class));
+            ringProgressDialog = ProgressDialog.show(this, null, getResources().getString(R.string.please_wait), true);
+            try {
+                XMPPManage.getInstance().disConnect();
+                editor = sp.edit();
+                editor.putString("TOKEN", null);
+                editor.commit();
+                CaseListActivity.this.stopService(new Intent(CaseListActivity.this, XMPPService.class));
+                LoginManager.getInstance().logOut();
+                Intent intent = new Intent(this, LoginActivity.class);
+                startActivity(intent);
+                LoginManager.getInstance().logOut();
+                ringProgressDialog.dismiss();
+                finish();
+            } catch (Exception e) {
+                e.printStackTrace();
+                ringProgressDialog.dismiss();
+            }
 
-            LoginManager.getInstance().logOut();
-
-            Intent intent = new Intent(this, LoginActivity.class);
-            startActivity(intent);
-            LoginManager.getInstance().logOut();
-            finish();
         } else if (btnAlert == v) {
             intent = new Intent(getApplicationContext(), AlertSettingActivity.class);
             startActivity(intent);

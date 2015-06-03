@@ -61,15 +61,9 @@ public class XMPPService extends IntentService {
 
                     } else {
                         Log.e("XMPPSerVICE", "Break .. .. ... .. ." + jid);
-                        Log.e("XMPPSerVICE", "Break .. .. ... .. ." + xmppManage.getmConnection().isConnected());
-                        Log.e("XMPPSerVICE", "Break .. .. ... .. ." + jid);
-                        Log.e("XMPPSerVICE", "Break .. .. ... .. ." + xmppManage.getmConnection().isConnected());
-                        Log.e("XMPPSerVICE", "Break .. .. ... .. ." + jid);
-                        xmppManage.createPubSub();
+                        //xmppManage.createPubSub();
                         ChatRooms chatRooms = openfireQueary.getChatRoomInThread();
                         Log.e("XMPPSerVICE", "ChatRoom .. .. ... .. ." + chatRooms);
-
-
                         if (chatRooms != null) {
                             if (chatRooms.getChatRoom() != null) {
                                 for (ChatRoom e : chatRooms.getChatRoom()) {

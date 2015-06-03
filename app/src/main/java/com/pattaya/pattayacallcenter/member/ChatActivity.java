@@ -286,16 +286,27 @@ public class ChatActivity extends ActionBarActivity implements View.OnClickListe
             cameraMange.captureImage();
             mSlideMenuManageImage.stateShowMenu(mSlideMenuManageImage.SETTING_MENU_HIDE);
 
+            InputMethodManager inputManager = (InputMethodManager)
+                    getSystemService(Context.INPUT_METHOD_SERVICE);
+            inputManager.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(),
+                    InputMethodManager.HIDE_NOT_ALWAYS);
+
         } else if (v == btnImage) {
             Intent intent = new Intent(this, CustomGalleryActivity.class);
             startActivityForResult(intent, PICK_IMAGE_MULTIPLE);
             mSlideMenuManageImage.stateShowMenu(mSlideMenuManageImage.SETTING_MENU_HIDE);
 
-
+            InputMethodManager inputManager = (InputMethodManager)
+                    getSystemService(Context.INPUT_METHOD_SERVICE);
+            inputManager.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(),
+                    InputMethodManager.HIDE_NOT_ALWAYS);
         } else if (v == btnAdd) {
             mSlideMenuManageImage.eventShow();
             mSlideMenuManageSticker.stateShowMenu(mSlideMenuManageSticker.SETTING_MENU_HIDE);
-
+            InputMethodManager inputManager = (InputMethodManager)
+                    getSystemService(Context.INPUT_METHOD_SERVICE);
+            inputManager.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(),
+                    InputMethodManager.HIDE_NOT_ALWAYS);
 
         } else if (v == btnSticker) {
             mSlideMenuManageImage.stateShowMenu(mSlideMenuManageImage.SETTING_MENU_HIDE);
@@ -305,11 +316,19 @@ public class ChatActivity extends ActionBarActivity implements View.OnClickListe
                 btnUpdateStricker.setVisibility(View.VISIBLE);
                 progressBar.setVisibility(View.GONE);
             }
+            InputMethodManager inputManager = (InputMethodManager)
+                    getSystemService(Context.INPUT_METHOD_SERVICE);
+            inputManager.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(),
+                    InputMethodManager.HIDE_NOT_ALWAYS);
 
         } else if (v == btnPlace) {
             mSlideMenuManageImage.stateShowMenu(mSlideMenuManageImage.SETTING_MENU_HIDE);
             Intent intent = new Intent(this, CaseMapActivity.class);
             startActivityForResult(intent, TAG_INTENT_PLACE);
+            InputMethodManager inputManager = (InputMethodManager)
+                    getSystemService(Context.INPUT_METHOD_SERVICE);
+            inputManager.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(),
+                    InputMethodManager.HIDE_NOT_ALWAYS);
 
         } else if (v == btnCommit) {
             if (!txtMsg.getText().toString().matches("")) {
@@ -323,12 +342,11 @@ public class ChatActivity extends ActionBarActivity implements View.OnClickListe
             txtempty.setVisibility(View.GONE);
             btnUpdateStricker.setVisibility(View.GONE);
             progressBar.setVisibility(View.VISIBLE);
+            InputMethodManager inputManager = (InputMethodManager)
+                    getSystemService(Context.INPUT_METHOD_SERVICE);
+            inputManager.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(),
+                    InputMethodManager.HIDE_NOT_ALWAYS);
         }
-
-        InputMethodManager inputManager = (InputMethodManager)
-                getSystemService(Context.INPUT_METHOD_SERVICE);
-        inputManager.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(),
-                InputMethodManager.HIDE_NOT_ALWAYS);
 
 
     }

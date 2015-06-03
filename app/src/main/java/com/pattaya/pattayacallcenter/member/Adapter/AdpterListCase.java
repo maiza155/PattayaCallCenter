@@ -18,11 +18,14 @@ import com.pattaya.pattayacallcenter.Data.MasterData;
 import com.pattaya.pattayacallcenter.R;
 import com.pattaya.pattayacallcenter.guest.CaseDetailActivity;
 import com.pattaya.pattayacallcenter.member.CaseDetailMemberActivity;
+import com.pattaya.pattayacallcenter.member.CaseFragment;
 import com.pattaya.pattayacallcenter.webservice.object.casedata.CaseListMemberData;
 import com.readystatesoftware.viewbadger.BadgeView;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static com.pattaya.pattayacallcenter.R.drawable.asset_icon_status_flag;
 import static com.pattaya.pattayacallcenter.R.drawable.asset_icon_status_gray;
@@ -37,6 +40,7 @@ import static com.pattaya.pattayacallcenter.R.drawable.custom_date_bg_yellow;
 public class AdpterListCase extends BaseAdapter {
     List<CaseListMemberData> data;
     SharedPreferences settings;
+    Map<Integer, Integer> map = new HashMap<>();
     private LayoutInflater mInflater;
     private Context context;
 
@@ -48,11 +52,17 @@ public class AdpterListCase extends BaseAdapter {
 
     public void resetAdpter(List<CaseListMemberData> caseListMemberDataList) {
         this.data = caseListMemberDataList;
+        for (CaseListMemberData e : this.data) {
+            map.put(e.getComplaintId(), data.indexOf(e));
+        }
         notifyDataSetChanged();
     }
 
     public void addItem(List<CaseListMemberData> caseListMemberDataList) {
         data.addAll(caseListMemberDataList);
+        for (CaseListMemberData e : data) {
+            map.put(e.getComplaintId(), data.indexOf(e));
+        }
         notifyDataSetChanged();
         // this.data = caseListMemberDataList;
     }
@@ -62,11 +72,20 @@ public class AdpterListCase extends BaseAdapter {
         tempList.addAll(data);
         tempList.addAll(this.data);
         this.data = tempList;
+        for (CaseListMemberData e : this.data) {
+            map.put(e.getComplaintId(), data.indexOf(e));
+        }
         notifyDataSetChanged();
-//        for (PostObject e : this.data) {
-//           // mapPostId.put(e.getPostId(), listData.indexOf(e));
-//        }
 
+
+    }
+
+    public void updateItem(int id, String detail) {
+        int index = map.get(id);
+        if (data.size() > index && index >= 0) {
+            data.get(index).setCaseName(detail);
+            notifyDataSetChanged();
+        }
 
     }
 
@@ -173,7 +192,7 @@ public class AdpterListCase extends BaseAdapter {
                     intent.putExtra("id", data.get(position).getCasesId());
                     intent.putExtra("casename", data.get(position).getCaseName());
                     intent.putExtra("complainid", data.get(position).getComplaintId());
-                    context.startActivity(intent);
+                    CaseFragment.newInstance().startCommentActivity(intent);
                 } else {
                     System.out.println(data.get(position).getComplaintId());
                     Intent intent = new Intent(context, CaseDetailActivity.class);

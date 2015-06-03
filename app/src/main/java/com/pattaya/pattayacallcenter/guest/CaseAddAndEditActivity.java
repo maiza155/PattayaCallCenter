@@ -324,7 +324,7 @@ public class CaseAddAndEditActivity extends ActionBarActivity implements View.On
                                                             pub.setUsername(e.getJid().split("@")[0]);
                                                             pub.setImage(displayImage);
                                                             Log.e("TAG", "getList Success  JIID " + e.getJid());
-                                                            pub.setDisplayData(c.getTime().toString());
+                                                            pub.setDisplayDate(c.getTime().toString());
                                                             // pub.setPrimarykey(complainId);
                                                             if (complainId == 0) {
                                                                 pub.setAction("ส่งเรื่องร้องเรียน");

@@ -218,8 +218,10 @@ public class FriendRequestActivity extends ActionBarActivity implements SwipeRef
             for (Users e : list) {
                 if (e.getType() == Users.TYPE_NOT_FRIEND) {
                     childListFriend.add(new InviteFriendObject(e.getJid(), e.getName(), e.getPic()));
+
                 } else if (e.getType() == Users.TYPE_INVITE_GROUP) {
                     childListGroup.add(new InviteFriendObject(e.getJid(), e.getName(), e.getPic()));
+
                 }
             }
             return childListFriend;
@@ -232,6 +234,7 @@ public class FriendRequestActivity extends ActionBarActivity implements SwipeRef
             expandableListAdapter.resetAdapter(groupList.get(0), inviteFriendObjects);
             expandableListAdapter.resetAdapter(groupList.get(1), childListGroup);
             expandableListView.expandGroup(0);
+            expandableListView.expandGroup(1);
         }
     }
 

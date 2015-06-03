@@ -8,7 +8,7 @@ import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.util.Log;
 
-import com.mobprofs.retrofit.converters.SimpleXmlConverter;
+import com.google.gson.Gson;
 import com.pattaya.pattayacallcenter.Application;
 import com.pattaya.pattayacallcenter.BusProvider;
 import com.pattaya.pattayacallcenter.Data.MasterData;
@@ -38,7 +38,6 @@ import org.jivesoftware.smack.filter.PacketFilter;
 import org.jivesoftware.smack.packet.IQ;
 import org.jivesoftware.smack.packet.Message;
 import org.jivesoftware.smack.packet.Packet;
-import org.jivesoftware.smack.packet.PacketExtension;
 import org.jivesoftware.smack.packet.Presence;
 import org.jivesoftware.smack.provider.ProviderManager;
 import org.jivesoftware.smack.tcp.XMPPTCPConnection;
@@ -48,18 +47,13 @@ import org.jivesoftware.smackx.muc.InvitationListener;
 import org.jivesoftware.smackx.muc.MultiUserChat;
 import org.jivesoftware.smackx.pubsub.AccessModel;
 import org.jivesoftware.smackx.pubsub.ConfigureForm;
-import org.jivesoftware.smackx.pubsub.EventElement;
 import org.jivesoftware.smackx.pubsub.FormType;
-import org.jivesoftware.smackx.pubsub.ItemsExtension;
 import org.jivesoftware.smackx.pubsub.LeafNode;
 import org.jivesoftware.smackx.pubsub.PayloadItem;
 import org.jivesoftware.smackx.pubsub.PubSubManager;
 import org.jivesoftware.smackx.pubsub.PublishModel;
 import org.jivesoftware.smackx.pubsub.SimplePayload;
 import org.jivesoftware.smackx.pubsub.SubscribeForm;
-import org.jivesoftware.smackx.pubsub.packet.PubSubNamespace;
-import org.jivesoftware.smackx.xdata.FormField;
-import org.jivesoftware.smackx.xdata.packet.DataForm;
 
 import java.io.IOException;
 import java.text.SimpleDateFormat;
@@ -224,35 +218,53 @@ public class XMPPManage implements MessageListener {
                         Log.e("XMPPManage", "From :: " + " >> " + from);
                         Log.e("XMPPManage", "Received message :: " + " >> " + message.getBody());
                         Log.d("XMPPManage", "XML Message  " + " >> " + message);
-                        if (!from.equalsIgnoreCase(mConnection.getUser().split("/")[0])
-                                && DatabaseChatHelper.init().getOneUsers(from) != null) {
-                            Calendar c = Calendar.getInstance();
-                            System.out.println(sdf.format(c.getTime())); //2014/08/06 16:00:22
-                            final Messages messages = new Messages();
-                            messages.setMessage(message.getBody());
-                            messages.setRoom(from);
-                            messages.setSender(from);
-                            messages.setTime(sdf.format(c.getTime()));
-                            //BusProvider.getInstance().post(messages);
-                            getUserData(messages);
+                        String[] notify = message.getBody().split("<notify>");
+                        if (notify.length > 1) {
+                            Log.d("XMPPManage", "XML Message Notify " + " >> " + message);
+                            Log.e("Tag, ", "////////////// notify messages Normal/////////////////////////");
+                            PubsubObject pubsubObject = new Gson().fromJson(notify[1], PubsubObject.class);
+                            if (pubsubObject.getAction().matches("org")) {
+                                Log.e("TAg", "INVITE TO oRG");
+                                BusProvider.getInstance().post("org_update");
+                            } else {
+                                if (!isOfficial) {
+                                    NotifyCase.setNotifyChat(pubsubObject);
+                                }
 
-
-                        } else if (from.equalsIgnoreCase(xmppManage.getmConnection().getUser().split("/")[0])) {
-                            String room = message.getSubject();
-                            System.out.println("XMPPManage  " + "room = [" + room + "]");
-                            if (room != null) {
-                                Calendar c = Calendar.getInstance();
-                                System.out.println(sdf.format(c.getTime())); //2014/08/06 16:00:22
-                                Messages messages = new Messages();
-                                messages.setMessage(message.getBody());
-                                messages.setRoom(room);
-                                messages.setSender(from);
-                                messages.setTime(sdf.format(c.getTime()));
-                                // DataChat mData = new DataChat(otherUser, messages);
-                                databaseChatHelper.addLogs(messages);
-                                BusProvider.getInstance().post(messages);
                             }
 
+
+                        } else {
+                            if (!from.equalsIgnoreCase(mConnection.getUser().split("/")[0])
+                                    && DatabaseChatHelper.init().getOneUsers(from) != null) {
+                                Calendar c = Calendar.getInstance();
+                                System.out.println(sdf.format(c.getTime())); //2014/08/06 16:00:22
+                                final Messages messages = new Messages();
+                                messages.setMessage(message.getBody());
+                                messages.setRoom(from);
+                                messages.setSender(from);
+                                messages.setTime(sdf.format(c.getTime()));
+                                //BusProvider.getInstance().post(messages);
+                                getUserData(messages);
+
+
+                            } else if (from.equalsIgnoreCase(xmppManage.getmConnection().getUser().split("/")[0])) {
+                                String room = message.getSubject();
+                                System.out.println("XMPPManage  " + "room = [" + room + "]");
+                                if (room != null) {
+                                    Calendar c = Calendar.getInstance();
+                                    System.out.println(sdf.format(c.getTime())); //2014/08/06 16:00:22
+                                    Messages messages = new Messages();
+                                    messages.setMessage(message.getBody());
+                                    messages.setRoom(room);
+                                    messages.setSender(from);
+                                    messages.setTime(sdf.format(c.getTime()));
+                                    // DataChat mData = new DataChat(otherUser, messages);
+                                    databaseChatHelper.addLogs(messages);
+                                    BusProvider.getInstance().post(messages);
+                                }
+
+                            }
                         }
 
 
@@ -310,48 +322,48 @@ public class XMPPManage implements MessageListener {
                 mConnection.addPacketListener(new PacketListener() {
                     public void processPacket(Packet packet) {
                         Log.e("Tag, ", "////////////// notify messages Normal/////////////////////////");
-                        PubsubObject pubsubObject = new PubsubObject();
-                        Message message = (Message) packet;
-                        SimpleXmlConverter xmlphase = new SimpleXmlConverter();
-
-                        EventElement event = packet.getExtension("event", PubSubNamespace.EVENT.getXmlns());
-                        if (event != null) {
-                            ItemsExtension itemsElem = (ItemsExtension) event.getEvent();
-                            List<? extends PacketExtension> pubItems = itemsElem.getItems();
-                            PayloadItem itemPubsub = (PayloadItem) pubItems.get(0);
-
-                            DataForm dataForm = (DataForm) itemPubsub.getPayload();
-                            for (FormField e : dataForm.getFields()) {
-                                if (e.getVariable().matches("ownerImage")) {
-                                    pubsubObject.setImage(e.getValues().get(0));
-                                } else if (e.getVariable().matches("ownerName")) {
-                                    pubsubObject.setName(e.getValues().get(0));
-                                } else if (e.getVariable().matches("title")) {
-                                    pubsubObject.setTitle(e.getValues().get(0));
-                                } else if (e.getVariable().matches("displayDate")) {
-                                    pubsubObject.setDisplayData(String.valueOf(System.currentTimeMillis()));
-                                } else if (e.getVariable().matches("action")) {
-                                    pubsubObject.setAction(e.getValues().get(0));
-                                } else if (e.getVariable().matches("primaryKey")) {
-                                    pubsubObject.setPrimarykey(Integer.parseInt(e.getValues().get(0)));
-                                } else if (e.getVariable().matches("caseId")) {
-                                    pubsubObject.setCaseId(Integer.parseInt(e.getValues().get(0)));
-                                } else if (e.getVariable().matches("complainId")) {
-                                    pubsubObject.setComplainId(Integer.parseInt(e.getValues().get(0)));
-                                }
-                            }
-                            if (pubsubObject.getAction().matches("org")) {
-                                Log.e("TAg", "INVITE TO oRG");
-                                BusProvider.getInstance().post("org_update");
-                            } else {
-                                if (!isOfficial) {
-                                    NotifyCase.setNotifyChat(pubsubObject);
-                                }
-
-                            }
-
-
-                        }
+//                        PubsubObject pubsubObject = new PubsubObject();
+//                        Message message = (Message) packet;
+//                        SimpleXmlConverter xmlphase = new SimpleXmlConverter();
+//
+//                        EventElement event = packet.getExtension("event", PubSubNamespace.EVENT.getXmlns());
+//                        if (event != null) {
+//                            ItemsExtension itemsElem = (ItemsExtension) event.getEvent();
+//                            List<? extends PacketExtension> pubItems = itemsElem.getItems();
+//                            PayloadItem itemPubsub = (PayloadItem) pubItems.get(0);
+//
+//                            DataForm dataForm = (DataForm) itemPubsub.getPayload();
+//                            for (FormField e : dataForm.getFields()) {
+//                                if (e.getVariable().matches("ownerImage")) {
+//                                    pubsubObject.setImage(e.getValues().get(0));
+//                                } else if (e.getVariable().matches("ownerName")) {
+//                                    pubsubObject.setName(e.getValues().get(0));
+//                                } else if (e.getVariable().matches("title")) {
+//                                    pubsubObject.setTitle(e.getValues().get(0));
+//                                } else if (e.getVariable().matches("displayDate")) {
+//                                    pubsubObject.setDisplayData(String.valueOf(System.currentTimeMillis()));
+//                                } else if (e.getVariable().matches("action")) {
+//                                    pubsubObject.setAction(e.getValues().get(0));
+//                                } else if (e.getVariable().matches("primaryKey")) {
+//                                    pubsubObject.setPrimarykey(Integer.parseInt(e.getValues().get(0)));
+//                                } else if (e.getVariable().matches("caseId")) {
+//                                    pubsubObject.setCaseId(Integer.parseInt(e.getValues().get(0)));
+//                                } else if (e.getVariable().matches("complainId")) {
+//                                    pubsubObject.setComplainId(Integer.parseInt(e.getValues().get(0)));
+//                                }
+//                            }
+//                            if (pubsubObject.getAction().matches("org")) {
+//                                Log.e("TAg", "INVITE TO oRG");
+//                                BusProvider.getInstance().post("org_update");
+//                            } else {
+//                                if (!isOfficial) {
+//                                    NotifyCase.setNotifyChat(pubsubObject);
+//                                }
+//
+//                            }
+//
+//
+//                        }
 
 
                     }
@@ -709,27 +721,6 @@ public class XMPPManage implements MessageListener {
         return mConnection;
     }
 
-    public void setmConnection(XMPPTCPConnection mConnection) {
-        this.mConnection = mConnection;
-    }
-
-
-    void getGroupRoom() {
-        ArrayList joinedRooms = null;
-        try {
-            joinedRooms = (ArrayList) MultiUserChat.getJoinedRooms(mConnection, mConnection.getUser());
-        } catch (SmackException.NoResponseException e) {
-            e.printStackTrace();
-        } catch (XMPPException.XMPPErrorException e) {
-            e.printStackTrace();
-        } catch (SmackException.NotConnectedException e) {
-            e.printStackTrace();
-        }
-        for (int i = 0; i < joinedRooms.size(); i++) {
-            Log.d("XMPPManage", "TAG Multi Room" + ":: " + joinedRooms.get(i));
-
-        }
-    }
 
     public MultiUserChat initGroupChat(String room) {
         //room = room;
@@ -1056,128 +1047,43 @@ public class XMPPManage implements MessageListener {
     public void sendMessageNotify(final PubsubObject pubsubObject) {
         Log.e("AG", "/////////////////////////////////////////////////////////");
 
+        pubsubObject.setDisplayDate(String.valueOf(System.currentTimeMillis()));
+        final String user = pubsubObject.getUsername();
+        Gson gson = new Gson();
+        final String json = gson.toJson(pubsubObject);
+        Log.e("Notify", json);
         new AsyncTask<Void, Void, Boolean>() {
             @Override
             protected Boolean doInBackground(Void... params) {
-                final String image = (pubsubObject.getImage() == null) ? "" : pubsubObject.getImage();
-                final String name = (pubsubObject.getName() == null) ? "" : pubsubObject.getName();
-                final String title = (pubsubObject.getTitle() == null) ? "" : pubsubObject.getTitle();
-                final String displayData = (pubsubObject.getDisplayData() == null) ? "" : pubsubObject.getDisplayData();
-                final String action = (pubsubObject.getAction() == null) ? "" : pubsubObject.getAction();
-                final Integer primarykey = pubsubObject.getPrimarykey();
-                final Integer caseId = pubsubObject.getCaseId();
-                final Integer complainId = pubsubObject.getComplainId();
+                if (mConnection != null && mConnection.isConnected()) {
+                    ChatManager chatmanager = ChatManager.getInstanceFor(mConnection);
+                    Chat chat = chatmanager.createChat(user + "@" + SERVICE, XMPPManage.this);
+                    int randomNum = 500 + (int) (Math.random() * 2000);
+                    String packetId = "adpckt" + randomNum;
+                    try {
 
+                        //messages.setTo("ffff");
+                        chat.sendMessage("<notify>" + json);
+                        // mChat.sendMessage(messages);
+                        chat.close();
 
-                ConnectionConfiguration config = new ConnectionConfiguration(HOST, PORT, SERVICE);
-                config.setSecurityMode(ConnectionConfiguration.SecurityMode.disabled);
-                // config.setDebuggerEnabled(true);
-                admin = new XMPPTCPConnection(config);
-                manager = new PubSubManager(admin);
-                final String username = pubsubObject.getUsername() + "_notify";
-
-                try {
-                    if (isNetworkConnected()) {
-                        admin.connect();
-                        admin.login("admin", "p@ssw0rd", "Android");
-
-                        Log.e("XMPPManage", "Admin Connection is SendMessage : " + admin.isConnected());
-                        ConfigureForm form = new ConfigureForm(FormType.submit);
-                        form.setAccessModel(AccessModel.open);
-                        form.setDeliverPayloads(true);
-                        form.setNotifyRetract(true);
-                        form.setNotifyDelete(true);
-                        form.setPublishModel(PublishModel.open);
-                        manager = new PubSubManager(admin);
-                        LeafNode myNode = manager.getNode(username);
-
-                        DataForm dataForm = new DataForm("result");
-
-                        ///////////////  ownerImage ////////////////////
-                        FormField formImage = new FormField("ownerImage");
-                        formImage.addValue(image);
-
-                        dataForm.addField(formImage);
-
-                        ///////////////  ownerName ////////////////////
-                        FormField formName = new FormField("ownerName");
-                        formName.addValue(name);
-
-                        dataForm.addField(formName);
-
-                        ///////////////  Title ////////////////////
-                        FormField formTitle = new FormField("title");
-                        formTitle.addValue(title);
-
-
-                        dataForm.addField(formTitle);
-
-
-                        ///////////////  Action ////////////////////
-                        FormField formAction = new FormField("action");
-                        formAction.addValue(action);
-
-                        dataForm.addField(formAction);
-
-
-                        ///////////////  primaryKey ////////////////////
-                        FormField formKey = new FormField("primaryKey");
-                        formKey.addValue(String.valueOf(primarykey));
-
-                        dataForm.addField(formKey);
-
-                        ///////////////  primaryKey ////////////////////
-                        FormField formCaseKey = new FormField("caseId");
-                        formCaseKey.addValue(String.valueOf(caseId));
-
-                        dataForm.addField(formCaseKey);
-
-                        ///////////////  primaryKey ////////////////////
-                        FormField formComplainKey = new FormField("complainId");
-                        formComplainKey.addValue(String.valueOf(complainId));
-
-                        dataForm.addField(formComplainKey);
-
-
-                        ///////////////  displayDate ////////////////////
-                        FormField formDate = new FormField("displayDate");
-                        formDate.addValue(displayData);
-
-                        dataForm.addField(formDate);
-
-                        SimplePayload payload = new SimplePayload(
-                                "x",
-                                "pubsub:" + username + ":x",
-                                dataForm.toXML().toString());
-
-
-                        PayloadItem<SimplePayload> item = new PayloadItem(
-                                null, payload);
-                        myNode.send(item);
-                        //System.out.println("///////////////////////////////////////////////////////");
-
-                    } else {
-
+                    } catch (SmackException.NotConnectedException e) {
+                        e.printStackTrace();
+                    } catch (Exception e) {
+                        e.printStackTrace();
                     }
 
-                } catch (SmackException e) {
-                    e.printStackTrace();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                } catch (XMPPException e) {
-                    //subscribePubSub();
-                    e.printStackTrace();
-                }
 
-                try {
-
-                    admin.disconnect();
-                } catch (SmackException.NotConnectedException e) {
-                    e.printStackTrace();
                 }
                 return null;
+
             }
         }.execute();
+
+
+        ConnectionConfiguration config = new ConnectionConfiguration(HOST, PORT, SERVICE);
+        config.setSecurityMode(ConnectionConfiguration.SecurityMode.disabled);
+        // config.setDebuggerEnabled(true);
 
 
     }

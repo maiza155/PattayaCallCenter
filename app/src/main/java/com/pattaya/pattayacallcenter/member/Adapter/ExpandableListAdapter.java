@@ -157,7 +157,9 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
                     Boolean bool = XMPPManage.getInstance().createRoster(laptop.getJid(), laptop.getName());
                     if (bool) {
                         removeAt(groupPosition, childPosition);
-
+                        final Users mUser = new Users(laptop.getJid(), laptop.getName(), null, Users.TYPE_FRIEND);
+                        mUser.setPic(laptop.getImage());
+                        DatabaseChatHelper.init().addUsers(mUser);
                         BusProvider.getInstance().post("add_roster_complete");
                     } else {
                         Toast.makeText(context,
@@ -172,11 +174,12 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
                             System.out.println("response = [" + response + "], response2 = [" + response2 + "]");
                             removeAt(groupPosition, childPosition);
                             XMPPManage.getInstance().setJoinRoom(laptop.getJid());
-                            BusProvider.getInstance().post("add_roster_complete");
 
                             final Users mUser = new Users(laptop.getJid(), laptop.getName(), null, Users.TYPE_GROUP);
                             mUser.setPic(laptop.getImage());
                             DatabaseChatHelper.init().addUsers(mUser);
+                            BusProvider.getInstance().post("add_roster_complete");
+
                         }
 
                         @Override

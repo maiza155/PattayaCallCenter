@@ -472,13 +472,33 @@ public class LoginActivity extends Activity {
                     //   Log.e("Facerbook ", "id    " + saveFacebookObject.getLastName());
                     editor.putInt(MasterData.SHARED_USER_USER_ID, userDataObject.getUserId());
                     editor.putString(MasterData.SHARED_USER_USERNAME, userDataObject.getUsername());
-                    editor.putString(MasterData.SHARED_USER_IMAGE, saveFacebookObject.getImage());
+
+                    if (userDataObject.getUserImage() != null && !userDataObject.getUserImage().isEmpty()) {
+                        editor.putString(MasterData.SHARED_USER_IMAGE, saveFacebookObject.getImage());
+                    } else {
+                        editor.putString(MasterData.SHARED_USER_IMAGE, userDataObject.getUserImage());
+                    }
+
                     editor.putString(MasterData.SHARED_USER_DISPLAY_NAME, userDataObject.getDisplayName());
                     editor.putString(MasterData.SHARED_USER_ORGANIZE, userDataObject.getOrgId());
                     editor.putString(MasterData.SHARED_USER_USER_TYPE, userDataObject.getUserTypeEN());
                     editor.putString(MasterData.SHARED_USER_JID, userDataObject.getjId());
-                    editor.putString(MasterData.SHARED_USER_FRIST_NAME, saveFacebookObject.getFirstName());
-                    editor.putString(MasterData.SHARED_USER_LAST_NAME, saveFacebookObject.getLastName());
+
+                    // System.out.println(userDataObject.getFirstname());
+                    // System.out.println(userDataObject.getLastname());
+                    if (userDataObject.getFirstname() == null || userDataObject.getFirstname().isEmpty()) {
+                        editor.putString(MasterData.SHARED_USER_FRIST_NAME, saveFacebookObject.getFirstName());
+                    } else {
+                        editor.putString(MasterData.SHARED_USER_FRIST_NAME, userDataObject.getFirstname());
+                    }
+                    if (userDataObject.getLastname() == null || userDataObject.getLastname().isEmpty()) {
+                        editor.putString(MasterData.SHARED_USER_LAST_NAME, saveFacebookObject.getLastName());
+                    } else {
+                        editor.putString(MasterData.SHARED_USER_LAST_NAME, userDataObject.getLastname());
+                    }
+
+
+
                     editor.putBoolean(MasterData.SHARED_USER_FACEBOOK, true);
                     editor.commit();
 
@@ -495,13 +515,28 @@ public class LoginActivity extends Activity {
 
                     editor.putInt(MasterData.SHARED_USER_USER_ID, userDataObject.getUserId());
                     editor.putString(MasterData.SHARED_USER_USERNAME, userDataObject.getUsername());
-                    editor.putString(MasterData.SHARED_USER_IMAGE, saveFacebookObject.getImage());
+
+                    if (userDataObject.getUserImage() != null && !userDataObject.getUserImage().isEmpty()) {
+                        editor.putString(MasterData.SHARED_USER_IMAGE, saveFacebookObject.getImage());
+                    } else {
+                        editor.putString(MasterData.SHARED_USER_IMAGE, userDataObject.getUserImage());
+                    }
+
                     editor.putString(MasterData.SHARED_USER_DISPLAY_NAME, userDataObject.getDisplayName());
                     editor.putString(MasterData.SHARED_USER_ORGANIZE, userDataObject.getOrgId());
                     editor.putString(MasterData.SHARED_USER_USER_TYPE, userDataObject.getUserTypeEN());
                     editor.putString(MasterData.SHARED_USER_JID, userDataObject.getjId());
-                    editor.putString(MasterData.SHARED_USER_FRIST_NAME, saveFacebookObject.getFirstName());
-                    editor.putString(MasterData.SHARED_USER_LAST_NAME, saveFacebookObject.getLastName());
+
+                    if (userDataObject.getFirstname() == null || userDataObject.getFirstname().isEmpty()) {
+                        editor.putString(MasterData.SHARED_USER_FRIST_NAME, saveFacebookObject.getFirstName());
+                    } else {
+                        editor.putString(MasterData.SHARED_USER_FRIST_NAME, userDataObject.getFirstname());
+                    }
+                    if (userDataObject.getLastname() == null || userDataObject.getLastname().isEmpty()) {
+                        editor.putString(MasterData.SHARED_USER_LAST_NAME, saveFacebookObject.getLastName());
+                    } else {
+                        editor.putString(MasterData.SHARED_USER_LAST_NAME, userDataObject.getLastname());
+                    }
                     editor.putBoolean(MasterData.SHARED_USER_FACEBOOK, true);
 
                     editor.commit();

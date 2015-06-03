@@ -21,6 +21,7 @@ import com.pattaya.pattayacallcenter.R;
 import com.pattaya.pattayacallcenter.guest.CaseChatActivity;
 import com.pattaya.pattayacallcenter.guest.CaseDetailActivity;
 import com.pattaya.pattayacallcenter.member.CaseChatMemberActivity;
+import com.pattaya.pattayacallcenter.member.CaseDetailMemberActivity;
 import com.pattaya.pattayacallcenter.webservice.RestFulQueary;
 import com.pattaya.pattayacallcenter.webservice.WebserviceConnector;
 import com.pattaya.pattayacallcenter.webservice.object.casedata.CaseMainObject;
@@ -56,9 +57,9 @@ public class NotifyCase {
         Boolean isOfficial = sp.getBoolean(MasterData.SHARED_IS_OFFICIAL, false);
         Boolean isMember = sp.getBoolean(MasterData.SHARED_IS_MEMBER,false);
 
-        System.out.println(object.getDisplayData());
+        System.out.println(object.getDisplayDate());
 
-        Long millis = Long.parseLong(object.getDisplayData(), 10);
+        Long millis = Long.parseLong(object.getDisplayDate(), 10);
         SimpleDateFormat mysdf = new SimpleDateFormat("d MMM yyyy HH:mm ");
         Date cal = new Date(millis);
         RemoteViews contentView = new RemoteViews(Application.getContext().getPackageName(),
@@ -100,7 +101,7 @@ public class NotifyCase {
                 jidRoom = "complaint-"+object.getComplainId()+"@conference.pattaya-data";
             }
 
-            Intent notificationIntent = new Intent(Application.getContext(), CaseChatMemberActivity.class);
+            Intent notificationIntent = new Intent(Application.getContext(), CaseDetailMemberActivity.class);
             notificationIntent.putExtra("id", object.getCaseId());
             notificationIntent.putExtra("casename", object.getTitle());
             notificationIntent.putExtra("complainid", object.getComplainId());

@@ -476,7 +476,7 @@ public class CaseDetailMemberActivity extends ActionBarActivity {
     }
 
     void getData() {
-        final ProgressDialog ringProgressDialog = ProgressDialog.show(this, getResources().getString(R.string.load_data), getResources().getString(R.string.please_wait), true);
+        final ProgressDialog ringProgressDialog = ProgressDialog.show(this, null, getResources().getString(R.string.please_wait), true);
         ringProgressDialog.setCancelable(true);
         GetComplainObject getComplainObject = new GetComplainObject();
         getComplainObject.setAccessToken(token);
@@ -634,6 +634,13 @@ public class CaseDetailMemberActivity extends ActionBarActivity {
 
         if (requestCode == EDIT_ACTIVITY) {
             if (resultCode == Activity.RESULT_OK) {
+                String detail = data.getStringExtra("detail");
+                Intent i = new Intent();
+                i.putExtra("detail", detail);
+                i.putExtra("complainId", complainId);
+                setResult(Activity.RESULT_OK, i);
+                //System.out.println(""+data.getStringExtra("detail"));
+
                 finish();
 
             }

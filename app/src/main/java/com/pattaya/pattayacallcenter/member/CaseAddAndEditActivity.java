@@ -552,7 +552,7 @@ public class CaseAddAndEditActivity extends ActionBarActivity implements View.On
                                                         pub.setUsername(e.getJid().split("@")[0]);
                                                         pub.setImage(displayImage);
                                                         pub.setAction("เปิดเคส");
-                                                        pub.setDisplayData(c.getTime().toString());
+                                                        pub.setDisplayDate(c.getTime().toString());
                                                         pub.setCaseId(updateResult.getCasesId());
                                                         pub.setComplainId(updateResult.getPrimaryKeyId());
                                                         pub.setName(displayName);
@@ -600,7 +600,7 @@ public class CaseAddAndEditActivity extends ActionBarActivity implements View.On
                                                             pub.setUsername(e.getJid().split("@")[0]);
                                                             pub.setImage(displayImage);
                                                             pub.setAction("อัพเดทเคส");
-                                                            pub.setDisplayData(c.getTime().toString());
+                                                            pub.setDisplayDate(c.getTime().toString());
                                                             //pub.setPrimarykey(complainId);
                                                             pub.setComplainId(complainId);
                                                             pub.setCaseId(caseId);
@@ -623,9 +623,10 @@ public class CaseAddAndEditActivity extends ActionBarActivity implements View.On
                                                         public void success(Response response, Response response2) {
                                                             //System.out.println("response = [" + response + "], response2 = [" + response2 + "]");
 
+
                                                             XMPPManage.getInstance().setJoinRoom(chatRoomObject.getRoomName() + "@conference.pattaya-data");
                                                             for (PubsubObject e : listNotify) {
-                                                                Log.e("TAG", ">>>>" + e.getUsername());
+                                                                //Log.e("TAG", ">>>>" + e.getUsername());
                                                                 XMPPManage.getInstance().new TaskSendNotify(e).execute();
                                                             }
                                                             runOnUiThread(new Runnable() {
@@ -758,7 +759,7 @@ public class CaseAddAndEditActivity extends ActionBarActivity implements View.On
     }
 
     void getData() {
-        final ProgressDialog ringProgressDialog = ProgressDialog.show(this, getResources().getString(R.string.load_data), getResources().getString(R.string.please_wait), true);
+        final ProgressDialog ringProgressDialog = ProgressDialog.show(this, null, getResources().getString(R.string.please_wait), true);
         ringProgressDialog.setCancelable(true);
         final GetComplainObject getComplainObject = new GetComplainObject();
         getComplainObject.setAccessToken(token);
@@ -955,7 +956,7 @@ public class CaseAddAndEditActivity extends ActionBarActivity implements View.On
                                                 pub.setUsername(e.getJid().split("@")[0]);
                                                 pub.setImage(displayImage);
                                                 pub.setAction("อัพเดทเคส");
-                                                pub.setDisplayData(c.getTime().toString());
+                                                pub.setDisplayDate(c.getTime().toString());
                                                 //pub.setPrimarykey(complainId);
                                                 pub.setComplainId(complainId);
                                                 pub.setCaseId(caseId);
@@ -981,16 +982,14 @@ public class CaseAddAndEditActivity extends ActionBarActivity implements View.On
                                                     Log.e("TAG", ">>>>" + e.getUsername());
                                                     XMPPManage.getInstance().new TaskSendNotify(e).execute();
                                                 }
-                                                runOnUiThread(new Runnable() {
-                                                    @Override
-                                                    public void run() {
-                                                        ringProgressDialog.dismiss();
-                                                    }
-                                                });
 
 
                                                 Toast.makeText(getApplication(), "success", Toast.LENGTH_SHORT).show();
+                                                ringProgressDialog.dismiss();
                                                 BusProvider.getInstance().post("update_case_list");
+                                                Intent i = new Intent();
+                                                i.putExtra("detail", openCaseAssignObject.getCasesName());
+                                                setResult(Activity.RESULT_OK, i);
                                                 finish();
 
 

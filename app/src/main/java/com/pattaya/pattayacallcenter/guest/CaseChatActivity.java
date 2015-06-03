@@ -313,14 +313,17 @@ public class CaseChatActivity extends ActionBarActivity implements View.OnClickL
         if (v == btnCamera) {
             cameraMange.captureImage();
             mSlideMenuManage.stateShowMenu(mSlideMenuManage.SETTING_MENU_HIDE);
+            hideKeyboard();
 
         } else if (v == btnImage) {
             Intent intent = new Intent(this, CustomGalleryActivity.class);
             startActivityForResult(intent, MasterData.PICK_IMAGE_MULTIPLE);
             mSlideMenuManage.stateShowMenu(mSlideMenuManage.SETTING_MENU_HIDE);
+            hideKeyboard();
         } else if (v == btnAdd) {
             mSlideMenuManageImage.eventShow();
             mSlideMenuManageSticker.stateShowMenu(mSlideMenuManage.SETTING_MENU_HIDE);
+            hideKeyboard();
 
         } else if (v == btnSticker) {
             mSlideMenuManageImage.stateShowMenu(mSlideMenuManage.SETTING_MENU_HIDE);
@@ -328,15 +331,18 @@ public class CaseChatActivity extends ActionBarActivity implements View.OnClickL
             if (!isMyServiceRunning(StrickLoaderService.class)) {
                 btnUpdateStricker.setVisibility(View.VISIBLE);
                 progressBar.setVisibility(View.GONE);
+                hideKeyboard();
             }
         } else if (v == btnPlace) {
             Intent intent = new Intent(this, CaseMapActivity.class);
             startActivityForResult(intent, TAG_INTENT_PLACE);
+            hideKeyboard();
         } else if (v == btnUpdateStricker) {
             startService(new Intent(this, StrickLoaderService.class));
             txtempty.setVisibility(View.GONE);
             btnUpdateStricker.setVisibility(View.GONE);
             progressBar.setVisibility(View.VISIBLE);
+            hideKeyboard();
         } else if (v == btn) {
             finish();
         } else if (v == btnCommit) {
@@ -357,7 +363,6 @@ public class CaseChatActivity extends ActionBarActivity implements View.OnClickL
 
         }
 
-        hideKeyboard();
 
     }
 
