@@ -169,8 +169,6 @@ public class CaseAddAndEditActivity extends ActionBarActivity implements View.On
         }
 
 
-
-
     }
 
 
@@ -323,7 +321,7 @@ public class CaseAddAndEditActivity extends ActionBarActivity implements View.On
                                                             PubsubObject pub = new PubsubObject();
                                                             pub.setUsername(e.getJid().split("@")[0]);
                                                             pub.setImage(displayImage);
-                                                            Log.e("TAG", "getList Success  JIID " + e.getJid());
+                                                            Log.e("TAG", "getList Success  JIID " + e.getJid() + "  " + jid);
                                                             pub.setDisplayDate(c.getTime().toString());
                                                             // pub.setPrimarykey(complainId);
                                                             if (complainId == 0) {
@@ -356,18 +354,14 @@ public class CaseAddAndEditActivity extends ActionBarActivity implements View.On
                                                                 XMPPManage.getInstance().new TaskSendNotify(e).execute();
                                                             }
                                                             DatabaseChatHelper.init().clearCaseTable();
-                                                            runOnUiThread(new Runnable() {
-                                                                public void run() {
-                                                                    BusProvider.getInstance().post("update_case_list");
-                                                                    Toast.makeText(getApplication(), "success", Toast.LENGTH_SHORT).show();
-                                                                    Intent i = new Intent();
-                                                                    setResult(Activity.RESULT_OK, i);
 
-                                                                    ringProgressDialog.dismiss();
-                                                                    finish();
+                                                            BusProvider.getInstance().post("update_case_list");
+                                                            Toast.makeText(getApplication(), "success", Toast.LENGTH_SHORT).show();
+                                                            Intent i = new Intent();
+                                                            setResult(Activity.RESULT_OK, i);
 
-                                                                }
-                                                            });
+                                                            ringProgressDialog.dismiss();
+                                                            finish();
 
 
                                                         }

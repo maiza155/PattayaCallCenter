@@ -289,7 +289,6 @@ public class CaseChatActivity extends ActionBarActivity implements View.OnClickL
                 SharedPreferences settings = Application.getContext().getSharedPreferences(MasterData.SHARED_CASE_COUNT, Context.MODE_PRIVATE);
                 String caseStr = "id_" + complainId;
                 settings.edit().putInt(caseStr, 0).commit();
-
                 DatabaseChatHelper.init().clearCountLastMessage(messages.getRoom());
                 if (!messages.getSender().matches(jid)) {
                     NotifyChat.cancelNotification(NotifyChat.NOTIFY_CHAT_ID);

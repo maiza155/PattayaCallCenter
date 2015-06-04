@@ -165,32 +165,32 @@ public class XMPPManage implements MessageListener {
 
                     @Override
                     public void reconnectionFailed(Exception arg0) {
-                        Log.e("xmppadapter", "Failed to reconnect to the XMPP server.>>" + mConnection.isConnected());
+                        //  Log.e("xmppadapter", "Failed to reconnect to the XMPP server.>>" + mConnection.isConnected());
                     }
 
                     @Override
                     public void reconnectingIn(int seconds) {
-                        Log.i("xmppadapter", "Reconnecting in " + seconds + " seconds.>>" + mConnection.isConnected());
+                        //  Log.i("xmppadapter", "Reconnecting in " + seconds + " seconds.>>" + mConnection.isConnected());
                     }
 
                     @Override
                     public void connectionClosedOnError(Exception arg0) {
-                        Log.i("xmppadapter", "Connection to XMPP server was lost.>>" + mConnection.isConnected());
+                        //  Log.i("xmppadapter", "Connection to XMPP server was lost.>>" + mConnection.isConnected());
                     }
 
                     @Override
                     public void connected(XMPPConnection xmppConnection) {
-                        Log.i("xmppadapter", "XMPP connection was connected.>>" + mConnection.isConnected());
+                        //  Log.i("xmppadapter", "XMPP connection was connected.>>" + mConnection.isConnected());
                     }
 
                     @Override
                     public void authenticated(XMPPConnection xmppConnection) {
-                        Log.i("xmppadapter", "XMPP connection was authenticated.>>" + mConnection.isConnected());
+                        //   Log.i("xmppadapter", "XMPP connection was authenticated.>>" + mConnection.isConnected());
                     }
 
                     @Override
                     public void connectionClosed() {
-                        Log.i("xmppadapter", "XMPP connection was closed.>>" + mConnection.isConnected());
+                        //    Log.i("xmppadapter", "XMPP connection was closed.>>" + mConnection.isConnected());
 
                     }
                 });
@@ -321,7 +321,7 @@ public class XMPPManage implements MessageListener {
 
                 mConnection.addPacketListener(new PacketListener() {
                     public void processPacket(Packet packet) {
-                        Log.e("Tag, ", "////////////// notify messages Normal/////////////////////////");
+                        //Log.e("Tag, ", "////////////// notify messages Normal/////////////////////////");
 //                        PubsubObject pubsubObject = new PubsubObject();
 //                        Message message = (Message) packet;
 //                        SimpleXmlConverter xmlphase = new SimpleXmlConverter();
