@@ -14,7 +14,8 @@ public class RestAdapterOpenFire {
 
     static RestAdapter restAdapter = null;
     static RestAdapter restAdapterJson = null;
-    static String PORT = "9090";
+    //static String PORT = "9090";
+    static String PORT = "9092";
 
     public static RestAdapter getInstance() {
         if (restAdapter == null) {

@@ -70,8 +70,6 @@ public class CustomGalleryActivity extends ActionBarActivity {
             ids[i] = imagecursor.getInt(image_column_index);
             int dataColumnIndex = imagecursor.getColumnIndex(MediaStore.Images.Media.DATA);
             arrPath.add(imagecursor.getString(dataColumnIndex));
-
-
         }
 
 
