@@ -43,7 +43,8 @@ import retrofit.RetrofitError;
 import retrofit.client.Response;
 
 
-public class PostListFragment extends Fragment implements AbsListView.OnScrollListener
+public class PostListFragment extends Fragment implements
+        AbsListView.OnScrollListener
         , View.OnClickListener
         , SwipeRefreshLayout.OnRefreshListener {
 

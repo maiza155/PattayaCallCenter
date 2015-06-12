@@ -34,9 +34,10 @@ public class WebserviceConnector {
     public static RestAdapter getInstanceUpload() {
         if (restAdapterUpload == null) {
             restAdapterUpload = new RestAdapter.Builder()
-                    .setEndpoint(URL + "UploadService/rest/file")
+                    //.setEndpoint(URL + "UploadService/rest/file")
+                    .setEndpoint(URL + "RESTfulExample/rest/file")
                     .setLogLevel(RestAdapter.LogLevel.FULL)
-                            // .setEndpoint(URL + "RESTfulExample/rest/file")
+
                     .setClient(new OkClient(new OkHttpClient()))
                     .build();
         }

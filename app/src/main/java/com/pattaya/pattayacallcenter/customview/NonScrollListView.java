@@ -3,7 +3,6 @@ package com.pattaya.pattayacallcenter.customview;
 
 import android.content.Context;
 import android.util.AttributeSet;
-
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
@@ -16,6 +15,8 @@ import com.nineoldandroids.animation.ValueAnimator;
  * Created by SWF on 3/12/2015.
  */
 public class NonScrollListView extends ListView implements Animator.AnimatorListener {
+    int height = this.getHeight();
+
     public NonScrollListView(Context context) {
         super(context);
     }
@@ -24,12 +25,10 @@ public class NonScrollListView extends ListView implements Animator.AnimatorList
         super(context, attrs);
     }
 
+
     public NonScrollListView(Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
     }
-
-
-    int height = this.getHeight();
 
     @Override
     public void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {

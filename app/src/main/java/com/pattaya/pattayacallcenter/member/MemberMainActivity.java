@@ -57,6 +57,7 @@ public class MemberMainActivity extends ActionBarActivity {
         viewPager.setAdapter(adapterPager);
         tabs.setViewPager(viewPager);
 
+
     }
 
 

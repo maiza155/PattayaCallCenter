@@ -1,12 +1,16 @@
 package com.pattaya.pattayacallcenter.member.Adapter;
 
 import android.app.AlertDialog;
+import android.app.DownloadManager;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.net.Uri;
 import android.os.AsyncTask;
+import android.os.Build;
+import android.os.Environment;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -258,6 +262,22 @@ public class AdapterListViewPost extends BaseAdapter {
 
             }
         });
+
+        holder.image1.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                showDialog(v.getContext(), listData.get(position).getPostImageList().get(0));
+                return false;
+            }
+        });
+
+        holder.image2.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                showDialog(v.getContext(), listData.get(position).getPostImageList().get(0));
+                return false;
+            }
+        });
         Log.e("TAG-Post", "UserId " + userId + "     Create BY = " + listData.get(position).getPostById());
         if (userId != listData.get(position).getPostById()) {
 
@@ -295,6 +315,38 @@ public class AdapterListViewPost extends BaseAdapter {
 
         return convertView;
     }
+
+    public void showDialog(final Context context, final String file) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(context);
+        builder.setMessage("Download File Image");
+        builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                downloadImage(context, file);
+            }
+        });
+
+        builder.show();
+    }
+
+    void downloadImage(Context context, String url) {
+
+        DownloadManager.Request request = new DownloadManager.Request(Uri.parse(url));
+        //request.setDescription("Some descrition");
+        request.setTitle("Download new image");
+        // in order for this if to run, you must use the android 3.2 to compile your app
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
+            request.allowScanningByMediaScanner();
+            request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
+        }
+        request.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, "pattaya");
+
+        // get download service and enqueue file
+        DownloadManager manager = (DownloadManager) context.getSystemService(Context.DOWNLOAD_SERVICE);
+        manager.enqueue(request);
+    }
+
+
 
     class TaskDelete extends AsyncTask<Void, Void, Boolean> {
         int postId;

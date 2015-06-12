@@ -80,18 +80,22 @@
                     android:layout_height="150dp"
                     android:src="@drawable/blue_background" />
 
-                <Button
-                    android:layout_width="40dp"
-                    android:layout_height="40dp"
-                    android:layout_centerInParent="true"
-                    android:background="@drawable/ic_refresher"
-                    android:visibility="gone" />
+
                 <ProgressBar
                     android:id="@+id/progress"
                     style="?android:attr/progressBarStyleHorizontal"
                     android:layout_width="100dp"
                     android:layout_height="30dp"
                     android:layout_centerInParent="true" />
+
+                <Button
+                    android:id="@+id/refresh"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:layout_centerInParent="true"
+                    android:background="@drawable/ic_fail_o"
+                    android:clickable="false" />
+
             </RelativeLayout>
 
         </FrameLayout>

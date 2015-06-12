@@ -2,13 +2,17 @@ package com.pattaya.pattayacallcenter;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.DownloadManager;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Point;
+import android.net.Uri;
 import android.os.AsyncTask;
+import android.os.Build;
+import android.os.Environment;
 import android.util.Base64;
 import android.util.Log;
 import android.view.Display;
@@ -19,6 +23,7 @@ import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.BaseAdapter;
+import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.ListView;
@@ -185,6 +190,24 @@ public class AdapterChat extends BaseAdapter {
 
     }
 
+    void downloadImage(String url) {
+
+        DownloadManager.Request request = new DownloadManager.Request(Uri.parse(url));
+        //request.setDescription("Some descrition");
+        request.setTitle("Download new image");
+        // in order for this if to run, you must use the android 3.2 to compile your app
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
+            request.allowScanningByMediaScanner();
+            request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
+        }
+        request.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, "pattaya");
+
+        // get download service and enqueue file
+        DownloadManager manager = (DownloadManager) context.getSystemService(Context.DOWNLOAD_SERVICE);
+        manager.enqueue(request);
+    }
+
+
     @Override
     public int getCount() {
         return data.size();
@@ -291,6 +314,7 @@ public class AdapterChat extends BaseAdapter {
 
         final String[] imagedata = dataMessage.split("<img>");
         holder.imageContrainer.setVisibility(View.GONE);
+        holder.btmRefresh.setVisibility(View.GONE);
         if (imagedata.length > 1) {
             holder.imageStickerMsg.setVisibility(View.GONE);
             holder.txtMessage.setVisibility(View.GONE);
@@ -307,6 +331,11 @@ public class AdapterChat extends BaseAdapter {
                         .error(R.drawable.img_not_found)
                         .into(holder.imageViewMsg);
                 //holder.progress.setVisibility(View.GONE);
+                if (data.get(position).getError() == 1) {
+                    holder.progress.setVisibility(View.GONE);
+                    holder.btmRefresh.setVisibility(View.VISIBLE);
+
+                }
             } else {
                 System.out.println(imagedata[1]);
                 BitmapPool pool = Glide.get(context).getBitmapPool();
@@ -324,12 +353,53 @@ public class AdapterChat extends BaseAdapter {
         holder.imageContrainer.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(context, FullscreenActivity.class);
-                intent.putExtra("pathUrl", imagedata[1]);
-                intent.putExtra("position", position);
-                v.getContext().startActivity(intent);
+                if (data.get(position).getError() == 1) {
+                    AlertDialog.Builder builder = new AlertDialog.Builder(context);
+                    builder.setMessage("Resend image");
+                    builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            //data.remove(position);
+                            data.get(position).setError(0);
+                            new TaskResizeUpload(imagedata[3], position).execute();
+
+                        }
+                    });
+                    builder.setNegativeButton("Delete", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            data.remove(position);
+                            notifyDataSetChanged();
+
+                        }
+                    });
+
+                    builder.show();
+                } else {
+                    Intent intent = new Intent(context, FullscreenActivity.class);
+                    intent.putExtra("pathUrl", imagedata[1]);
+                    intent.putExtra("position", position);
+                    v.getContext().startActivity(intent);
+                }
+
             }
         });
+
+
+//        holder.imageContrainer.setOnLongClickListener(new View.OnLongClickListener() {
+//            @Override
+//            public boolean onLongClick(View v) {
+//                Log.v("Longclick_image", "" + imagedata[1]);
+//                if (!isMe) {
+//                    Log.v("Longclick_image", "" + imagedata[1]);
+//                }
+//
+//                return false;
+//            }
+//        });
+
+
+
 
         convertView.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -568,6 +638,7 @@ public class AdapterChat extends BaseAdapter {
         ImageView imageViewMsg;
         ProgressBar progress;
         RelativeLayout imageContrainer;
+        Button btmRefresh;
 
 
         Holder(View v) {
@@ -586,7 +657,7 @@ public class AdapterChat extends BaseAdapter {
             imageContrainer = (RelativeLayout) v.findViewById(R.id.image_container);
             progress = (ProgressBar) v.findViewById(R.id.progress);
             imageViewMsg = (ImageView) v.findViewById(R.id.image);
-
+            btmRefresh = (Button) v.findViewById(R.id.refresh);
             txtMessage.setMaxWidth(width / 2);
 
 
@@ -754,6 +825,8 @@ public class AdapterChat extends BaseAdapter {
                 public void failure(RetrofitError error) {
                     System.out.println("error = [" + error + "]");
                     data.get(position).setError(1);
+                    View mView = view.getChildAt(position - view.getFirstVisiblePosition());
+                    getView(position, mView, view);
                     Toast.makeText(context.getApplicationContext(), "Fail uploading ,please try again.", Toast.LENGTH_SHORT).show();
                     notifyDataSetChanged();
 

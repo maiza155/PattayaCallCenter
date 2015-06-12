@@ -325,6 +325,7 @@ public class FriendFragment extends Fragment implements SwipeRefreshLayout.OnRef
             System.out.println("Data Comlete >>>>" + arrUsers);
 
             for (Users users : arrUsers) {
+                System.out.println("Data Comlete >>>>" + users.getName());
                 if (users.getType() == Users.TYPE_FRIEND) {
                     childListFriend.add(users);
                     if (users.getFavorite()) {
