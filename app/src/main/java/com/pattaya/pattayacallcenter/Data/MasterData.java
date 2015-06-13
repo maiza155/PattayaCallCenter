@@ -8,7 +8,7 @@ public class MasterData {
     public static final int PICK_IMAGE_MULTIPLE = 300;
     public static final int PLACE_DATA = 299;
     public static final int FORWARD_TO_DATA = 298;
-    public static final int PERCEN_OF_IMAGE_FILE = 70;
+    public static final int PERCEN_OF_IMAGE_FILE = 90;
 
 
     public static final String SHARED_NAME_USER_FILE = "PREF_USER";
@@ -34,6 +34,12 @@ public class MasterData {
 
 
     public static final String SHARED_CASE_COUNT = "CASE_COUNT";
+
+
+    public static final int CASE_CLOSE = 80;
+
+
+
 
 
 }

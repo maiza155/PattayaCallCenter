@@ -151,7 +151,7 @@ public class ChatListFragment extends Fragment {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == TAG_DELETE_ACTIVITY) {
             if (resultCode == Activity.RESULT_OK) {
-                new queryTask().execute();
+                //new queryTask().execute();
 
             }
 

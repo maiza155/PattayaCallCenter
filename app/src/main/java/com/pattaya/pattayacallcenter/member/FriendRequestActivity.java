@@ -205,6 +205,7 @@ public class FriendRequestActivity extends ActionBarActivity implements SwipeRef
 
 
     class asynTask extends AsyncTask<Void, Void, List<InviteFriendObject>> {
+
         @Override
         protected void onPreExecute() {
             super.onPreExecute();

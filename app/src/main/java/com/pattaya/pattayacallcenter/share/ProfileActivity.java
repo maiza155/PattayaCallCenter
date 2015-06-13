@@ -501,7 +501,7 @@ public class ProfileActivity extends ActionBarActivity implements View.OnClickLi
             String uuid = UUID.randomUUID().toString();
             System.out.println("uuid = " + uuid);
             int randomNum = 500 + (int) (Math.random() * 2000000000);
-            File file = new File(getCacheDir(), "pattaya" + randomNum + uuid);
+            File file = new File(getCacheDir(), "pattaya" + randomNum + uuid + ".jpg");
             try {
                 file.createNewFile();
             } catch (IOException error) {

@@ -346,6 +346,11 @@ public class AdapterChat extends BaseAdapter {
                         .error(R.drawable.img_not_found)
                         .into(holder.imageViewMsg);
                 holder.progress.setVisibility(View.GONE);
+                if (data.get(position).getError() == 1) {
+                    holder.progress.setVisibility(View.GONE);
+                    holder.btmRefresh.setVisibility(View.VISIBLE);
+
+                }
 
             }
 
@@ -360,8 +365,15 @@ public class AdapterChat extends BaseAdapter {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
                             //data.remove(position);
-                            data.get(position).setError(0);
-                            new TaskResizeUpload(imagedata[3], position).execute();
+
+                            if (imagedata[1].matches("xxx")) {
+                                data.get(position).setError(0);
+                                new TaskResizeUpload(imagedata[3], position).execute();
+                            } else {
+                                data.get(position).setError(0);
+                                enterImage(imagedata[1], position);
+                            }
+
 
                         }
                     });
@@ -397,8 +409,6 @@ public class AdapterChat extends BaseAdapter {
 //                return false;
 //            }
 //        });
-
-
 
 
         convertView.setOnClickListener(new View.OnClickListener() {
@@ -439,8 +449,10 @@ public class AdapterChat extends BaseAdapter {
 
     }
 
-    void enterImage(final String message, int position) {
+    void enterImage(final String file, final int position) {
         Log.e("Error", "Connection Fail wait .... for login  " + position);
+        final String message = "<img>" + file;
+
         new AsyncTask<Void, Void, Boolean>() {
             @Override
             protected Boolean doInBackground(Void... params) {
@@ -449,13 +461,9 @@ public class AdapterChat extends BaseAdapter {
                         || (xmppManage.getChat() == null && dataUser.getType() == Users.TYPE_FRIEND)) {
                     Log.e("Error", "Connection Fail wait .... for login  " + xmppManage.getChat());
                     initChatService();
-                    Calendar c = Calendar.getInstance();
-                    Messages messages = new Messages();
-                    messages.setTime(sdf.format(c.getTime()));
-                    messages.setSender(mUser);
-                    messages.setMessage(message);
-                    messages.setError(1);
-                    // add(messages);
+                    data.get(position).setError(1);
+                    data.get(position).setMessage(message);
+
 
                 } else {
                     Log.e("TAG Chat Socket", "" + xmppManage.getmConnection().isSocketClosed());
@@ -463,12 +471,7 @@ public class AdapterChat extends BaseAdapter {
                         xmppManage.setJoinGroupChat(multiUserChat);
                         if (multiUserChat.isJoined()) {
                             try {
-                                Calendar c = Calendar.getInstance();
-                                Messages messages = new Messages();
-                                messages.setTime(sdf.format(c.getTime()));
-                                messages.setSender(mUser);
-                                messages.setMessage(message);
-                                add(messages);
+                                data.get(position).setMessage(message);
                                 multiUserChat.sendMessage(message);
                             } catch (XMPPException e) {
                                 e.printStackTrace();
@@ -479,25 +482,31 @@ public class AdapterChat extends BaseAdapter {
                             Log.e("Smack", "Join ? : " + multiUserChat.isJoined());
                             xmppManage.setJoinGroupChat(multiUserChat);
                             Log.e("Smack", "Join ? : " + multiUserChat.isJoined());
-                            Calendar c = Calendar.getInstance();
-                            Messages messages = new Messages();
-                            messages.setTime(sdf.format(c.getTime()));
-                            messages.setSender(mUser);
-                            messages.setMessage(message);
-                            messages.setError(1);
-                            add(messages);
+
+
+                            data.get(position).setError(1);
+                            data.get(position).setMessage(message);
+
                         }
                     } else if (dataUser.getType() == Users.TYPE_FRIEND || dataUser.getType() == Users.TYPE_NOT_FRIEND) {
-                        Messages messages = new Messages();
-                        Calendar c = Calendar.getInstance();
-                        messages.setTime(sdf.format(c.getTime()));
-                        messages.setSender(mUser);
-                        messages.setMessage(message);
-                        add(messages);
+
+                        data.get(position).setMessage(message);
+
                         xmppManage.chat(message, dataUser.getJid());
                     }
                 }
                 return null;
+            }
+
+            @Override
+            protected void onPostExecute(Boolean aBoolean) {
+                super.onPostExecute(aBoolean);
+                //notifyDataSetChanged();
+                if (data.size() > position) {
+                    View mView = view.getChildAt(position - view.getFirstVisiblePosition());
+                    getView(position, mView, view);
+                }
+
             }
         }.execute();
 
@@ -726,7 +735,7 @@ public class AdapterChat extends BaseAdapter {
             System.out.println("uuid = " + uuid);
             int randomNum = 500 + (int) ((Math.random() * 1204006080) / Math.random() + Math.random());
             int randomNum2 = 500 + (int) ((Math.random() * 1204006080) / Math.random() + Math.random());
-            String name = "pattaya-image-chat" + randomNum + "ToiP" + randomNum2 + uuid;
+            String name = "pattaya-image-chat" + randomNum + "ToiP" + randomNum2 + uuid + ".jpg";
             File file = new File(context.getCacheDir(), name);
             try {
                 file.createNewFile();
@@ -739,7 +748,7 @@ public class AdapterChat extends BaseAdapter {
                         .load(s)
                         .asBitmap()
                         .fitCenter()
-                        .into(500, 500) // Width and height
+                        .into(700, 700) // Width and height
                         .get();
             } catch (InterruptedException error) {
                 error.printStackTrace();
@@ -779,8 +788,11 @@ public class AdapterChat extends BaseAdapter {
                     ((Activity) context).runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
-                            View mView = view.getChildAt(position - view.getFirstVisiblePosition());
-                            getView(position, mView, view);
+                            if (data.size() > position) {
+                                View mView = view.getChildAt(position - view.getFirstVisiblePosition());
+                                getView(position, mView, view);
+                            }
+
 
                         }
                     });
@@ -814,10 +826,9 @@ public class AdapterChat extends BaseAdapter {
                     System.out.println(fileListObject.getData().get(0).getUrl());
                     System.out.println("Complete Upload Image !!!!");
                     System.out.println("position : " + position);
-                    data.get(position).setMessage("<img>" + fileListObject.getData().get(0).getUrl());
-                    enterImage(data.get(position).getMessage(), position);
-                    data.remove(position);
-                    notifyDataSetChanged();
+
+                    enterImage(fileListObject.getData().get(0).getUrl(), position);
+
 
                 }
 
@@ -827,6 +838,7 @@ public class AdapterChat extends BaseAdapter {
                     data.get(position).setError(1);
                     View mView = view.getChildAt(position - view.getFirstVisiblePosition());
                     getView(position, mView, view);
+
                     Toast.makeText(context.getApplicationContext(), "Fail uploading ,please try again.", Toast.LENGTH_SHORT).show();
                     notifyDataSetChanged();
 

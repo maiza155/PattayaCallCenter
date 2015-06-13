@@ -353,7 +353,12 @@ public class CaseChatMemberActivity extends ActionBarActivity implements View.On
     }
 
     void setRoom() {
-        final String roomName = "case-" + complainId;
+        final String roomName;
+        if (isOfficial) {
+            roomName = "complain-" + complainId;
+        } else {
+            roomName = "case-" + complainId;
+        }
         openfireQueary.getChatRoomDetail(roomName, new Callback<ChatRoom>() {
             @Override
             public void success(ChatRoom chatRoom, Response response) {

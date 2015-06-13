@@ -669,7 +669,7 @@ public class CaseAddAndEditActivity extends ActionBarActivity implements View.On
                         imageCount++;
                         String uuid = UUID.randomUUID().toString();
                         int randomNum = 500 + (int) ((Math.random() * 1204006080) / Math.random());
-                        File file = new File(getCacheDir(), "pattaya-complain" + randomNum + uuid);
+                        File file = new File(getCacheDir(), "pattaya-complain" + randomNum + uuid + ".jpg");
                         try {
                             file.createNewFile();
                         } catch (IOException error) {

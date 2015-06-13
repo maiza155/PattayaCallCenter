@@ -62,7 +62,7 @@
                         android:layout_marginBottom="10dp"
                         android:layout_marginLeft="20dp"
                         android:layout_marginTop="5dp"
-                        android:text="บ้านเลขที่ 1-5 ถ.พัทยาเหนือ ต.นาเกลือ อ.บางละมุง จ.ชลบุรี" />
+                        android:text="บ้านเลขที่ " />
                 </TableRow>
 
                 <TableRow>
@@ -169,10 +169,10 @@
 
                         <TextView
                             android:id="@+id/txt_empty"
-                            android:layout_gravity="center"
-                            android:gravity="center"
                             android:layout_width="match_parent"
                             android:layout_height="match_parent"
+                            android:layout_gravity="center"
+                            android:gravity="center"
                             android:text="ไม่มีข้อมูล" />
 
                     </FrameLayout>

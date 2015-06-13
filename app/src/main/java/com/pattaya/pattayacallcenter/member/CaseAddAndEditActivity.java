@@ -985,7 +985,11 @@ public class CaseAddAndEditActivity extends ActionBarActivity implements View.On
 
 
                                                 Toast.makeText(getApplication(), "success", Toast.LENGTH_SHORT).show();
-                                                ringProgressDialog.dismiss();
+
+                                                if (ringProgressDialog != null && ringProgressDialog.isShowing()) {
+                                                    ringProgressDialog.dismiss();
+                                                }
+
                                                 BusProvider.getInstance().post("update_case_list");
                                                 Intent i = new Intent();
                                                 i.putExtra("detail", openCaseAssignObject.getCasesName());
@@ -998,12 +1002,9 @@ public class CaseAddAndEditActivity extends ActionBarActivity implements View.On
                                             @Override
                                             public void failure(RetrofitError error) {
                                                 System.out.println("error = [" + error + "]");
-                                                runOnUiThread(new Runnable() {
-                                                    @Override
-                                                    public void run() {
-                                                        ringProgressDialog.dismiss();
-                                                    }
-                                                });
+                                                if (ringProgressDialog != null && ringProgressDialog.isShowing()) {
+                                                    ringProgressDialog.dismiss();
+                                                }
 
                                                 Toast.makeText(getApplication(), "Openfire Unable connect server. Please try again", Toast.LENGTH_SHORT).show();
                                             }
@@ -1249,7 +1250,7 @@ public class CaseAddAndEditActivity extends ActionBarActivity implements View.On
                         System.out.println("uuid = " + uuid);
                         imageCount++;
                         int randomNum = 500 + (int) ((Math.random() * 1204006080) / Math.random());
-                        File file = new File(getCacheDir(), "pattaya-case" + randomNum + uuid);
+                        File file = new File(getCacheDir(), "pattaya-case" + randomNum + uuid + ".jpg");
                         try {
                             file.createNewFile();
                         } catch (IOException error) {

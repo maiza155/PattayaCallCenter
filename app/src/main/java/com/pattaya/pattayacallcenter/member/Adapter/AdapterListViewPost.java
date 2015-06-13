@@ -266,7 +266,7 @@ public class AdapterListViewPost extends BaseAdapter {
         holder.image1.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View v) {
-                showDialog(v.getContext(), listData.get(position).getPostImageList().get(0));
+                //showDialog(v.getContext(), listData.get(position).getPostImageList().get(0));
                 return false;
             }
         });
@@ -274,18 +274,18 @@ public class AdapterListViewPost extends BaseAdapter {
         holder.image2.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View v) {
-                showDialog(v.getContext(), listData.get(position).getPostImageList().get(0));
+                //showDialog(v.getContext(), listData.get(position).getPostImageList().get(0));
                 return false;
             }
         });
-        Log.e("TAG-Post", "UserId " + userId + "     Create BY = " + listData.get(position).getPostById());
+        Log.e("TAG_Post", "UserId " + userId + "     Create BY = " + listData.get(position).getPostById());
         if (userId != listData.get(position).getPostById()) {
 
             holder.btnEdit.setVisibility(View.GONE);
         } else {
-
+            holder.btnEdit.setVisibility(View.VISIBLE);
         }
-        holder.btnEdit.setVisibility(View.VISIBLE);
+
         holder.btnEdit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(final View v) {

@@ -370,7 +370,7 @@ public class PostActivity extends ActionBarActivity implements View.OnClickListe
                         System.out.println("uuid = " + uuid);
                         System.out.println(e);
                         int randomNum = 500 + (int) ((Math.random() * 1204006080) / Math.random());
-                        File file = new File(getCacheDir(), "pattaya-post" + randomNum + uuid);
+                        File file = new File(getCacheDir(), "pattaya-post" + randomNum + uuid + ".jpg");
                         try {
                             file.createNewFile();
                         } catch (IOException error) {
@@ -382,7 +382,7 @@ public class PostActivity extends ActionBarActivity implements View.OnClickListe
                                     .load(e.getPath())
                                     .asBitmap()
                                     .fitCenter()
-                                    .into(500, 500) // Width and height
+                                    .into(700, 700) // Width and height
                                     .get();
                         } catch (InterruptedException error) {
                             error.printStackTrace();

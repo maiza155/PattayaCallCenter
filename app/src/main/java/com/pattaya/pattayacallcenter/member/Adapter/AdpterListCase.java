@@ -89,6 +89,18 @@ public class AdpterListCase extends BaseAdapter {
 
     }
 
+
+    public void removeData(int complainId) {
+        int index = map.get(complainId);
+        System.out.println("CaseBusObject int " + index);
+        data.remove(index);
+        for (CaseListMemberData e : this.data) {
+            map.put(e.getComplaintId(), data.indexOf(e));
+        }
+        notifyDataSetChanged();
+
+    }
+
     @Override
     public int getCount() {
         return data.size();

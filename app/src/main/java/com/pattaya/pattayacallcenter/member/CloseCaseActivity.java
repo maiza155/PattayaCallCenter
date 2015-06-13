@@ -30,6 +30,7 @@ import com.google.gson.Gson;
 import com.pattaya.pattayacallcenter.Application;
 import com.pattaya.pattayacallcenter.BusProvider;
 import com.pattaya.pattayacallcenter.CountingTypedFile;
+import com.pattaya.pattayacallcenter.Data.CaseBusObject;
 import com.pattaya.pattayacallcenter.Data.MasterData;
 import com.pattaya.pattayacallcenter.ProgressListener;
 import com.pattaya.pattayacallcenter.R;
@@ -259,14 +260,14 @@ public class CloseCaseActivity extends ActionBarActivity implements View.OnClick
 
 
                                     }
-                                    runOnUiThread(new Runnable() {
-                                        public void run() {
-                                            ringProgressDialog.dismiss();
-                                        }
-                                    });
+                                    if (ringProgressDialog != null && ringProgressDialog.isShowing()) {
+                                        ringProgressDialog.dismiss();
+                                    }
+                                    CaseBusObject caseBusObject = new CaseBusObject();
+                                    caseBusObject.setCompLainId(complainId);
+                                    caseBusObject.setState(MasterData.CASE_CLOSE);
 
-
-                                    BusProvider.getInstance().post("update_case_list");
+                                    BusProvider.getInstance().post(caseBusObject);
                                     Intent i = new Intent();
                                     setResult(Activity.RESULT_OK, i);
                                     finish();
@@ -278,13 +279,17 @@ public class CloseCaseActivity extends ActionBarActivity implements View.OnClick
 
                         @Override
                         public void failure(RetrofitError error) {
-                            ringProgressDialog.dismiss();
+                            if (ringProgressDialog != null && ringProgressDialog.isShowing()) {
+                                ringProgressDialog.dismiss();
+                            }
                             Toast.makeText(getApplication(), "Unable connect server \n Please try again", Toast.LENGTH_SHORT).show();
                         }
                     });
 
                 } else {
-                    ringProgressDialog.dismiss();
+                    if (ringProgressDialog != null && ringProgressDialog.isShowing()) {
+                        ringProgressDialog.dismiss();
+                    }
                     Toast.makeText(getApplication(), "Please try again", Toast.LENGTH_SHORT).show();
                 }
 
@@ -294,7 +299,9 @@ public class CloseCaseActivity extends ActionBarActivity implements View.OnClick
             @Override
             public void failure(RetrofitError error) {
                 System.out.println("error = [" + error + "]");
-                ringProgressDialog.dismiss();
+                if (ringProgressDialog != null && ringProgressDialog.isShowing()) {
+                    ringProgressDialog.dismiss();
+                }
                 Toast.makeText(getApplication(), "Cannot upload file please try again", Toast.LENGTH_SHORT).show();
             }
         });

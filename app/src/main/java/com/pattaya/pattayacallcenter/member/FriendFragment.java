@@ -48,6 +48,7 @@ public class FriendFragment extends Fragment implements SwipeRefreshLayout.OnRef
     ArrayList<Users> childListGroup = new ArrayList<>(); //list ในการเก็บข้อมูลของ DataShow
     ArrayList<Users> childListFriend = new ArrayList<>(); //list ในการเก็บข้อมูลของ DataShow
     ArrayList<Users> childListFavorite = new ArrayList<>(); //list ในการเก็บข้อมูลของ DataShow
+    queryTask queryTask = null;
     private ImageButton btn;
     private TextView titleTextView;
     private Intent intent;
@@ -56,16 +57,12 @@ public class FriendFragment extends Fragment implements SwipeRefreshLayout.OnRef
     private List<String> groupList;
     private Map<String, List<Users>> laptopCollection;
     private EditText search;
-
     private String jid;
     private BadgeView badge;
-
-
     private SwipeRefreshLayout mSwipeRefreshLayout;
     private Boolean isFirst;
     private Boolean isStart = true;
     private int initBudge = 0;
-
 
     public FriendFragment() {
         // Required empty public constructor
@@ -125,10 +122,25 @@ public class FriendFragment extends Fragment implements SwipeRefreshLayout.OnRef
         Activity activity = getActivity();
         if (activity != null) {
             if (event.matches("friendfragment")) {
-                new queryTask().execute();
+                if (queryTask == null) {
+                    queryTask = new queryTask();
+                    queryTask.execute();
+                } else {
+                    if (queryTask.getStatus() == AsyncTask.Status.FINISHED) {
+                        queryTask.execute();
+                    }
+                }
             } else if (event.matches("add_roster_complete")) {
                 // new TaskGetFriend(getActivity()).execute();
-                new queryTask().execute();
+                if (queryTask == null) {
+                    queryTask = new queryTask();
+                    queryTask.execute();
+                } else {
+                    if (queryTask.getStatus() == AsyncTask.Status.FINISHED) {
+                        queryTask = new queryTask();
+                        queryTask.execute();
+                    }
+                }
             } else if (event.matches("invited_update")) {
                 if (badge != null) {
                     int oldBadge = (badge.getText().toString().isEmpty()) ? 0 : Integer.parseInt(badge.getText().toString());
@@ -168,8 +180,16 @@ public class FriendFragment extends Fragment implements SwipeRefreshLayout.OnRef
                         badge.show();
                     }
                 }
+                if (queryTask == null) {
+                    queryTask = new queryTask();
+                    queryTask.execute();
+                } else {
+                    if (queryTask.getStatus() == AsyncTask.Status.FINISHED) {
+                        queryTask = new queryTask();
+                        queryTask.execute();
+                    }
+                }
 
-                new queryTask().execute();
             } else {
                 Toast.makeText(Application.getContext(),
                         getResources().getString(R.string.cant_connect_server), Toast.LENGTH_SHORT)
@@ -249,7 +269,15 @@ public class FriendFragment extends Fragment implements SwipeRefreshLayout.OnRef
         expandableListView.setAdapter(expandableListAdapterFriend);
 
         if (isStart) {
-            new queryTask().execute();
+            if (queryTask == null) {
+                queryTask = new queryTask();
+                queryTask.execute();
+            } else {
+                if (queryTask.getStatus() == AsyncTask.Status.FINISHED) {
+                    queryTask = new queryTask();
+                    queryTask.execute();
+                }
+            }
         }
 
         return view;
@@ -301,7 +329,11 @@ public class FriendFragment extends Fragment implements SwipeRefreshLayout.OnRef
 
     class queryTask extends AsyncTask<Void, Void, Boolean> {
         ArrayList<Users> arrUsers;
+        Boolean checkState = false;
 
+        public Boolean isCheckState() {
+            return checkState;
+        }
 
         @Override
         protected void onPreExecute() {
@@ -349,7 +381,7 @@ public class FriendFragment extends Fragment implements SwipeRefreshLayout.OnRef
         @Override
         protected void onPostExecute(Boolean success) {
             super.onPostExecute(success);
-
+            checkState = true;
             Activity activity = getActivity();
             if (activity != null) {
                 expandableListAdapterFriend.resetAdapter(groupList.get(0), childListFavorite);
@@ -375,9 +407,14 @@ public class FriendFragment extends Fragment implements SwipeRefreshLayout.OnRef
         ArrayList<Users> arrGroup;
         ArrayList<Users> arrFavor;
         String search;
+        Boolean checkState = false;
 
         querySreachTask(String search) {
             this.search = search;
+        }
+
+        public Boolean isCheckState() {
+            return checkState;
         }
 
         @Override
@@ -422,6 +459,7 @@ public class FriendFragment extends Fragment implements SwipeRefreshLayout.OnRef
         protected void onPostExecute(Boolean success) {
             super.onPostExecute(success);
             Activity activity = getActivity();
+            checkState = success;
             if (activity != null) {
                 expandableListAdapterFriend.resetAdapter(groupList.get(0), arrFavor);
                 expandableListAdapterFriend.resetAdapter(groupList.get(1), arrGroup);

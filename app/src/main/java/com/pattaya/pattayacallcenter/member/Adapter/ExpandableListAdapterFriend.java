@@ -56,6 +56,7 @@ public class ExpandableListAdapterFriend extends BaseExpandableListAdapter {
 
 
     public void resetAdapter(String key, List<Users> data) {
+        this.laptopCollections.remove(key);
         this.laptopCollections.put(key, data);
         notifyDataSetChanged();
 

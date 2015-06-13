@@ -34,6 +34,7 @@ import android.widget.TextView;
 import com.bumptech.glide.Glide;
 import com.google.gson.Gson;
 import com.pattaya.pattayacallcenter.BusProvider;
+import com.pattaya.pattayacallcenter.Data.CaseBusObject;
 import com.pattaya.pattayacallcenter.Data.MasterData;
 import com.pattaya.pattayacallcenter.R;
 import com.pattaya.pattayacallcenter.chat.DatabaseChatHelper;
@@ -214,6 +215,16 @@ public class CaseFragment extends Fragment implements View.OnClickListener
                 }
             }
         }
+    }
+
+    @Subscribe
+    public void updateListData(CaseBusObject object) {
+        System.out.println("CaseBusObject " + object.getCompLainId());
+        if (object.getState() == MasterData.CASE_CLOSE) {
+            adpterListCase.removeData(object.getCompLainId());
+        }
+
+
     }
 
     void setActionBar(ActionBarActivity actionBar) {
